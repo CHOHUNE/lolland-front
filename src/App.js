@@ -5,6 +5,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { HomeLayout } from "./layout/HomeLayout";
+import { MemberSignup } from "./page/member/MemberSignup";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -24,14 +25,12 @@ const routes = createBrowserRouter(
       {/* 결제 */}
 
       {/* 회원관련 */}
+      <Route path="signup" element={<MemberSignup />} />
 
       {/* 게시판관련 */}
-        <Route path="gameBoard" element={<GameBoard/>}/>
-        <Route path="gameBoard/:id" element={<GameBoardView/>}/>
-        <Route path="gameBoard/write" element={<GameBoardWrite/>}/>
-
-
-
+      {/*  <Route path="gameBoard" element={<GameBoard/>}/>*/}
+      {/*  <Route path="gameBoard/:id" element={<GameBoardView/>}/>*/}
+      {/*  <Route path="gameBoard/write" element={<GameBoardWrite/>}/>*/}
     </Route>,
   ),
 );
