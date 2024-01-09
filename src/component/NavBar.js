@@ -1,6 +1,8 @@
 import {Box, Button, Flex, Text} from "@chakra-ui/react";
+import {useNavigate} from "react-router-dom";
 
 export function NavBar() {
+    const navigate = useNavigate();
   return (
     <Box>
       {/* 상단 네브바 */}
@@ -27,7 +29,7 @@ export function NavBar() {
       <Box w={"100%"} h={"80px"} bg={"#5F625C"}>
         <Flex w={"100%"} h={"100%"} >
           <Box  w={"40%"} alignItems={"center"} justifyContent={"start"} display={"flex"} gap={5}>
-          <Button borderRadius={0} h={"70%"}>게임 커뮤니티</Button>
+          <Button borderRadius={0} h={"70%"} onClick={ ()=>navigate("/gameboard")}>게임 커뮤니티</Button>
           <Button borderRadius={0} h={"70%"}>게임 장비 커뮤니티</Button>
           <Button borderRadius={0} h={"70%"}>전자기기</Button>
           <Button borderRadius={0} h={"70%"}>조립pc</Button>
