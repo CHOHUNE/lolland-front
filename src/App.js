@@ -26,6 +26,12 @@ const routes = createBrowserRouter(
       {/* 회원관련 */}
 
       {/* 게시판관련 */}
+        <Route path="gameBoard" element={<GameBoard/>}/>
+        <Route path="gameBoard/:id" element={<GameBoardView/>}/>
+        <Route path="gameBoard/write" element={<GameBoardWrite/>}/>
+
+
+
     </Route>,
   ),
 );
