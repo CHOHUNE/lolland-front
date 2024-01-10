@@ -35,26 +35,7 @@ function CommentForm({ isSubmitting, onSubmit }) {
   );
 }
 
-function CommentList({ commentList }) {
-  const toast = useToast();
-
-  function handleDelete(id) {
-    axios
-      .delete("/api/comment/" + id)
-      .then(() => {
-        toast({
-          description: "삭제 성공",
-          status: "success",
-        });
-      })
-      .catch(() => {
-        toast({
-          description: "실패",
-          status: "error",
-        });
-      });
-  }
-
+function CommentList({ commentList, onDelete, isSubmitting }) {
   return (
     <Card>
       <CardHeader>
@@ -74,7 +55,8 @@ function CommentList({ commentList }) {
                   {comment.comment_content}
                 </Text>
                 <Button
-                  onClick={() => handleDelete(comment.id)}
+                  isDisabled={isSubmitting}
+                  onClick={() => onDelete(comment.id)}
                   size="xs"
                   colorScheme="red"
                 >
@@ -93,6 +75,7 @@ export function GameBoardCommentContainer({ gameboardId }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [commentList, setCommentList] = useState([]);
 
@@ -100,7 +83,7 @@ export function GameBoardCommentContainer({ gameboardId }) {
     axios
       .get("/api/comment/list/" + id)
       .then((response) => setCommentList(response.data));
-  }, [id]);
+  }, [id, isSubmitting]);
 
   function handleSubmit(comment) {
     setIsSubmitting(true);
@@ -112,8 +95,27 @@ export function GameBoardCommentContainer({ gameboardId }) {
       })
       .finally(() => {
         setIsSubmitting(false);
-        navigate(0);
       });
+  }
+
+  function handleDelete(id) {
+    setIsSubmitting(true);
+
+    axios
+      .delete("/api/comment/" + id)
+      .then(() => {
+        toast({
+          description: "삭제 성공",
+          status: "success",
+        });
+      })
+      .catch(() => {
+        toast({
+          description: "실패",
+          status: "error",
+        });
+      })
+      .finally(() => setIsSubmitting(false));
   }
 
   return (
@@ -123,7 +125,12 @@ export function GameBoardCommentContainer({ gameboardId }) {
         isSubmitting={isSubmitting}
         onSubmit={handleSubmit}
       />
-      <CommentList gameBoardId={id} commentList={commentList} />
+      <CommentList
+        gameBoardId={id}
+        commentList={commentList}
+        isSubmitting={isSubmitting}
+        onDelete={handleDelete}
+      />
     </Box>
   );
 }
