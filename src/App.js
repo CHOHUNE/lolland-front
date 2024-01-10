@@ -5,7 +5,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { HomeLayout } from "./layout/HomeLayout";
-import { ProductWrite } from "./ProductWrite";
+import { ReviewView } from "./page/review/ReviewView";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -13,9 +13,9 @@ const routes = createBrowserRouter(
       {/* 메인페이지 */}
 
       {/* 상품관련 */}
-      <Route path="/product/write" element={<ProductWrite />} />
 
       {/* 리뷰 */}
+      <Route path="/review" element={<ReviewView />} />
 
       {/* 장바구니 */}
 

@@ -56,7 +56,8 @@ export function NavBar() {
           </Box>
         </Flex>
       </Box>
-      <Button onClick={() => navigate("/product/write")}></Button>
+      {/*TODO: 임시*/}
+      <Button onClick={() => navigate("/review")}>리뷰보기</Button>
       {/* 하단 네브바 */}
       <Box w={"100%"} h={"80px"} bg={"#5F625C"}>
         <Flex w={"100%"} h={"100%"}>
