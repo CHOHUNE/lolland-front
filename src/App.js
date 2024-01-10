@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import { HomeLayout } from "./layout/HomeLayout";
 import { MemberSignup } from "./page/member/MemberSignup";
+import { MemberLogin } from "./page/member/MemberLogin";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -26,6 +27,7 @@ const routes = createBrowserRouter(
 
       {/* 회원관련 */}
       <Route path="signup" element={<MemberSignup />} />
+      <Route path="login" element={<MemberLogin />} />
 
       {/* 게시판관련 */}
       {/*  <Route path="gameBoard" element={<GameBoard/>}/>*/}

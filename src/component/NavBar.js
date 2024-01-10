@@ -52,7 +52,7 @@ export function NavBar() {
             <Button>검색</Button>
             <Button>장바구니</Button>
             <Button onClick={() => navigate("/signup")}>회원가입</Button>
-            <Button>로그인</Button>
+            <Button onClick={() => navigate("/login")}>로그인</Button>
           </Box>
         </Flex>
       </Box>
