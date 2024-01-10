@@ -11,6 +11,7 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
+import GameBoardCommentContainer from "./GameBoardCommentContainer";
 
 export function GameBoardView(props) {
   const [board, setBoard] = useState(null);
@@ -28,7 +29,7 @@ export function GameBoardView(props) {
       .catch((error) => {
         console.error("데이터를 가져오는 중 에러 발생:", error);
       });
-  }, []);
+  }, [id]);
 
   function handleDelete() {
     axios
@@ -85,6 +86,7 @@ export function GameBoardView(props) {
             <Button onClick={handleDelete} colorScheme={"red"}>
               삭제
             </Button>
+            <GameBoardCommentContainer gameboardId={id} />
           </HStack>
         </VStack>
       </Center>
