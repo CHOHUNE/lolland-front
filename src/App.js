@@ -19,6 +19,7 @@ const routes = createBrowserRouter(
       <Route path="/review" element={<ReviewView />} />
 
       {/* 장바구니 */}
+      {/* 이걸로 로그인 완성되면 수정 <Route path="/cart/:member_id" element={<Cart />} />*/}
       <Route path="/cart" element={<Cart />} />
 
       {/* 찜하기 */}

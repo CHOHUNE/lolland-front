@@ -14,7 +14,9 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 export function Cart() {
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -72,21 +74,32 @@ export function Cart() {
       count: 12,
     },
   ]);
+  const { member_id } = useParams();
 
-  function handleCheckBoxChange(product) {
-    setSelectedProducts((prevSelectedProducts) =>
-      prevSelectedProducts.includes(product.product_id)
-        ? prevSelectedProducts.filter((id) => id !== product.product_id)
-        : [...prevSelectedProducts, product.product_id],
-    );
+  useEffect(() => {
+    // fetchCart();
+  }, []);
+
+  function fetchCart() {
+    // axios.get("/api/cart/fetch", { member_id });
   }
 
+  // 전체 선택
   function handleSelectAllProducts(checked) {
     if (checked) {
       setSelectedProducts(productList.map((product) => product.product_id));
     } else {
       setSelectedProducts([]);
     }
+  }
+
+  // 개별 선택
+  function handleCheckBoxChange(product) {
+    setSelectedProducts((prevSelectedProducts) =>
+      prevSelectedProducts.includes(product.product_id)
+        ? prevSelectedProducts.filter((id) => id !== product.product_id)
+        : [...prevSelectedProducts, product.product_id],
+    );
   }
 
   return (
@@ -118,14 +131,19 @@ export function Cart() {
               <Th textAlign="center">상품명</Th>
               <Th textAlign="center">정보</Th>
               <Th textAlign="center">가격</Th>
-              <Th textAlign="center">수량</Th>
             </Tr>
           </Thead>
           <Tbody>
             {productList.map((product) => {
               return (
-                <Tr key={product.product_id}>
-                  <Td textAlign="center">
+                <Tr
+                  key={product.product_id}
+                  // onClick={() => navigate(`product/${product.product_id}`)}
+                >
+                  <Td
+                    textAlign="center"
+                    // onClick={(e) => e.stopPropagation()}
+                  >
                     <Checkbox
                       colorScheme="blue"
                       isChecked={selectedProducts.includes(product.product_id)}
@@ -145,7 +163,6 @@ export function Cart() {
                   <Td textAlign="center">
                     {product.product_price.toLocaleString()}
                   </Td>
-                  <Td textAlign="center">{product.count}</Td>
                 </Tr>
               );
             })}
