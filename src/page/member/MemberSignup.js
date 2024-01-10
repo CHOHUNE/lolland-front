@@ -11,22 +11,46 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  useToast,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { isDisabled } from "@testing-library/user-event/dist/utils";
 
 export function MemberSignup() {
   const [member_name, setMember_name] = useState("");
   const [member_login_id, setMember_login_id] = useState("");
   const [member_password, setMember_password] = useState("");
+
+  // 맴버 비밀번호 확인 ------------------------------------------------------------------------------
   const [member_password_checked, setMember_password_checked] = useState("");
+
+  // 맴버 핸드폰 번호 --------------------------------------------------------------------------------
   const [member_phone_number, setMember_phone_number] = useState("");
   const [member_phone_number1, setMember_phone_number1] = useState("");
   const [member_phone_number2, setMember_phone_number2] = useState("");
   const [member_phone_number3, setMember_phone_number3] = useState("");
+  // 맴버 핸드폰 Ref --------------------------------------------------------------------------------
+  const phoneInput2Ref = useRef();
+  const phoneInput3Ref = useRef();
+
+  // 맴버 이메일 ------------------------------------------------------------------------------------
   const [member_email, setMember_email] = useState("");
   const [member_email1, setMember_email1] = useState("");
   const [member_email2, setMember_email2] = useState("");
+
+  // 맴버 가입시 타입을 유저로 --------------------------------------------------------------------------
+  const [member_type, setMember_type] = useState("user");
+
+  // 이메일 인증번호 상태 체크 -------------------------------------------------------------------------
   const [sendNumber, setSendNumber] = useState(false);
+
+  // 네비게이트 -------------------------------------------------------------------------------------
+  const navigate = useNavigate();
+
+  // 토스트 ---------------------------------------------------------------------------------------
+  const toast = useToast();
 
   useEffect(() => {
     setMember_email(member_email1 + "@" + member_email2);
@@ -51,6 +75,57 @@ export function MemberSignup() {
     console.log(member_phone_number);
   }
 
+  function handleSingUpClick() {
+    setMember_type("user");
+    axios
+      .post("/api/member/signUp", {
+        member_name,
+        member_login_id,
+        member_password,
+        member_phone_number,
+        member_email,
+        member_type,
+      })
+      .then(() => {
+        toast({
+          description: "회원가입 성공하였습니다.",
+          status: "success",
+        });
+        navigate("/");
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 400) {
+          let errorMessage = error.response.data[0];
+          toast({
+            description: errorMessage,
+            status: "error",
+          });
+        } else {
+          // 기타 오류에 대한 처리
+          toast({
+            description: "가입에 실패하셨습니다.",
+            status: "error",
+          });
+        }
+      })
+      .finally();
+  }
+
+  // 핸드폰 인풋 1 ---------------------------------------------------------------------------------------
+  const handlePhoneInput1Change = (e) => {
+    setMember_phone_number1(e.target.value);
+    if (e.target.value.length === 3) {
+      phoneInput2Ref.current.focus();
+    }
+  };
+
+  // 핸드폰 인풋 2 ---------------------------------------------------------------------------------------
+  const handlePhoneInput2Change = (e) => {
+    setMember_phone_number2(e.target.value);
+    if (e.target.value.length === 4) {
+      phoneInput3Ref.current.focus();
+    }
+  };
   return (
     <Center mt={8} mb={8}>
       <Card w={"1000px"}>
@@ -133,11 +208,13 @@ export function MemberSignup() {
                 휴대폰번호
               </FormLabel>
               <Input
+                id="member_phone_number1"
                 value={member_phone_number1}
+                maxLength={3}
                 w={"140px"}
                 h={"50px"}
                 borderRadius={"0"}
-                onChange={(e) => setMember_phone_number1(e.target.value)}
+                onChange={handlePhoneInput1Change}
               />
               <Box
                 fontSize={"1.1rem"}
@@ -148,11 +225,14 @@ export function MemberSignup() {
                 -
               </Box>
               <Input
+                id="member_phone_number2"
+                ref={phoneInput2Ref}
                 value={member_phone_number2}
+                maxLength={4}
                 w={"140px"}
                 h={"50px"}
                 borderRadius={"0"}
-                onChange={(e) => setMember_phone_number2(e.target.value)}
+                onChange={handlePhoneInput2Change}
               />
               <Box
                 fontSize={"1.1rem"}
@@ -163,7 +243,10 @@ export function MemberSignup() {
                 -
               </Box>
               <Input
+                id="member_phone_number3"
+                ref={phoneInput3Ref}
                 value={member_phone_number3}
+                maxLength={4}
                 w={"140px"}
                 h={"50px"}
                 borderRadius={"0"}
@@ -178,8 +261,9 @@ export function MemberSignup() {
                 이메일
               </FormLabel>
               <Input
+                id="member_email1"
                 value={member_email1}
-                w={"170px"}
+                w={"175px"}
                 h={"50px"}
                 borderRadius={"0"}
                 onChange={(e) => setMember_email1(e.target.value)}
@@ -193,8 +277,9 @@ export function MemberSignup() {
                 @
               </Box>
               <Input
+                id="member_email2"
                 value={member_email2}
-                w={"170px"}
+                w={"175px"}
                 h={"50px"}
                 borderRadius={"0"}
                 onChange={(e) => setMember_email2(e.target.value)}
@@ -262,7 +347,7 @@ export function MemberSignup() {
         <Flex justifyContent={"center"}>
           <CardFooter>
             <FormControl>
-              <Button w={"250px"} h={"50px"}>
+              <Button w={"250px"} h={"50px"} onClick={() => navigate(-1)}>
                 취소하기
               </Button>
             </FormControl>
@@ -272,6 +357,7 @@ export function MemberSignup() {
                 h={"50px"}
                 style={{ backgroundColor: "#5F625C" }}
                 color={"whitesmoke"}
+                onClick={handleSingUpClick}
               >
                 가입하기
               </Button>
