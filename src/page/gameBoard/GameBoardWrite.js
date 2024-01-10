@@ -17,13 +17,13 @@ export function GameBoardWrite(props) {
   const [title, setTitle] = useState("");
   const [board_content, setBoard_content] = useState("");
   const [category, setCategory] = useState("");
-  // const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   let toast = useToast();
   let navigate = useNavigate();
 
   function handleSubmit() {
-    // setIsSubmitting(true);
+    setIsSubmitting(true);
     axios
       .post("/api/gameboard/write", {
         title,
@@ -35,15 +35,15 @@ export function GameBoardWrite(props) {
           description: "글 작성 완료",
           status: "success",
         });
-        // navigate("/gameboardlist")
+        navigate("/gameboard");
       })
       .catch(() => {
         toast({
           description: "작성 실패",
           status: "error",
         });
-      });
-    // .finally(() => setIsSubmitting(true));
+      })
+      .finally(() => setIsSubmitting(true));
   }
 
   return (
@@ -76,7 +76,7 @@ export function GameBoardWrite(props) {
           <Button
             onClick={handleSubmit}
             colorScheme="blue"
-            // isDisabled={isSubmitting}
+            isDisabled={isSubmitting}
           >
             저장
           </Button>

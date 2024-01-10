@@ -42,7 +42,11 @@ function GameBoardList() {
             <Tbody>
               {gameBoardList &&
                 gameBoardList.map((board) => (
-                  <Tr key={board.id}>
+                  <Tr
+                    key={board.id}
+                    _hover={{ cursor: "pointer" }}
+                    onClick={() => navigate("/gameboard/id/" + board.id)}
+                  >
                     <Td>{board.id}</Td>
                     <Td>{board.title}</Td>
                     <Td>{board.category}</Td>

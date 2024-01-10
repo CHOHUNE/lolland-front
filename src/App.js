@@ -10,7 +10,6 @@ import GameBoardList from "./page/gameBoard/GameBoardList";
 import GameBoardEdit from "./page/gameBoard/GameBoardEdit";
 import GameBoardView from "./page/gameBoard/GameBoardView";
 
-
 const routes = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<HomeLayout />}>
@@ -31,13 +30,10 @@ const routes = createBrowserRouter(
       {/* 회원관련 */}
 
       {/* 게시판관련 */}
-        <Route path="gameboard" element={<GameBoardList/>}/>
-        <Route path="gameboard/:id" element={<GameBoardView/>}/>
-        <Route path="gameboard/write" element={<GameBoardWrite/>}/>
-        <Route path="gameboard/edit:id" element={<GameBoardEdit/>}/>
-
-
-
+      <Route path="gameboard" element={<GameBoardList />} />
+      <Route path="gameboard/id/:id" element={<GameBoardView />} />
+      <Route path="gameboard/write" element={<GameBoardWrite />} />
+      <Route path="gameboard/edit/:id" element={<GameBoardEdit />} />
     </Route>,
   ),
 );
