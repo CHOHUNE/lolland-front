@@ -14,6 +14,9 @@ export function ProductWrite() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [seletedSubCategory, setSeletedSubCategory] = useState(null);
+  const [selectedCategoryName, setSelectedCategoryName] = useState("");
+  const [selectedSubCategoryName, setSelectedSubCategoryName] = useState("");
+
   const toast = useToast();
 
   const [name, setName] = useState(""); // 제목
@@ -60,12 +63,18 @@ export function ProductWrite() {
       (category) => category.category_id === parseInt(selectedCategoryId),
     );
     setSelectedCategory(selectedCategory);
+    setSelectedCategoryName(selectedCategory?.category_name); // 이름 저장
   };
 
   // ---------------------------------- 소분류 관련 로직 ----------------------------------
   const handleSubCategoryChange = (e) => {
     const selectedSubCategoryId = e.target.value;
-    setSeletedSubCategory(selectedSubCategoryId);
+    const selectedSubCategory = selectedCategory.subCategory.find(
+      (subCategory) =>
+        subCategory.subcategory_id === parseInt(selectedSubCategoryId),
+    );
+    setSeletedSubCategory(selectedSubCategoryId); // ID 저장
+    setSelectedSubCategoryName(selectedSubCategory?.subcategory_name); // 이름 저장
   };
 
   // ---------------------------------- 저장 버튼 클릭 로직 ----------------------------------
@@ -78,8 +87,8 @@ export function ProductWrite() {
         company_name: manufacturer,
         total_stock: stock,
         mainImg,
-        category_id: selectedCategory?.category_id,
-        subcategory_id: seletedSubCategory,
+        category_name: selectedCategoryName,
+        subcategory_name: selectedSubCategoryName,
       })
 
       .then((response) => {

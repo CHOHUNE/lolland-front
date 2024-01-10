@@ -43,6 +43,9 @@ export function ProductView() {
 
   return (
     <Box w="100%" p={5}>
+      <Flex>
+        {product.category_name} > {product.subcategory_name}
+      </Flex>
       <Flex
         direction="row"
         justify="center"
@@ -78,7 +81,7 @@ export function ProductView() {
               상품명
             </FormLabel>
             <Box mt={-2} border={"none"} flex={1}>
-              {product.product_name}
+              {product.product.product_name}
             </Box>
           </HStack>
           <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
@@ -86,7 +89,7 @@ export function ProductView() {
               금액
             </FormLabel>
             <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
-              {formatPrice(product.product_price)}원
+              {formatPrice(product.product.product_price)}원
             </Box>
           </HStack>
           <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
@@ -94,7 +97,7 @@ export function ProductView() {
               상품설명
             </FormLabel>
             <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
-              {product.product_content}
+              {product.product.product_content}
             </Box>
           </HStack>
           <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
@@ -102,7 +105,7 @@ export function ProductView() {
               재고
             </FormLabel>
             <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
-              {product.total_stock}개
+              {product.product.total_stock}개
             </Box>
           </HStack>
           <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
@@ -110,7 +113,7 @@ export function ProductView() {
               제조사
             </FormLabel>
             <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
-              {product.company.company_name}
+              {product.company_name}
             </Text>
           </HStack>
 
