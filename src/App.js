@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import { HomeLayout } from "./layout/HomeLayout";
 import { ReviewView } from "./page/review/ReviewView";
+import { Cart } from "./page/Cart/Cart";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -18,6 +19,7 @@ const routes = createBrowserRouter(
       <Route path="/review" element={<ReviewView />} />
 
       {/* 장바구니 */}
+      <Route path="/cart" element={<Cart />} />
 
       {/* 찜하기 */}
 

@@ -50,14 +50,12 @@ export function NavBar() {
             mr={5}
           >
             <Button>검색</Button>
-            <Button>장바구니</Button>
+            <Button onClick={() => navigate("/cart")}>장바구니</Button>
             <Button>회원가입</Button>
             <Button>로그인</Button>
           </Box>
         </Flex>
       </Box>
-      {/*TODO: 임시*/}
-      <Button onClick={() => navigate("/review")}>리뷰보기</Button>
       {/* 하단 네브바 */}
       <Box w={"100%"} h={"80px"} bg={"#5F625C"}>
         <Flex w={"100%"} h={"100%"}>
