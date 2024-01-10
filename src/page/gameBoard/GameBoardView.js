@@ -57,6 +57,18 @@ export function GameBoardView(props) {
     <Box>
       <Center>
         <VStack py={"100px"}>
+          <HStack>
+            <Button onClick={() => navigate(-1)}> 이전 </Button>
+            <Button
+              colorScheme={"purple"}
+              onClick={() => navigate("/gameboard/edit/" + id)}
+            >
+              수정
+            </Button>
+            <Button onClick={handleDelete} colorScheme={"red"}>
+              삭제
+            </Button>
+          </HStack>
           <Box
             border={"1px solid grey"}
             borderRadius={"10px"}
@@ -76,17 +88,7 @@ export function GameBoardView(props) {
             <p> reg_ time: {board.reg_time}</p>
           </Box>
           <HStack px={"10px"}>
-            <Button onClick={() => navigate(-1)}> 이전 </Button>
-            <Button
-              colorScheme={"purple"}
-              onClick={() => navigate("/gameboard/edit/" + id)}
-            >
-              수정
-            </Button>
-            <Button onClick={handleDelete} colorScheme={"red"}>
-              삭제
-            </Button>
-            <GameBoardCommentContainer gameboardId={id} />
+            <GameBoardCommentContainer />
           </HStack>
         </VStack>
       </Center>

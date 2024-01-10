@@ -11,59 +11,76 @@ import {
   StackDivider,
   Text,
   Textarea,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { DeleteIcon } from "@chakra-ui/icons";
 
-function CommentForm({ gameBoardId }) {
+function CommentForm({ isSubmitting, onSubmit }) {
   const [comment, setComment] = useState("");
   const { id } = useParams();
-  const navigate = useNavigate();
 
-  function hadleSubmit() {
-    axios
-      .post("/api/comment/add", {
-        game_board_id: id,
-        comment_content: comment,
-      })
-      .then(() => navigate(0));
+  function handleSubmit() {
+    onSubmit({ id, comment });
   }
 
   return (
     <Box>
       <Textarea value={comment} onChange={(e) => setComment(e.target.value)} />
-      <Button onClick={hadleSubmit}> 쓰기 </Button>
+      <Button isDisabled={isSubmitting} onClick={handleSubmit}>
+        쓰기
+      </Button>
     </Box>
   );
 }
 
-function CommentList({ gameBoardId }) {
-  const [commentList, setCommentList] = useState([]);
-  const { id } = useParams();
+function CommentList({ commentList }) {
+  const toast = useToast();
 
-  useEffect(() => {
-    // const params = new URLSearchParams();
-    // params.set("id", gameBoardId);
+  function handleDelete(id) {
     axios
-      .get("/api/comment/list/" + id)
-      .then((response) => setCommentList(response.data));
-  }, []);
+      .delete("/api/comment/" + id)
+      .then(() => {
+        toast({
+          description: "삭제 성공",
+          status: "success",
+        });
+      })
+      .catch(() => {
+        toast({
+          description: "실패",
+          status: "error",
+        });
+      });
+  }
+
   return (
     <Card>
       <CardHeader>
-        <Heading size={"md"}> 댓글 리스트</Heading>
+        <Heading size={"md"}>댓글 리스트</Heading>
       </CardHeader>
       <CardBody>
         <Stack divider={<StackDivider />} spacing={"4"}>
           {commentList.map((comment) => (
-            <Box>
+            <Box key={comment.id}>
               <Flex justifyContent={"space-between"}>
                 <Heading size={"xs"}>{comment.id}</Heading>
                 <Text fontSize={"xs"}>{comment.reg_time}</Text>
               </Flex>
-              <Text sx={{ whiteSpace: "pre-wrap" }} pt="2" fontSize={"sm"}>
-                {comment.comment_content}
-              </Text>
+
+              <Flex justifyContent="space-between" alignItems="center">
+                <Text sx={{ whiteSpace: "pre-wrap" }} pt="2" fontSize="sm">
+                  {comment.comment_content}
+                </Text>
+                <Button
+                  onClick={() => handleDelete(comment.id)}
+                  size="xs"
+                  colorScheme="red"
+                >
+                  <DeleteIcon />
+                </Button>
+              </Flex>
             </Box>
           ))}
         </Stack>
@@ -72,11 +89,41 @@ function CommentList({ gameBoardId }) {
   );
 }
 
-export function GameBoardCommentContainer({ gameBoardId }) {
+export function GameBoardCommentContainer({ gameboardId }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [commentList, setCommentList] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("/api/comment/list/" + id)
+      .then((response) => setCommentList(response.data));
+  }, [id]);
+
+  function handleSubmit(comment) {
+    setIsSubmitting(true);
+
+    axios
+      .post("/api/comment/add", {
+        game_board_id: comment.id,
+        comment_content: comment.comment,
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+        navigate(0);
+      });
+  }
+
   return (
     <Box>
-      <CommentForm gameBoardId={gameBoardId} />
-      <CommentList gameBoardId={gameBoardId} />
+      <CommentForm
+        gameBoardId={id}
+        isSubmitting={isSubmitting}
+        onSubmit={handleSubmit}
+      />
+      <CommentList gameBoardId={id} commentList={commentList} />
     </Box>
   );
 }

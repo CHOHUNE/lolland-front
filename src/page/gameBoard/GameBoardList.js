@@ -19,10 +19,17 @@ function GameBoardList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .get("/api/gameboard")
-      .then((response) => setGameBoardList(response.data));
-  }, []);
+    // 데이터가 이미 가져와진 상태이면 다시 요청하지 않음
+    if (!gameBoardList) {
+      axios
+        .get("/api/gameboard")
+        .then((response) => setGameBoardList(response.data))
+        .catch((error) =>
+          console.error("데이터를 가져오는 중 에러 발생:", error),
+        );
+    }
+  }, [gameBoardList]);
+
   return (
     <Box py={"100px"}>
       <Center>
