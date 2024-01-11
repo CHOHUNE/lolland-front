@@ -15,7 +15,12 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { DeleteIcon, EditIcon, NotAllowedIcon } from "@chakra-ui/icons";
+import {
+  AddIcon,
+  DeleteIcon,
+  EditIcon,
+  NotAllowedIcon,
+} from "@chakra-ui/icons";
 
 // 댓글 작성 폼
 function CommentForm({ isSubmitting, onSubmit }) {
@@ -35,15 +40,35 @@ function CommentForm({ isSubmitting, onSubmit }) {
     </Box>
   );
 }
+
 // ---------------코멘트 아이템 -------------------------- 개별 댓글 - 수정 및 삭제 기능
 function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
   // const hasAccess = useContext(LoginContext);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isWriting, setIsWriting] = useState(false);
   const [commentEdited, setCommentEdited] = useState(comment.comment_content);
+  const [replyComment, setReplyComment] = useState();
   const toast = useToast();
 
-  function handleSubmit() {
+  function handleDuplicateSubmit() {
+    console.log(comment.id);
+    console.log(comment.game_board_id);
+
+    setIsSubmitting(true);
+
+    axios
+      .post("/api/comment/add", {
+        parent_id: comment.id,
+        comment_content: commentEdited,
+        game_board_id: comment.game_board_id,
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  }
+
+  function handleEditSubmit() {
     setIsSubmitting(true);
     axios
       .put("/api/comment/edit", {
@@ -67,6 +92,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
       .finally(() => {
         setIsSubmitting(false);
         setIsEditing(false);
+        setIsWriting(false);
       });
   }
 
@@ -84,21 +110,61 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
           {isEditing && (
             <Box>
               <Textarea
+                value={replyComment}
+                onChange={(e) => setCommentEdited(e.target.value)}
+              />
+              <Button
+                colorScheme={"blue"}
+                isDisabled={isSubmitting}
+                onClick={handleEditSubmit}
+              >
+                수정 - 저장
+              </Button>
+            </Box>
+          )}
+
+          {isWriting && (
+            <Box>
+              <Textarea
                 value={commentEdited}
                 onChange={(e) => setCommentEdited(e.target.value)}
               />
               <Button
                 colorScheme={"blue"}
                 isDisabled={isSubmitting}
-                onClick={handleSubmit}
+                onClick={handleDuplicateSubmit}
               >
-                저장
+                댓글-댓글 저장
               </Button>
             </Box>
           )}
         </Box>
 
         {/*{hasAccess(comment.memberId) && (*/}
+
+        {isWriting || (
+          <Box>
+            <Button
+              size={"xs"}
+              colorScheme={"green"}
+              onClick={() => setIsWriting(true)}
+            >
+              <AddIcon />
+            </Button>
+          </Box>
+        )}
+        {isWriting && (
+          <Box>
+            <Button
+              size={"xs"}
+              colorScheme={"gray"}
+              onClick={() => setIsWriting(false)}
+            >
+              <NotAllowedIcon />
+            </Button>
+          </Box>
+        )}
+
         <Box>
           {isEditing || (
             <Button
@@ -131,6 +197,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
     </Box>
   );
 }
+
 //  코멘트 아이템 끝 -------------------------------
 
 // 여러개의 댓글 - CommentList
@@ -179,6 +246,7 @@ export function GameBoardCommentContainer() {
       .post("/api/comment/add", {
         game_board_id: comment.id,
         comment_content: comment.comment,
+        parent_id: comment.parent_id,
       })
       .finally(() => {
         setIsSubmitting(false);
