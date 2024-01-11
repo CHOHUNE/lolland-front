@@ -94,7 +94,11 @@ export function NavBar() {
             <Button borderRadius={0} h={"70%"}>
               게임 커뮤니티
             </Button>
-            <Button borderRadius={0} h={"70%"}>
+            <Button
+              borderRadius={0}
+              h={"70%"}
+              onClick={() => navigate("gearboard")}
+            >
               게임 장비 커뮤니티
             </Button>
             <Button borderRadius={0} h={"70%"}>
