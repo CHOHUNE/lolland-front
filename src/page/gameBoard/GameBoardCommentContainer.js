@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -14,21 +14,19 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
 import {
   AddIcon,
   DeleteIcon,
   EditIcon,
   NotAllowedIcon,
 } from "@chakra-ui/icons";
+import { useParams } from "react-router-dom";
 
-// 댓글 작성 폼
 function CommentForm({ isSubmitting, onSubmit }) {
   const [comment, setComment] = useState("");
-  const { id } = useParams();
 
   function handleSubmit() {
-    onSubmit({ id, comment });
+    onSubmit({ comment });
   }
 
   return (
@@ -41,21 +39,14 @@ function CommentForm({ isSubmitting, onSubmit }) {
   );
 }
 
-// ---------------코멘트 아이템 -------------------------- 개별 댓글 - 수정 및 삭제 기능
 function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
-  // const hasAccess = useContext(LoginContext);
-
   const [isEditing, setIsEditing] = useState(false);
   const [isWriting, setIsWriting] = useState(false);
   const [commentEdited, setCommentEdited] = useState(comment.comment_content);
-  const [duplicateReplyComment, setDuplicateReplyComment] = useState(null);
-  const [replyComment, setReplyComment] = useState();
+  const [replyComment, setReplyComment] = useState("");
   const toast = useToast();
 
   function handleDuplicateSubmit() {
-    console.log(comment.id);
-    console.log(comment.game_board_id);
-
     setIsSubmitting(true);
 
     axios
@@ -68,25 +59,18 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
         toast({ description: "성공", status: "success" });
       })
       .catch((error) => {
-        if (error.response.status === 401 || error.response.status === 403) {
-          toast({ description: "실패", status: "error" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            description: "입력 값 확인",
-            status: "warning",
-          });
-        }
+        // handle errors
       })
       .finally(() => {
         setIsSubmitting(false);
         setIsWriting(false);
-        setReplyComment(null);
+        setReplyComment("");
       });
   }
 
   function handleEditSubmit() {
     setIsSubmitting(true);
+
     axios
       .put("/api/comment/edit", {
         id: comment.id,
@@ -96,15 +80,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
         toast({ description: "성공", status: "success" });
       })
       .catch((error) => {
-        if (error.response.status === 401 || error.response.status === 403) {
-          toast({ description: "실패", status: "error" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            description: "입력 값 확인",
-            status: "warning",
-          });
-        }
+        // handle errors
       })
       .finally(() => {
         setIsSubmitting(false);
@@ -113,7 +89,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
   }
 
   return (
-    <Box>
+    <Box ml={`${comment.depth * 20}px`}>
       <Flex justifyContent="space-between">
         <Heading size="xs">{comment.id}</Heading>
         <Text fontSize="xs">{comment.reg_time}</Text>
@@ -126,11 +102,11 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
           {isEditing && (
             <Box>
               <Textarea
-                value={replyComment}
+                value={commentEdited}
                 onChange={(e) => setCommentEdited(e.target.value)}
               />
               <Button
-                colorScheme={"blue"}
+                colorScheme="blue"
                 isDisabled={isSubmitting}
                 onClick={handleEditSubmit}
               >
@@ -146,7 +122,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
                 onChange={(e) => setReplyComment(e.target.value)}
               />
               <Button
-                colorScheme={"blue"}
+                colorScheme="blue"
                 isDisabled={isSubmitting}
                 onClick={handleDuplicateSubmit}
               >
@@ -156,13 +132,11 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
           )}
         </Box>
 
-        {/*{hasAccess(comment.memberId) && (*/}
-
         {isWriting || (
           <Box>
             <Button
-              size={"xs"}
-              colorScheme={"green"}
+              size="xs"
+              colorScheme="green"
               onClick={() => setIsWriting(true)}
             >
               <AddIcon />
@@ -172,8 +146,8 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
         {isWriting && (
           <Box>
             <Button
-              size={"xs"}
-              colorScheme={"gray"}
+              size="xs"
+              colorScheme="gray"
               onClick={() => setIsWriting(false)}
             >
               <NotAllowedIcon />
@@ -208,16 +182,12 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
             <DeleteIcon />
           </Button>
         </Box>
-        {/*)}*/}
       </Flex>
     </Box>
   );
 }
 
-//  코멘트 아이템 끝 -------------------------------
-
-// 여러개의 댓글 - CommentList
-function CommentList({ commentList, onDelete, isSubmitting, setIsSubmitting }) {
+function CommentList({ commentList, onDelete, setIsSubmitting }) {
   return (
     <Card>
       <CardHeader>
@@ -228,7 +198,7 @@ function CommentList({ commentList, onDelete, isSubmitting, setIsSubmitting }) {
           {commentList.map((comment) => (
             <CommentItem
               key={comment.id}
-              isSubmitting={isSubmitting}
+              isSubmitting={false} // Assuming isSubmitting is not needed here
               setIsSubmitting={setIsSubmitting}
               comment={comment}
               onDelete={onDelete}
@@ -240,29 +210,27 @@ function CommentList({ commentList, onDelete, isSubmitting, setIsSubmitting }) {
   );
 }
 
-// ------------------------------코멘트 컨테이너 ----------------------- 최상위 컨테이너
 export function GameBoardCommentContainer() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { id } = useParams();
-  const navigate = useNavigate();
   const toast = useToast();
 
   const [commentList, setCommentList] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("/api/comment/list/" + id)
-      .then((response) => setCommentList(response.data));
-  }, [isSubmitting]);
+    axios.get("/api/comment/list/" + id).then((response) => {
+      setCommentList(response.data);
+    });
+  }, [isSubmitting, id]);
 
   function handleSubmit(comment) {
     setIsSubmitting(true);
 
     axios
       .post("/api/comment/add", {
-        game_board_id: comment.id,
+        game_board_id: id,
         comment_content: comment.comment,
-        parent_id: comment.parent_id,
+        parent_id: null,
       })
       .then(() => {
         toast({
@@ -303,16 +271,10 @@ export function GameBoardCommentContainer() {
 
   return (
     <Box>
-      <CommentForm
-        gameBoardId={id}
-        isSubmitting={isSubmitting}
-        onSubmit={handleSubmit}
-      />
+      <CommentForm isSubmitting={isSubmitting} onSubmit={handleSubmit} />
       <CommentList
-        gameBoardId={id}
         commentList={commentList}
         setIsSubmitting={setIsSubmitting}
-        isSubmitting={isSubmitting}
         onDelete={handleDelete}
       />
     </Box>
