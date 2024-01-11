@@ -14,14 +14,19 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCartShopping, faHeart } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCartShopping,
+  faHeart as fasHeart,
+} from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 하트
+import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons"; // 빈 하트
 
 export function ProductView() {
   const [product, setProduct] = useState(null);
 
   const { product_id } = useParams();
+  const [isFavorited, setIsFavorited] = useState(false);
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0); // 이미지 슬라이드용 상태
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     axios
@@ -121,12 +126,13 @@ export function ProductView() {
             {/* --------------- 찜하기 --------------- */}
             <Button
               h={"50px"}
-              w={"30%"}
+              w={"20%"}
               bg={"none"}
               borderRadius={0}
               border={"1px solid #eeeeee"}
+              onClick={() => setIsFavorited(!isFavorited)} // 클릭 시 상태 토글
             >
-              <FontAwesomeIcon icon={faHeart} />
+              <FontAwesomeIcon icon={isFavorited ? fasHeart : farHeart} />
             </Button>
             <Button
               h={"50px"}
