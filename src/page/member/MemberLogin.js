@@ -40,6 +40,11 @@ export function MemberLogin() {
       });
   }
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleLoginClick();
+    }
+  };
   return (
     <Center mt={8} mb={20}>
       <Card w={"1000px"}>
@@ -68,6 +73,7 @@ export function MemberLogin() {
                 비밀번호
               </FormLabel>
               <Input
+                onKeyDown={handleKeyDown}
                 value={member_password}
                 type={"password"}
                 w={"500px"}
