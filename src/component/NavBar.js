@@ -1,8 +1,29 @@
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Text, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export function NavBar() {
   const navigate = useNavigate();
+
+  const toast = useToast();
+
+  function handleLogoutClick() {
+    axios
+      .post("/api/member/logout")
+      .then(() => {
+        toast({
+          description: "로그 아웃 되었습니다.",
+          status: "success",
+        });
+        navigate("/");
+      })
+      .catch(() => {
+        toast({
+          description: "로그 아웃 중 문제가 발생하였습니다.",
+          status: "error",
+        });
+      });
+  }
 
   return (
     <Box>
@@ -52,7 +73,9 @@ export function NavBar() {
             <Button>검색</Button>
             <Button>장바구니</Button>
             <Button onClick={() => navigate("/signup")}>회원가입</Button>
+            <Button onClick={() => navigate("/memberPage")}>마이페이지</Button>
             <Button onClick={() => navigate("/login")}>로그인</Button>
+            <Button onClick={handleLogoutClick}>로그아웃</Button>
           </Box>
         </Flex>
       </Box>

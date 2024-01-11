@@ -9,9 +9,37 @@ import {
   FormControl,
   FormLabel,
   Input,
+  useToast,
 } from "@chakra-ui/react";
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export function MemberLogin() {
+  // 회원 로그인 정보 입력
+  const [member_login_id, setMember_login_id] = useState("");
+  const [member_password, setMember_password] = useState("");
+
+  const navigate = useNavigate();
+
+  const toast = useToast();
+
+  // 로그인 버튼 클릭
+  function handleLoginClick() {
+    axios
+      .post("/api/member/login", {
+        member_login_id,
+        member_password,
+      })
+      .then(() => {
+        toast({ description: "로그인에 성공 하였습니다.", status: "success" });
+        navigate(-1);
+      })
+      .catch(() => {
+        toast({ description: "로그인에 실패 하셨습니다.", status: "error" });
+      });
+  }
+
   return (
     <Center mt={8} mb={20}>
       <Card w={"1000px"}>
@@ -26,10 +54,11 @@ export function MemberLogin() {
                 아이디
               </FormLabel>
               <Input
+                value={member_login_id}
                 w={"500px"}
                 h={"50px"}
                 borderRadius={"0"}
-                onChange={(e) => {}}
+                onChange={(e) => setMember_login_id(e.target.value)}
               />
             </Flex>
           </FormControl>
@@ -39,10 +68,12 @@ export function MemberLogin() {
                 비밀번호
               </FormLabel>
               <Input
+                value={member_password}
+                type={"password"}
                 w={"500px"}
                 h={"50px"}
                 borderRadius={"0"}
-                onChange={(e) => {}}
+                onChange={(e) => setMember_password(e.target.value)}
               />
             </Flex>
           </FormControl>
@@ -55,6 +86,7 @@ export function MemberLogin() {
                 color={"whitesmoke"}
                 bg={"black"}
                 _hover={{ backgroundColor: "whitesmoke", color: "black" }}
+                onClick={handleLoginClick}
               >
                 로그인
               </Button>
