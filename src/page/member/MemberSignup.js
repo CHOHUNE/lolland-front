@@ -16,7 +16,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { isDisabled } from "@testing-library/user-event/dist/utils";
+import { useDaumPostcodePopup } from "react-daum-postcode";
 
 export function MemberSignup() {
   const [member_name, setMember_name] = useState("");
@@ -39,6 +39,40 @@ export function MemberSignup() {
   const [member_email, setMember_email] = useState("");
   const [member_email1, setMember_email1] = useState("");
   const [member_email2, setMember_email2] = useState("");
+
+  // 주소 --------------------------------------------------------------------------------------
+  const [member_address, setMember_address] = useState("");
+  const [member_detail_address, setMember_detail_address] = useState("");
+  const [member_address_type, setMember_address_type] = useState("");
+  const [member_address_name, setMember_address_name] = useState("");
+  // 우편번호 --------------------------------------------------------------------------------------
+  const [member_post_code, setMember_post_code] = useState("");
+  // Daum Postcode 스크립트 URL
+  const scriptUrl =
+    "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+  // Daum Postcode 팝업을 여는 함수
+  const openPostcodePopup = useDaumPostcodePopup(scriptUrl);
+  // 주소 검색 완료 핸들러
+  const handleComplete = (data) => {
+    let fullAddress = data.address;
+    let extraAddress = "";
+
+    if (data.addressType === "R") {
+      if (data.bname !== "") {
+        extraAddress += data.bname;
+      }
+      if (data.buildingName !== "") {
+        extraAddress +=
+          extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
+      }
+      fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
+    }
+
+    setMember_address(fullAddress); // 선택된 주소를 상태에 저장
+    setMember_post_code(data.zonecode);
+    setMember_address_name("기본주소1");
+    setMember_address_type("main");
+  };
 
   // 맴버 가입시 타입을 유저로 --------------------------------------------------------------------------
   const [member_type, setMember_type] = useState("user");
@@ -71,20 +105,26 @@ export function MemberSignup() {
 
   function handleEmailCodeClick() {
     setSendNumber(true);
-    console.log(member_email);
-    console.log(member_phone_number);
   }
 
   function handleSingUpClick() {
     setMember_type("user");
     axios
       .post("/api/member/signUp", {
+        // 회원정보
         member_name,
         member_login_id,
         member_password,
         member_phone_number,
         member_email,
         member_type,
+
+        // 주소정보
+        member_address_name,
+        member_address,
+        member_detail_address,
+        member_post_code,
+        member_address_type,
       })
       .then(() => {
         toast({
@@ -126,6 +166,10 @@ export function MemberSignup() {
       phoneInput3Ref.current.focus();
     }
   };
+  const handlePostCodeClick = () => {
+    openPostcodePopup({ onComplete: handleComplete });
+  };
+
   return (
     <Center mt={8} mb={8}>
       <Card w={"1000px"}>
@@ -318,8 +362,19 @@ export function MemberSignup() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 우편번호
               </FormLabel>
-              <Input w={"350px"} h={"50px"} borderRadius={"0"} />
-              <Button w={"140px"} h={"50px"} ml={"10px"}>
+              <Input
+                w={"350px"}
+                h={"50px"}
+                borderRadius={"0"}
+                readOnly
+                value={member_post_code}
+              />
+              <Button
+                w={"140px"}
+                h={"50px"}
+                ml={"10px"}
+                onClick={handlePostCodeClick}
+              >
                 주소검색
               </Button>
             </Flex>
@@ -330,7 +385,13 @@ export function MemberSignup() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 주소
               </FormLabel>
-              <Input w={"500px"} h={"50px"} borderRadius={"0"} />
+              <Input
+                w={"500px"}
+                h={"50px"}
+                borderRadius={"0"}
+                value={member_address}
+                readOnly
+              />
             </Flex>
           </FormControl>
           {/* 상세주소 */}
@@ -339,7 +400,13 @@ export function MemberSignup() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 상세주소
               </FormLabel>
-              <Input w={"500px"} h={"50px"} borderRadius={"0"} />
+              <Input
+                w={"500px"}
+                h={"50px"}
+                borderRadius={"0"}
+                value={member_detail_address}
+                onChange={(e) => setMember_detail_address(e.target.value)}
+              />
             </Flex>
           </FormControl>
         </CardBody>
