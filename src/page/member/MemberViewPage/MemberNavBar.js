@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faAddressBook,
   faCreditCard,
   faHeart,
   faUser,
@@ -21,16 +22,22 @@ export function MemberNavBar() {
   const [member, setMember] = useState("");
 
   const navigate = useNavigate();
-  // 내 정보 관리 클릭시 로직 ----------------------------------------------------
-  function handleMemberManageClick() {
-    navigate("/memberPage/memberInfo");
-  }
 
   useEffect(() => {
     axios.get("/api/member/memberInfo").then((response) => {
       setMember(response.data);
     });
   }, []);
+
+  // 내 정보 관리 클릭시 로직 ----------------------------------------------------
+  function handleMemberManageClick() {
+    navigate("/memberPage/memberInfo");
+  }
+
+  // 내 주소록 관리 클릭시 로직
+  function handleAddressClick() {
+    navigate("/memberPage/addressInfo");
+  }
 
   return (
     <Card>
@@ -51,6 +58,21 @@ export function MemberNavBar() {
               </FormLabel>
               <Box>
                 <FontAwesomeIcon icon={faUser} />
+              </Box>
+            </Flex>
+          </FormControl>
+          <Box border={"1px solid whitesmoke"}></Box>
+          <FormControl>
+            <Flex justify={"space-between"}>
+              <FormLabel
+                _hover={{ cursor: "pointer" }}
+                fontWeight={"900"}
+                onClick={handleAddressClick}
+              >
+                내 주소록 관리 >
+              </FormLabel>
+              <Box>
+                <FontAwesomeIcon icon={faAddressBook} />
               </Box>
             </Flex>
           </FormControl>

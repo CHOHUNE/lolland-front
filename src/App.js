@@ -19,6 +19,7 @@ import { ReviewView } from "./page/review/ReviewView";
 import { Cart } from "./page/Cart/Cart";
 import { MemberInfo } from "./page/member/MemberViewPage/MemberInfo";
 import { MemberManage } from "./page/member/MemberViewPage/MemberManage";
+import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -49,6 +50,7 @@ const routes = createBrowserRouter(
       <Route path="memberPage" element={<MemberView />}>
         <Route path="memberInfo" element={<MemberInfo />} />
         <Route path="memberInfo/memberManagePage" element={<MemberManage />} />
+        <Route path="addressInfo" element={<MemberAddress />} />
       </Route>
 
       {/* 게시판관련 */}
