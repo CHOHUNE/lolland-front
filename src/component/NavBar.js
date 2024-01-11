@@ -91,7 +91,11 @@ export function NavBar() {
             display={"flex"}
             gap={5}
           >
-            <Button borderRadius={0} h={"70%"}>
+            <Button
+              borderRadius={0}
+              h={"70%"}
+              onClick={() => navigate("/gameboard")}
+            >
               게임 커뮤니티
             </Button>
             <Button borderRadius={0} h={"70%"}>
