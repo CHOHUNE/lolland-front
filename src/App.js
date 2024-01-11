@@ -10,6 +10,9 @@ import GameBoardWrite from "./page/gameBoard/GameBoardWrite";
 import GameBoardList from "./page/gameBoard/GameBoardList";
 import GameBoardEdit from "./page/gameBoard/GameBoardEdit";
 import GameBoardView from "./page/gameBoard/GameBoardView";
+import { ProductWrite } from "./page/product/ProductWrite";
+import { ProductList } from "./page/product/ProductList";
+import { ProductView } from "./page/product/ProductView";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -17,6 +20,9 @@ const routes = createBrowserRouter(
       {/* 메인페이지 */}
 
       {/* 상품관련 */}
+      <Route path="product/write/" element={<ProductWrite />} />
+      <Route path="product/list/" element={<ProductList />} />
+      <Route path="product/:product_id" element={<ProductView />} />
 
       {/* 리뷰 */}
 
