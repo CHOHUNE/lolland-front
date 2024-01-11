@@ -16,6 +16,7 @@ import { ProductList } from "./page/product/ProductList";
 import { ProductView } from "./page/product/ProductView";
 import { ReviewView } from "./page/review/ReviewView";
 import { Cart } from "./page/Cart/Cart";
+import { ProductEdit } from "./ProductEdit";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -26,6 +27,7 @@ const routes = createBrowserRouter(
       <Route path="product/write/" element={<ProductWrite />} />
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
+      <Route path="edit/:product_id" element={<ProductEdit />} />
 
       {/* 리뷰 */}
       <Route path="/review" element={<ReviewView />} />
