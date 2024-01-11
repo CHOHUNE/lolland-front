@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   ButtonGroup,
   Collapse,
@@ -25,7 +26,7 @@ import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { Fragment, useState } from "react";
 import { Form } from "react-router-dom";
 
-export function Qna() {
+export function Qna({ formattedLogId, formattedDate }) {
   const testQna = [
     {
       question_id: 1,
@@ -33,6 +34,7 @@ export function Qna() {
       question_content: "개졸림",
       member_login_id: "testforqna",
       answer_status: "답변완료",
+      answer_content: "나두..",
       question_reg_time: "2019-01-21T05:47:08.644",
     },
     {
@@ -40,6 +42,7 @@ export function Qna() {
       question_title: "환불해주삼",
       member_login_id: "admin",
       question_content: "어떻게 환불해야하나요",
+      answer_content: "불가능합니다",
       answer_status: "답변완료",
       question_reg_time: "2019-01-21T05:47:08.644",
     },
@@ -77,6 +80,7 @@ export function Qna() {
         "\n" +
         "제품인가요???",
       answer_status: "답변완료",
+      answer_content: "죄송합니다 애플에서만 작동합니다",
       question_reg_time: "2019-01-21T05:47:08.644",
     },
     {
@@ -92,25 +96,6 @@ export function Qna() {
     },
   ];
 
-  function formattedLogId(member_login_id) {
-    const formattedLoginId = member_login_id;
-    if (formattedLoginId) {
-      const maskedLoginId =
-        member_login_id.slice(0, 3) + "*".repeat(formattedLoginId.length - 3);
-      return maskedLoginId;
-    }
-    return "";
-  }
-
-  const formattedDate = (question_reg_time) => {
-    const date = new Date(question_reg_time);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Adding 1 because months are zero-based
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  };
-
   const [openId, setOpenId] = useState(null);
   const [isWriting, setIsWriting] = useState(false);
 
@@ -125,19 +110,19 @@ export function Qna() {
   return (
     <>
       {isWriting ? (
-        <>
+        <Box mx="15%" my={10}>
           <Heading mb={10}>문의 등록</Heading>
           <Form>
-            <FormControl>
-              <FormLabel fontWeight="bold">
+            <FormControl mb={5}>
+              <FormLabel fontWeight="bold" mb={5}>
                 <Tag size="lg" borderRadius={0} bgColor="black" color="white">
                   제목
                 </Tag>
               </FormLabel>
-              <Input placeholder="제목을 입력하세요" mb={3} />
+              <Input placeholder="제목을 입력하세요" />
             </FormControl>
             <FormControl>
-              <FormLabel fontWeight="bold">
+              <FormLabel fontWeight="bold" mb={5}>
                 <Tag size="lg" borderRadius={0} bgColor="black" color="white">
                   문의 내용
                 </Tag>
@@ -145,7 +130,7 @@ export function Qna() {
               <Textarea h="xs" placeholder="문의 내용을 작성해주세요" />
             </FormControl>
           </Form>
-          <ButtonGroup w="full" justifyContent="center" my={5}>
+          <ButtonGroup w="full" justifyContent="center" my={10}>
             <Button
               w={"30%"}
               borderRadius={0}
@@ -166,7 +151,7 @@ export function Qna() {
               닫기
             </Button>
           </ButtonGroup>
-        </>
+        </Box>
       ) : (
         <>
           <Flex justifyContent="center" mx="25%" gap={2} my={10}>
@@ -249,18 +234,36 @@ export function Qna() {
                       </Td>
                     </Tr>
                     {openId === question.question_id && (
-                      <Tr>
-                        <Td colSpan={4} px={10}>
-                          <Collapse
-                            in={openId === question.question_id}
-                            animateOpacity
-                          >
+                      <>
+                        <Tr>
+                          <Td colSpan={4} px={10}>
                             <Text whiteSpace="pre-wrap" lineHeight="30px">
                               {question.question_content}
                             </Text>
-                          </Collapse>
-                        </Td>
-                      </Tr>
+                          </Td>
+                        </Tr>
+                        {question.answer_content && (
+                          <Tr>
+                            <Td colSpan={4} px={10} py={6} bgColor="gray.100">
+                              <Text
+                                as="span"
+                                p={1}
+                                bgColor="black"
+                                color="white"
+                              >
+                                판매자 답변
+                              </Text>
+                              <Text
+                                whiteSpace="pre-wrap"
+                                lineHeight="30px"
+                                mt={5}
+                              >
+                                {question.answer_content}
+                              </Text>
+                            </Td>
+                          </Tr>
+                        )}
+                      </>
                     )}
                   </>
                 ))}
