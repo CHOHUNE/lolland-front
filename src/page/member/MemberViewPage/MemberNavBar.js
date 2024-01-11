@@ -14,18 +14,28 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export function MemberNavBar() {
+  const [member, setMember] = useState("");
+
   const navigate = useNavigate();
   // 내 정보 관리 클릭시 로직 ----------------------------------------------------
   function handleMemberManageClick() {
     navigate("/memberPage/memberInfo");
   }
 
+  useEffect(() => {
+    axios.get("/api/member/memberInfo").then((response) => {
+      setMember(response.data);
+    });
+  }, []);
+
   return (
     <Card>
       <CardHeader fontSize={"1.5rem"} color={"#5F625C"} fontWeight={"900"}>
-        id 님의 페이지
+        {member.member_login_id} 님의 페이지
       </CardHeader>
 
       <CardBody border={"1px solid black"} bg={"black"} color={"whitesmoke"}>

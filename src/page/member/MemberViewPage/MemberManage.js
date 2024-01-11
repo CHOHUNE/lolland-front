@@ -10,13 +10,29 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Spinner,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export function MemberManage() {
   const [member, setMember] = useState(null);
+
+  const toast = useToast();
+
+  const { isOpen, onClose, onOpen } = useDisclosure();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get("/api/member/memberInfo").then((response) => {
@@ -26,6 +42,22 @@ export function MemberManage() {
 
   if (member == null) {
     return <Spinner />;
+  }
+
+  // 회원 탈퇴 버튼 클릭
+  function handleMemberDeleteClick() {
+    axios
+      .delete("/api/member")
+      .then(() =>
+        toast({ description: "회원자격을 상실 하셨습니다.", status: "error" }),
+      )
+      .then(() => navigate("/"))
+      .catch(() =>
+        toast({
+          description: "탈퇴 처리중 문제가 발생하였습니다.",
+          colorScheme: "gray",
+        }),
+      );
   }
 
   return (
@@ -77,10 +109,36 @@ export function MemberManage() {
         <CardFooter>
           <Flex gap={4}>
             <Button>수정하기</Button>
-            <Button colorScheme={"red"}>회원 탈퇴</Button>
+            <Button colorScheme={"red"} onClick={onOpen}>
+              회원 탈퇴
+            </Button>
           </Flex>
         </CardFooter>
       </Card>
+
+      {/* 삭제 모달창 */}
+      <>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>회원 탈퇴 😭</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Box>정말 탈퇴 하시겠습니까?</Box>
+              <Box color={"red"}>탈퇴 버튼 클릭시 즉시 탈퇴 처리 됩니다.</Box>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button mr={3} onClick={onClose}>
+                취소
+              </Button>
+              <Button colorScheme={"red"} onClick={handleMemberDeleteClick}>
+                탈퇴
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </>
     </Center>
   );
 }
