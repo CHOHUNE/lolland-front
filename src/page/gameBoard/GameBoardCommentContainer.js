@@ -81,7 +81,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
       .finally(() => {
         setIsSubmitting(false);
         setIsWriting(false);
-        // setReplyComment(null);
+        setReplyComment(null);
       });
   }
 
@@ -263,6 +263,18 @@ export function GameBoardCommentContainer() {
         game_board_id: comment.id,
         comment_content: comment.comment,
         parent_id: comment.parent_id,
+      })
+      .then(() => {
+        toast({
+          description: "등록 성공",
+          status: "success",
+        });
+      })
+      .catch(() => {
+        toast({
+          description: "실패",
+          status: "error",
+        });
       })
       .finally(() => {
         setIsSubmitting(false);
