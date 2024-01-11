@@ -14,6 +14,8 @@ import GameBoardView from "./page/gameBoard/GameBoardView";
 import { ProductWrite } from "./page/product/ProductWrite";
 import { ProductList } from "./page/product/ProductList";
 import { ProductView } from "./page/product/ProductView";
+import { ReviewView } from "./page/review/ReviewView";
+import { Cart } from "./page/Cart/Cart";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -26,8 +28,11 @@ const routes = createBrowserRouter(
       <Route path="product/:product_id" element={<ProductView />} />
 
       {/* 리뷰 */}
+      <Route path="/review" element={<ReviewView />} />
 
       {/* 장바구니 */}
+      {/* 이걸로 로그인 완성되면 수정 <Route path="/cart/:member_id" element={<Cart />} />*/}
+      <Route path="/cart" element={<Cart />} />
 
       {/* 찜하기 */}
 

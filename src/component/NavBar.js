@@ -73,7 +73,7 @@ export function NavBar() {
             mr={5}
           >
             <Button>검색</Button>
-            <Button>장바구니</Button>
+            <Button onClick={() => navigate("/cart")}>장바구니</Button>
             <Button onClick={() => navigate("/signup")}>회원가입</Button>
             <Button onClick={() => navigate("/memberPage")}>마이페이지</Button>
             <Button onClick={() => navigate("/login")}>로그인</Button>

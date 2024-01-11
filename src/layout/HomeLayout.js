@@ -5,10 +5,10 @@ import { Footer } from "../component/Footer";
 
 export function HomeLayout() {
   return (
-    <Box fontWeight={"700"}>
-      <NavBar />
+    <Box>
+      <NavBar fontWeight={"700"} />
       <Outlet />
-      <Footer />
+      <Footer fontWeight={"700"} />
     </Box>
   );
 }
