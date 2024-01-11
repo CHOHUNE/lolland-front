@@ -48,6 +48,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isWriting, setIsWriting] = useState(false);
   const [commentEdited, setCommentEdited] = useState(comment.comment_content);
+  const [duplicateReplyComment, setDuplicateReplyComment] = useState(null);
   const [replyComment, setReplyComment] = useState();
   const toast = useToast();
 
@@ -60,11 +61,27 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
     axios
       .post("/api/comment/add", {
         parent_id: comment.id,
-        comment_content: commentEdited,
+        comment_content: replyComment,
         game_board_id: comment.game_board_id,
+      })
+      .then(() => {
+        toast({ description: "성공", status: "success" });
+      })
+      .catch((error) => {
+        if (error.response.status === 401 || error.response.status === 403) {
+          toast({ description: "실패", status: "error" });
+        }
+        if (error.response.status === 400) {
+          toast({
+            description: "입력 값 확인",
+            status: "warning",
+          });
+        }
       })
       .finally(() => {
         setIsSubmitting(false);
+        setIsWriting(false);
+        // setReplyComment(null);
       });
   }
 
@@ -92,7 +109,6 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
       .finally(() => {
         setIsSubmitting(false);
         setIsEditing(false);
-        setIsWriting(false);
       });
   }
 
@@ -126,8 +142,8 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
           {isWriting && (
             <Box>
               <Textarea
-                value={commentEdited}
-                onChange={(e) => setCommentEdited(e.target.value)}
+                value={replyComment}
+                onChange={(e) => setReplyComment(e.target.value)}
               />
               <Button
                 colorScheme={"blue"}
