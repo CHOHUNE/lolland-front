@@ -1,27 +1,29 @@
 import {
   Box,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
   Divider,
   Flex,
   HStack,
   IconButton,
-  Radio,
+  Tab,
+  TabIndicator,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
   Textarea,
   useToast,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane, faStar } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
+import { Qna } from "../qna/Qna";
 
 const StarRating = ({ rating, setRating }) => {
   const [hover, setHover] = useState(null);
   return (
-    <HStack spacing={2} p={2} mb={2}>
+    <Flex justifyContent="space-evenly" p={3} my={2} mx="40%">
       {[...Array(5)].map((star, index) => {
         const ratingValue = index + 1;
         return (
@@ -35,7 +37,7 @@ const StarRating = ({ rating, setRating }) => {
             <FontAwesomeIcon
               icon={faStar}
               cursor={"pointer"}
-              size="xl"
+              size="2xl"
               transition="color 200ms"
               onClick={() =>
                 setRating(rating === ratingValue ? 0 : ratingValue)
@@ -44,7 +46,7 @@ const StarRating = ({ rating, setRating }) => {
           </Box>
         );
       })}
-    </HStack>
+    </Flex>
   );
 };
 
@@ -59,7 +61,7 @@ export function ReviewView() {
   //   fetchReview();
   // }, []);
 
-  const member = { id: 1, member_login_id: "user", member_type: "user" };
+  const member = { id: 1, member_login_id: "Admin", member_type: "user" };
 
   const reviewList = [
     {
@@ -67,6 +69,7 @@ export function ReviewView() {
       product_id: 1,
       member_login_id: member.member_login_id,
       review_content: "테스트아무말1",
+      review_reg_time: "2019-01-21T05:47:08.644",
       rating: 5,
     },
     {
@@ -74,6 +77,7 @@ export function ReviewView() {
       product_id: 1,
       member_login_id: member.member_login_id,
       review_content: "테스트아무말2",
+      review_reg_time: "2019-01-21T05:47:08.644",
       rating: 2,
     },
     {
@@ -81,14 +85,27 @@ export function ReviewView() {
       product_id: 1,
       member_login_id: member.member_login_id,
       review_content: "테스트아무말3",
+      review_reg_time: "2019-01-21T05:47:08.644",
       rating: 0,
     },
   ];
 
   const Star = ({ rating }) => {
-    const stars = Array.from({ length: rating }).map((_, index) => (
-      <FontAwesomeIcon key={index} icon={faStar} color="#FFE000" size="sm" />
-    ));
+    const totalStars = 5;
+
+    const stars = Array.from({ length: totalStars }).map((_, index) => {
+      const starColor = index < rating ? "#FFE000" : "#EAEAE7";
+
+      return (
+        <FontAwesomeIcon
+          key={index}
+          icon={faStar}
+          color={starColor}
+          size="sm"
+        />
+      );
+    });
+
     return <HStack spacing={1}>{stars}</HStack>;
   };
 
@@ -191,42 +208,103 @@ export function ReviewView() {
   //     });
   // }
 
+  const tabStyles = {
+    w: "30%",
+    fontSize: "2xl",
+    color: "#B4B4B4",
+    _selected: { fontWeight: "bold", color: "black" },
+  };
+
+  function formattedLogId(member_login_id) {
+    const formattedLoginId = member_login_id;
+    if (formattedLoginId) {
+      const maskedLoginId =
+        member_login_id.slice(0, 3) + "*".repeat(formattedLoginId.length - 3);
+      return maskedLoginId;
+    }
+    return "";
+  }
+
+  const formattedDate = (question_reg_time) => {
+    const date = new Date(question_reg_time);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Adding 1 because months are zero-based
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <StarRating rating={rating} setRating={setRating} />
-        <Flex justifyContent="center">
-          <Textarea
-            value={review}
-            onChange={(e) => setReview(e.target.value)}
-            placeholder="리뷰를 작성해주세요"
-            mr={2}
-          />
-          <IconButton
-            colorScheme="blue"
-            height="undefined"
-            icon={<FontAwesomeIcon icon={faPaperPlane} />}
-            onClick={handleSubmit}
-          />
-        </Flex>
-      </CardHeader>
-      <CardBody>
-        {reviewList && reviewList.length > 0 ? (
-          reviewList.map((review, index) => (
-            <Box key={review.review_id}>
-              <HStack spacing={5} my={2}>
-                <Text color="blue">{review.member_login_id}</Text>
-                <Star rating={review.rating} />
-              </HStack>
-              <Text mb={5}>{review.review_content}</Text>
-              {index < reviewList.length - 1 && <Divider />}
-            </Box>
-          ))
-        ) : (
-          <Box justifyContent="center">아직 리뷰가 없는 상품입니다.</Box>
-        )}
-      </CardBody>
-      <CardFooter>페이지네이션</CardFooter>
-    </Card>
+    <>
+      <Tabs position="relative" variant="unstyled">
+        <TabList p={5} justifyContent="space-evenly" align="center">
+          <Tab {...tabStyles}>상품 설명</Tab>
+          <Tab {...tabStyles}>리뷰 & 댓글 ({reviewList.length})</Tab>
+          <Tab {...tabStyles}>Q&A</Tab>
+        </TabList>
+        <TabIndicator mt="-1.5px" height="2px" bg="black" borderRadius="1px" />
+        <TabPanels px={10}>
+          {/* -------------------------- 상품 설명 -------------------------- */}
+          <TabPanel>
+            <Text size="md">
+              {"{"} product.product.content {"}"}
+            </Text>
+          </TabPanel>
+
+          {/* -------------------------- 리뷰 & 댓글 -------------------------- */}
+          <TabPanel>
+            <StarRating rating={rating} setRating={setRating} />
+            <Flex justifyContent="center" mx="20%" mb={10}>
+              <Textarea
+                value={review}
+                onChange={(e) => setReview(e.target.value)}
+                placeholder="리뷰를 작성해주세요"
+                mr={2}
+              />
+              <IconButton
+                w="10%"
+                bgColor="black"
+                color="white"
+                height="undefined"
+                icon={<FontAwesomeIcon icon={faPaperPlane} />}
+                onClick={handleSubmit}
+              />
+            </Flex>
+            {reviewList && reviewList.length > 0 ? (
+              reviewList.map((review, index) => (
+                <Box key={review.review_id} mx="20%" my={5}>
+                  <HStack spacing={5} mb={5}>
+                    <Text
+                      color="white"
+                      bgColor="black"
+                      borderRadius={20}
+                      px={2}
+                      fontSize="xs"
+                    >
+                      {formattedLogId(review.member_login_id)}
+                    </Text>
+                    <Star rating={review.rating} />
+                    <Text opacity={0.6}>
+                      {formattedDate(review.review_reg_time)}
+                    </Text>
+                  </HStack>
+                  <Text mb={6}>{review.review_content}</Text>
+                  {index < reviewList.length - 1 && <Divider />}
+                </Box>
+              ))
+            ) : (
+              <Box justifyContent="center">아직 리뷰가 없는 상품입니다.</Box>
+            )}
+          </TabPanel>
+          {/* -------------------------- Q&A -------------------------- */}
+          <TabPanel>
+            <Qna
+              formattedLogId={formattedLogId}
+              formattedDate={formattedDate}
+            />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </>
   );
 }
