@@ -1,16 +1,45 @@
-import {Box, Button, Flex, Text} from "@chakra-ui/react";
-import {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import { Box, Button, Flex, Text, useToast } from "@chakra-ui/react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export function NavBar() {
   const navigate = useNavigate();
 
+  const toast = useToast();
+
+  function handleLogoutClick() {
+    axios
+      .post("/api/member/logout")
+      .then(() => {
+        toast({
+          description: "로그 아웃 되었습니다.",
+          status: "success",
+        });
+        navigate("/");
+      })
+      .catch(() => {
+        toast({
+          description: "로그 아웃 중 문제가 발생하였습니다.",
+          status: "error",
+        });
+      });
+  }
+
   return (
     <Box>
       {/* 상단 네브바 */}
-      <Box w={"100%"} h={"90px"} bg={"#D9D9D9"} >
-        <Flex w={"100%"} h={"100%"} textAlign={"center"} >
-          <Box w={"200px"} h={"100%"} display={"flex"} justifyContent={"center"} alignItems={"center"} bg={"#C4CFD7"} onClick={() => navigate("/")}>
+      <Box w={"100%"} h={"90px"} bg={"#D9D9D9"}>
+        <Flex w={"100%"} h={"100%"} textAlign={"center"}>
+          <Box
+            w={"200px"}
+            h={"100%"}
+            display={"flex"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            bg={"#C4CFD7"}
+            onClick={() => navigate("/")}
+          >
             프로젝트 로고
           </Box>
           <Box
@@ -46,7 +75,9 @@ export function NavBar() {
             <Button>검색</Button>
             <Button>장바구니</Button>
             <Button onClick={() => navigate("/signup")}>회원가입</Button>
-            <Button>로그인</Button>
+            <Button onClick={() => navigate("/memberPage")}>마이페이지</Button>
+            <Button onClick={() => navigate("/login")}>로그인</Button>
+            <Button onClick={handleLogoutClick}>로그아웃</Button>
           </Box>
         </Flex>
       </Box>
@@ -72,8 +103,20 @@ export function NavBar() {
             <Button borderRadius={0} h={"70%"}>
               조립pc
             </Button>
-            <Button borderRadius={0} h={"70%"} onClick={() => navigate("product/write/")}>상품등록</Button>
-            <Button borderRadius={0} h={"70%"} onClick={() => navigate("product/list/")}>상품리스트</Button>
+            <Button
+              borderRadius={0}
+              h={"70%"}
+              onClick={() => navigate("product/write/")}
+            >
+              상품등록
+            </Button>
+            <Button
+              borderRadius={0}
+              h={"70%"}
+              onClick={() => navigate("product/list/")}
+            >
+              상품리스트
+            </Button>
           </Box>
           <Box
             w={"100%"}
