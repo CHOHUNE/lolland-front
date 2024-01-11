@@ -112,19 +112,23 @@ export function MemberSignup() {
     axios
       .post("/api/member/signUp", {
         // 회원정보
-        member_name,
-        member_login_id,
-        member_password,
-        member_phone_number,
-        member_email,
-        member_type,
+        member: {
+          member_name,
+          member_login_id,
+          member_password,
+          member_phone_number,
+          member_email,
+          member_type,
+        },
 
         // 주소정보
-        member_address_name,
-        member_address,
-        member_detail_address,
-        member_post_code,
-        member_address_type,
+        memberAddress: {
+          member_address_name,
+          member_address,
+          member_detail_address,
+          member_post_code,
+          member_address_type,
+        },
       })
       .then(() => {
         toast({
