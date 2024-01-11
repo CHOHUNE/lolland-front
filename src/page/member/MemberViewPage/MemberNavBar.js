@@ -13,8 +13,15 @@ import {
   faHeart,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 export function MemberNavBar() {
+  const navigate = useNavigate();
+  // 내 정보 관리 클릭시 로직 ----------------------------------------------------
+  function handleMemberManageClick() {
+    navigate("/memberPage/memberInfo");
+  }
+
   return (
     <Card>
       <CardHeader fontSize={"1.5rem"} color={"#5F625C"} fontWeight={"900"}>
@@ -25,7 +32,11 @@ export function MemberNavBar() {
         <Flex gap={10}>
           <FormControl>
             <Flex justify={"space-between"}>
-              <FormLabel _hover={{ cursor: "pointer" }} fontWeight={"900"}>
+              <FormLabel
+                _hover={{ cursor: "pointer" }}
+                fontWeight={"900"}
+                onClick={handleMemberManageClick}
+              >
                 내 정보 관리 >
               </FormLabel>
               <Box>

@@ -1,4 +1,4 @@
-import { Box, Card, CardBody, CardHeader, Center } from "@chakra-ui/react";
+import { Card, CardBody, CardHeader, Center } from "@chakra-ui/react";
 import { MemberNavBar } from "./MemberNavBar";
 import { Outlet } from "react-router-dom";
 

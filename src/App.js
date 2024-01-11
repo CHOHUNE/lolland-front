@@ -47,8 +47,8 @@ const routes = createBrowserRouter(
       <Route path="signup" element={<MemberSignup />} />
       <Route path="login" element={<MemberLogin />} />
       <Route path="memberPage" element={<MemberView />}>
-        <Route index element={<MemberInfo />} />
-        <Route path="memberManagePage" element={<MemberManage />} />
+        <Route path="memberInfo" element={<MemberInfo />} />
+        <Route path="memberInfo/memberManagePage" element={<MemberManage />} />
       </Route>
 
       {/* 게시판관련 */}

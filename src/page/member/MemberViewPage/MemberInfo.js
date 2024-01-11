@@ -10,7 +10,7 @@ import {
   Input,
   useToast,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -20,15 +20,6 @@ export function MemberInfo() {
   const toast = useToast();
 
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   axios
-  //     .get("/api/member/myPage")
-  //     .then(() =>
-  //       toast({ description: "정보 갖고오기 성공", status: "success" }),
-  //     )
-  //     .catch(() => toast({ description: "갖고오기 실패", status: "error" }));
-  // }, []);
 
   function handleMemberInfoClick() {
     axios
@@ -43,7 +34,7 @@ export function MemberInfo() {
           status: "success",
         }),
       )
-      .then(() => navigate("/memberPage/memberManagePage"))
+      .then(() => navigate("/memberPage/memberInfo/memberManagePage"))
       .catch(() => {
         toast({
           description: "비밀번호가 틀립니다.",
