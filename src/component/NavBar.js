@@ -1,5 +1,5 @@
 import { Box, Button, Flex, Text, useToast } from "@chakra-ui/react";
-import {useState} from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -29,9 +29,17 @@ export function NavBar() {
   return (
     <Box>
       {/* 상단 네브바 */}
-      <Box w={"100%"} h={"90px"} bg={"#D9D9D9"} >
-        <Flex w={"100%"} h={"100%"} textAlign={"center"} >
-          <Box w={"200px"} h={"100%"} display={"flex"} justifyContent={"center"} alignItems={"center"} bg={"#C4CFD7"} onClick={() => navigate("/")}>
+      <Box w={"100%"} h={"90px"} bg={"#D9D9D9"}>
+        <Flex w={"100%"} h={"100%"} textAlign={"center"}>
+          <Box
+            w={"200px"}
+            h={"100%"}
+            display={"flex"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            bg={"#C4CFD7"}
+            onClick={() => navigate("/")}
+          >
             프로젝트 로고
           </Box>
           <Box
@@ -95,8 +103,20 @@ export function NavBar() {
             <Button borderRadius={0} h={"70%"}>
               조립pc
             </Button>
-            <Button borderRadius={0} h={"70%"} onClick={() => navigate("product/write/")}>상품등록</Button>
-            <Button borderRadius={0} h={"70%"} onClick={() => navigate("product/list/")}>상품리스트</Button>
+            <Button
+              borderRadius={0}
+              h={"70%"}
+              onClick={() => navigate("product/write/")}
+            >
+              상품등록
+            </Button>
+            <Button
+              borderRadius={0}
+              h={"70%"}
+              onClick={() => navigate("product/list/")}
+            >
+              상품리스트
+            </Button>
           </Box>
           <Box
             w={"100%"}
