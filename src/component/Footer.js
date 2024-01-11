@@ -13,7 +13,7 @@ import {
 export function Footer() {
   return (
     <>
-      <Box bgColor="#F4F4F4" p={10}>
+      <Box bgColor="#F4F4F4" px={10} pt={5} pb={10}>
         <Flex justifyContent="flex-start" mx="3%" p={5}>
           <ButtonGroup size="sm" variant="undefined">
             <Button>회사소개</Button>
