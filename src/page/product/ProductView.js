@@ -29,7 +29,8 @@ import {
   faHeart as fasHeart,
 } from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 하트
 import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons"; // 빈 하트
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { ReviewView } from "../review/ReviewView"; // 빈 하트
 
 export function ProductView() {
   const [product, setProduct] = useState(null);
@@ -433,6 +434,11 @@ export function ProductView() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      {/* --------------- 상품 상세 설명, 리뷰 , Q&A --------------- */}
+      <ReviewView
+        product_id={product.product_id}
+        product_content={product.product_content}
+      />
     </Box>
   );
 }
