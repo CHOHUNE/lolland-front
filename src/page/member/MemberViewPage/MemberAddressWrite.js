@@ -1,5 +1,4 @@
 import {
-  background,
   Box,
   Button,
   Card,
@@ -23,7 +22,7 @@ export function MemberAddressWrite() {
   // 주소 --------------------------------------------------------------------------------------
   const [member_address, setMember_address] = useState("");
   const [member_detail_address, setMember_detail_address] = useState("");
-  const [member_address_type, setMember_address_type] = useState("");
+  const [member_address_type, setMember_address_type] = useState("sub");
   const [member_address_name, setMember_address_name] = useState("");
   // 우편번호 --------------------------------------------------------------------------------------
   const [member_post_code, setMember_post_code] = useState("");
@@ -86,11 +85,20 @@ export function MemberAddressWrite() {
         }),
       )
       .then(() => navigate("/memberPage/addressInfo"))
-      .catch(() => {
-        toast({
-          description: "주소 등록중 문제가 발생 하였습니다.",
-          status: "error",
-        });
+      .catch((error) => {
+        if (error.response && error.response.status === 400) {
+          let errorMessage = error.response.data[0];
+          toast({
+            description: errorMessage,
+            status: "error",
+          });
+        } else {
+          // 기타 오류에 대한 처리
+          toast({
+            description: "가입에 실패하셨습니다.",
+            status: "error",
+          });
+        }
       });
   }
 

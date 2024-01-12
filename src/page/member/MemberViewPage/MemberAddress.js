@@ -27,8 +27,12 @@ import { useNavigate } from "react-router-dom";
 
 export function MemberAddress() {
   const [memberAddress, setMemberAddress] = useState([]);
+  const [member, setMember] = useState("");
 
   const [selectedAddress, setSelectedAddress] = useState("");
+
+  // 주소록 상태 변경 인식 코드 -----------------------------------------------------
+  const [addressState, setAddressState] = useState(false);
 
   const toast = useToast();
   const navigate = useNavigate();
@@ -57,6 +61,7 @@ export function MemberAddress() {
     onDeleteOpen();
   };
 
+  // 페이지 랜딩시 -----------------------------------------------------------------
   useEffect(() => {
     axios
       .get("/api/memberAddress/loginUser")
@@ -72,10 +77,19 @@ export function MemberAddress() {
           status: "error",
         });
         navigate("/login");
+      })
+      .finally(() => {
+        setAddressState(false);
       });
+  }, [addressState]);
+
+  useEffect(() => {
+    axios.get("/api/member/memberInfo").then((response) => {
+      setMember(response.data);
+    });
   }, []);
 
-  // 삭제 버튼 클릭
+  // 삭제 버튼 클릭 -----------------------------------------------------------------
   function handleDeleteClick() {
     axios
       .delete("/api/memberAddress/deleteAddress/" + selectedAddress.id)
@@ -86,6 +100,9 @@ export function MemberAddress() {
             selectedAddress.member_address_name + " 주소가 삭제 되었습니다.",
           status: "success",
         });
+      })
+      .then(() => {
+        setAddressState(true);
       })
       .catch(() => {
         toast({
@@ -98,7 +115,14 @@ export function MemberAddress() {
   return (
     <Center>
       <Card w={"1000px"}>
-        <CardHeader>_님의 주소 목록 입니다.</CardHeader>
+        <CardHeader mt={4}>
+          <Flex gap={4} alignItems={"flex-end"}>
+            <Box fontSize={"1.4rem"} fontWeight={"900"}>
+              {member.member_name}
+            </Box>
+            <Box>_님의 주소 목록 입니다.</Box>
+          </Flex>
+        </CardHeader>
         <CardBody>
           <Table>
             <Tr>

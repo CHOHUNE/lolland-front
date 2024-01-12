@@ -102,7 +102,9 @@ export function MemberManage() {
             </Flex>
           </FormControl>
           <FormControl mt={4}>
-            <Button>내 주소록 조회 하기</Button>
+            <Button onClick={() => navigate("/memberPage/addressInfo")}>
+              내 주소록 조회 하기
+            </Button>
           </FormControl>
         </CardBody>
 
