@@ -27,8 +27,8 @@ export function ProductEdit() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
-  const [removeMainImgs, setRemoveMainImgs] = useState({}); // 이미지삭제
-  const [mainImg, setMainImg] = useState(null); // 이미지 추가
+  const [removeMainImgs, setRemoveMainImgs] = useState([]); // 이미지삭제
+  const [mainImg, setMainImg] = useState([]);
 
   const [previewImages, setPreviewImages] = useState([]);
 
@@ -140,19 +140,19 @@ export function ProductEdit() {
 
   // 이미지 파일이 선택되었을 때 호출될 함수
   const handleImageChange = (event) => {
+    setMainImg(event.target.files);
+
     if (event.target.files) {
       const filesArray = Array.from(event.target.files).map((file) => {
-        return URL.createObjectURL(file); // 파일을 위한 Data URL을 생성합니다.
+        return URL.createObjectURL(file);
       });
-
-      setPreviewImages(filesArray); // 미리보기 이미지 목록을 업데이트합니다.
-
-      // 메모리 누수를 방지하기 위해, 컴포넌트가 언마운트될 때 URL을 해제합니다.
+      setPreviewImages(filesArray);
       return () =>
         filesArray.forEach((fileUrl) => URL.revokeObjectURL(fileUrl));
     }
   };
 
+  // ------------------------------ 저장 버튼 클릭시 실행될 로직 ------------------------------
   function handleUpdateClick() {
     axios.putForm("/api/product/edit", {
       product_id: product_id, //
@@ -163,8 +163,8 @@ export function ProductEdit() {
       company_name: product.company_name, //
       category_id: selectedCategory, //
       subcategory_id: selectedSubCategory, //
-      removeMainImgs: product.mainImgUrls, // 서버에 이미 있는 이미지 URL들
-      newImgs: previewImages, // 새로 업로드할 이미지 미리보기 URL들
+      removeMainImgs: product.mainImgUrls, //v
+      newImgs: mainImg, // 새로 업로드할 이미지 미리보기 URL들
       options: options,
     });
   }

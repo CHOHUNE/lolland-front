@@ -321,34 +321,54 @@ export function ProductView() {
                         </Button>
                       </Box>
                       <HStack
-                        w={"74px"}
-                        border={"1px solid gray"}
-                        borderRadius={"10px"}
-                        bg={"white"}
-                        m={3}
+                        style={{
+                          display: "flex",
+                          width: "80px",
+                          border: "1px solid gray",
+                          borderRadius: "10px",
+                          backgroundColor: "white",
+                          margin: "3px",
+                        }}
                       >
                         {/* ------------------- 수량 증가 버튼 ------------------- */}
                         <Button
                           size={"xs"}
-                          bg={"none"}
-                          borderRight={"1px solid gray"}
-                          borderRadius={0}
-                          p={0}
+                          style={{
+                            width: "23px",
+                            background: "none",
+                            borderRight: "1px solid gray",
+                            borderRadius: 0,
+                            padding: 0,
+                          }}
                           onClick={() => increaseQuantity(key)}
                           _hover={{ bg: "none" }}
                           _active={{ bg: "none" }}
                         >
                           <ChevronUpIcon />
                         </Button>
-                        {/* ------------------- 수량 ------------------- */}
-                        <Box fontSize={"13px"}>{optionList.quantity}</Box>
+
+                        {/* ------------------- 수량 표시 ------------------- */}
+                        <Box
+                          style={{
+                            flex: 1,
+                            textAlign: "center",
+                            fontSize: "13px",
+                            width: "20px",
+                          }}
+                        >
+                          {optionList.quantity}
+                        </Box>
+
                         {/* ------------------- 수량 감소 버튼 ------------------- */}
                         <Button
                           size={"xs"}
-                          bg={"none"}
-                          borderLeft={"1px solid gray"}
-                          borderRadius={0}
-                          p={0}
+                          style={{
+                            width: "23px",
+                            background: "none",
+                            borderLeft: "1px solid gray",
+                            borderRadius: 0,
+                            padding: 0,
+                          }}
                           onClick={() => decreaseQuantity(key)}
                           _hover={{ bg: "none" }}
                           _active={{ bg: "none" }}
