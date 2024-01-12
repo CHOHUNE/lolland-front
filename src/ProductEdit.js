@@ -44,12 +44,6 @@ export function ProductEdit() {
         setProduct(data);
         setSelectedCategory(data.product.category_id);
         setSelectedSubCategory(data.product.subcategory_id);
-        setRemoveMainImgs(
-          data.mainImgUrls.reduce(
-            (acc, _, index) => ({ ...acc, [index]: false }),
-            {},
-          ),
-        );
       })
       .catch((error) =>
         toast({
@@ -122,19 +116,16 @@ export function ProductEdit() {
   };
 
   // ------------------------------ 메인이미지 삭제 로직 ------------------------------
-  function handleRemoveMainImgSwitch(index) {
-    setProduct((prevProduct) => ({
-      ...prevProduct,
-      mainImgUrls: prevProduct.mainImgUrls.filter(
-        (_, imgIndex) => imgIndex !== index,
-      ),
-    }));
-
-    // 삭제할 이미지의 상태를 업데이트합니다.
-    setRemoveMainImgs((prev) => {
-      const newRemoveMainImgs = { ...prev };
-      delete newRemoveMainImgs[index];
-      return newRemoveMainImgs;
+  function handleRemoveMainImgSwitch(imgId) {
+    setRemoveMainImgs((prevImgs) => {
+      const findIndex = prevImgs.findIndex((item) => item === imgId);
+      if (findIndex > -1) {
+        // 이미 배열에 ID가 있으면 제거합니다.
+        return prevImgs.filter((item) => item !== imgId);
+      } else {
+        // 배열에 ID가 없으면 추가합니다.
+        return [...prevImgs, imgId];
+      }
     });
   }
 
@@ -163,12 +154,14 @@ export function ProductEdit() {
       company_name: product.company_name, //
       category_id: selectedCategory, //
       subcategory_id: selectedSubCategory, //
-      removeMainImgs: product.mainImgUrls, //v
+      // removeMainImgs: product.mainImgUrls, //v
+      removeMainImgs,
       newImgs: mainImg, // 새로 업로드할 이미지 미리보기 URL들
       options: options,
     });
   }
 
+  console.log(removeMainImgs);
   return (
     <Box>
       {/* ------------------- 대분류 로직 ------------------- */}
@@ -279,20 +272,26 @@ export function ProductEdit() {
 
       {/* ------------------- 메인이미지 로직 ------------------- */}
       <Flex>
-        {product.mainImgUrls.map((imgUrl, index) => (
-          <Box key={index} my="5px">
+        {product.productImgs.map((productImg, index) => (
+          <Box key={productImg.main_img_id} my="5px">
             <FormControl display="flex" alignItems="center">
               <FormLabel htmlFor={`switch-${index}`}>
                 <FontAwesomeIcon color="red" icon={faTrashCan} />
               </FormLabel>
               <Switch
                 id={`switch-${index}`}
-                isChecked={removeMainImgs[index] || false}
+                isChecked={removeMainImgs.includes(productImg.main_img_id)}
                 colorScheme="red"
-                onChange={() => handleRemoveMainImgSwitch(index)}
+                onChange={() =>
+                  handleRemoveMainImgSwitch(productImg.main_img_id)
+                }
               />
             </FormControl>
-            <Image src={imgUrl} alt={`Main Image ${index}`} w="150px" />
+            <Image
+              src={productImg.main_img_uri}
+              alt={`Main Image ${index}`}
+              w="150px"
+            />
           </Box>
         ))}
       </Flex>

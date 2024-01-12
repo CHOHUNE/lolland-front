@@ -40,11 +40,11 @@ export function ProductView() {
   const { product_id } = useParams();
   const [isFavorited, setIsFavorited] = useState(false);
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
   const navigate = useNavigate();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   // ---------------------------- 상품 렌더링 ----------------------------
   useEffect(() => {
@@ -70,8 +70,8 @@ export function ProductView() {
   };
 
   // ------------------------------ 썸네일 클릭 시 메인 이미지 변경 ------------------------------
-  const selectImage = (index) => {
-    setCurrentImageIndex(index);
+  const changeMainImage = (index) => {
+    setSelectedImageIndex(index);
   };
 
   const handleOptionChange = (e) => {
@@ -205,20 +205,32 @@ export function ProductView() {
       >
         {/* 메인 이미지 */}
         <Box p={2}>
-          {product.mainImgUrls && product.mainImgUrls.length > 0 && (
-            <Image
-              src={product.mainImgUrls[currentImageIndex]}
-              alt={product.product_name}
-              boxSize="400px"
-              objectFit="contain"
-            />
+          {product && product.productImgs && product.productImgs.length > 0 && (
+            <Box p={2}>
+              <Image
+                src={product.productImgs[selectedImageIndex].main_img_uri}
+                alt={`Product Image ${selectedImageIndex}`}
+                boxSize="400px"
+                objectFit="contain"
+              />
+            </Box>
           )}
+
           {/* 썸네일 이미지 */}
           <HStack justifyContent={"center"} mt={2}>
-            {product.mainImgUrls &&
-              product.mainImgUrls.map((imgUrl, index) => (
-                <Box key={index} onMouseEnter={() => selectImage(index)}>
-                  <Image src={imgUrl} boxSize="100px" objectFit="cover" />
+            {product &&
+              product.productImgs &&
+              product.productImgs.map((img, index) => (
+                <Box
+                  key={img.main_img_id}
+                  onClick={() => changeMainImage(index)}
+                  onMouseEnter={() => changeMainImage(index)} // 마우스 호버 시 메인 이미지 변경
+                >
+                  <Image
+                    src={img.main_img_uri}
+                    boxSize="100px"
+                    objectFit="cover"
+                  />
                 </Box>
               ))}
           </HStack>
