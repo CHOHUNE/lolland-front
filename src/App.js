@@ -21,6 +21,7 @@ import { ProductEdit } from "./ProductEdit";
 import { MemberInfo } from "./page/member/MemberViewPage/MemberInfo";
 import { MemberManage } from "./page/member/MemberViewPage/MemberManage";
 import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
+import { MemberAddressWrite } from "./page/member/MemberViewPage/MemberAddressWrite";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -53,6 +54,7 @@ const routes = createBrowserRouter(
         <Route path="memberInfo" element={<MemberInfo />} />
         <Route path="memberInfo/memberManagePage" element={<MemberManage />} />
         <Route path="addressInfo" element={<MemberAddress />} />
+        <Route path="addressWrite" element={<MemberAddressWrite />} />
       </Route>
 
       {/* 게시판관련 */}

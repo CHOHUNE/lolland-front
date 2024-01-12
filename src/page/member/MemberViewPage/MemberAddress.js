@@ -138,7 +138,9 @@ export function MemberAddress() {
         </CardBody>
 
         <CardFooter>
-          <Button>배송지 추가</Button>
+          <Button onClick={() => navigate("/memberPage/addressWrite")}>
+            배송지 추가
+          </Button>
         </CardFooter>
       </Card>
 
