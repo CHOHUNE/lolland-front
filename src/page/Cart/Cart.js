@@ -13,12 +13,17 @@ import {
   Th,
   Thead,
   Tr,
+  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBagShopping } from "@fortawesome/free-solid-svg-icons";
 
 export function Cart() {
+  const toast = useToast();
+  const [memberLoginId, setMemberLoginId] = useState("");
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productList, setProductList] = useState([
     {
@@ -81,7 +86,23 @@ export function Cart() {
   }, []);
 
   function fetchCart() {
-    // axios.get("/api/cart/fetch", { member_id });
+    axios
+      .get("/api/cart/fetch", { member_id })
+      .then((response) => {
+        const { cartDtoList, member_login_id } = response.data;
+        setProductList(cartDtoList);
+        setMemberLoginId(member_login_id);
+      })
+      .catch((error) => {
+        toast({
+          title: "카트 불러오기에 실패하였습니다",
+          description: "다시 한번 확인해주세요",
+          status: "error",
+        });
+      })
+      .finally(() => {
+        console.log(productList);
+      });
   }
 
   // 전체 선택
@@ -102,25 +123,114 @@ export function Cart() {
     );
   }
 
+  const buttonStyles = {
+    variant: "outline",
+    border: "1px solid black",
+    _hover: { bgColor: "black", color: "white" },
+    borderRadius: 0,
+  };
+
+  function handleDelete(selectedProducts) {
+    axios
+      .delete("/api/cart/selected", {
+        cart_ids: selectedProducts,
+      })
+      .then(() => {
+        toast({
+          description: "선택한 상품들을 삭제하였습니다",
+          status: "success",
+        });
+        setSelectedProducts([]);
+        fetchCart();
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          toast({
+            title: "선택한 상품들을 삭제하는데 실패하였습니다",
+            description: "백엔드 로그를 확인해보세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "선택한 상품들을 삭제하는데 실패하였습니다",
+            description: "다시 한번 시도해보시거나, 관리자에게 문의하세요",
+            status: "error",
+          });
+        }
+      });
+  }
+
+  function handlePurchase(selectedProducts) {
+    // axios.post() TODO: 결제로 옮기기
+  }
+
+  function handleDeleteAll(member_id) {
+    axios
+      .delete("/api/cart/delete" + member_id)
+      .then(() => {
+        toast({
+          description: "장바구니 비우기에 성공하였습니다",
+          status: "success",
+        });
+        fetchCart();
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          toast({
+            title: "장바구니 비우기에 실패하였습니다",
+            description: "백엔드 코드를 확인해보세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "장바구니 비우기에 실패하였습니다",
+            description: "다시 시도하시거나 관리자에게 문의하세요",
+            status: "error",
+          });
+        }
+      });
+  }
+
   return (
     <>
-      <Heading mb={5}>
-        <Text as="span" color="skyblue">
-          {"{"} member_login_id {"}"}
+      <Heading my={5} mx={10}>
+        <FontAwesomeIcon icon={faBagShopping} />
+        <Text as="span" color="orange" ml={3}>
+          {"{"} memberLoginId {"}"}
         </Text>
-        님의 카트
+        님의 장바구니
       </Heading>
-      <TableContainer>
+      <TableContainer mx={10} mb={10}>
         <Flex justifyContent="space-between" mx={10} mb={5}>
           <Checkbox
+            colorScheme="gray"
             isChecked={selectedProducts.length === productList.length}
             onChange={(e) => handleSelectAllProducts(e.target.checked)}
           >
             전체 선택
           </Checkbox>
           <ButtonGroup>
-            <Button>선택 삭제</Button>
-            <Button>선택 결제</Button>
+            <Button
+              isDisabled={true}
+              {...buttonStyles}
+              onClick={() => handleDelete(selectedProducts)}
+            >
+              선택 삭제
+            </Button>
+            <Button
+              isDisabled={true}
+              {...buttonStyles}
+              onClick={() => handlePurchase(selectedProducts)}
+            >
+              선택 결제
+            </Button>
+            <Button
+              isDisabled={true}
+              {...buttonStyles}
+              onClick={() => handleDeleteAll(member_id)}
+            >
+              전부 비우기
+            </Button>
           </ButtonGroup>
         </Flex>
         <Table>
@@ -130,6 +240,7 @@ export function Cart() {
               <Th textAlign="center">상품 이미지</Th>
               <Th textAlign="center">상품명</Th>
               <Th textAlign="center">정보</Th>
+              <Th textAlign="center">제조사</Th>
               <Th textAlign="center">가격</Th>
             </Tr>
           </Thead>
@@ -145,7 +256,7 @@ export function Cart() {
                     // onClick={(e) => e.stopPropagation()}
                   >
                     <Checkbox
-                      colorScheme="blue"
+                      colorScheme="gray"
                       isChecked={selectedProducts.includes(product.product_id)}
                       onChange={() => {
                         handleCheckBoxChange(product);
@@ -157,9 +268,9 @@ export function Cart() {
                   </Td>
                   <Td textAlign="center">{product.product_name}</Td>
                   <Td textAlign="center" whiteSpace={"nowrap"}>
-                    {product.category_name} {product.subcategory_name}{" "}
-                    {product.company_name}
+                    {product.category_name} / {product.subcategory_name}
                   </Td>
+                  <Td textAlign="center">{product.company_name}</Td>
                   <Td textAlign="center">
                     {product.product_price.toLocaleString()}
                   </Td>

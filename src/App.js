@@ -7,6 +7,7 @@ import {
 import { HomeLayout } from "./layout/HomeLayout";
 import { MemberSignup } from "./page/member/MemberSignup";
 import { MemberLogin } from "./page/member/MemberLogin";
+import { MemberView } from "./page/member/MemberViewPage/MemberView";
 import GameBoardWrite from "./page/gameBoard/GameBoardWrite";
 import GameBoardList from "./page/gameBoard/GameBoardList";
 import GameBoardEdit from "./page/gameBoard/GameBoardEdit";
@@ -20,6 +21,10 @@ import { GearBoard } from "./page/gearBoard/GearBoard";
 import { GearList } from "./page/gearBoard/GearList";
 import { GearView } from "./page/gearBoard/GearView";
 import { GearEdit } from "./page/gearBoard/GearEdit";
+import { ProductEdit } from "./ProductEdit";
+import { MemberInfo } from "./page/member/MemberViewPage/MemberInfo";
+import { MemberManage } from "./page/member/MemberViewPage/MemberManage";
+import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -30,6 +35,7 @@ const routes = createBrowserRouter(
       <Route path="product/write/" element={<ProductWrite />} />
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
+      <Route path="edit/:product_id" element={<ProductEdit />} />
 
       {/* 리뷰 */}
       <Route path="/review" element={<ReviewView />} />
@@ -47,6 +53,11 @@ const routes = createBrowserRouter(
       {/* 회원관련 */}
       <Route path="signup" element={<MemberSignup />} />
       <Route path="login" element={<MemberLogin />} />
+      <Route path="memberPage" element={<MemberView />}>
+        <Route path="memberInfo" element={<MemberInfo />} />
+        <Route path="memberInfo/memberManagePage" element={<MemberManage />} />
+        <Route path="addressInfo" element={<MemberAddress />} />
+      </Route>
 
       {/* 게시판관련 */}
       <Route path="gameboard" element={<GameBoardList />} />

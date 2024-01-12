@@ -15,7 +15,12 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { DeleteIcon, EditIcon, NotAllowedIcon } from "@chakra-ui/icons";
+import {
+  AddIcon,
+  DeleteIcon,
+  EditIcon,
+  NotAllowedIcon,
+} from "@chakra-ui/icons";
 
 // 댓글 작성 폼
 function CommentForm({ isSubmitting, onSubmit }) {
@@ -35,15 +40,52 @@ function CommentForm({ isSubmitting, onSubmit }) {
     </Box>
   );
 }
+
 // ---------------코멘트 아이템 -------------------------- 개별 댓글 - 수정 및 삭제 기능
 function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
   // const hasAccess = useContext(LoginContext);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isWriting, setIsWriting] = useState(false);
   const [commentEdited, setCommentEdited] = useState(comment.comment_content);
+  const [duplicateReplyComment, setDuplicateReplyComment] = useState(null);
+  const [replyComment, setReplyComment] = useState();
   const toast = useToast();
 
-  function handleSubmit() {
+  function handleDuplicateSubmit() {
+    console.log(comment.id);
+    console.log(comment.game_board_id);
+
+    setIsSubmitting(true);
+
+    axios
+      .post("/api/comment/add", {
+        parent_id: comment.id,
+        comment_content: replyComment,
+        game_board_id: comment.game_board_id,
+      })
+      .then(() => {
+        toast({ description: "성공", status: "success" });
+      })
+      .catch((error) => {
+        if (error.response.status === 401 || error.response.status === 403) {
+          toast({ description: "실패", status: "error" });
+        }
+        if (error.response.status === 400) {
+          toast({
+            description: "입력 값 확인",
+            status: "warning",
+          });
+        }
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+        setIsWriting(false);
+        setReplyComment(null);
+      });
+  }
+
+  function handleEditSubmit() {
     setIsSubmitting(true);
     axios
       .put("/api/comment/edit", {
@@ -84,21 +126,61 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
           {isEditing && (
             <Box>
               <Textarea
-                value={commentEdited}
+                value={replyComment}
                 onChange={(e) => setCommentEdited(e.target.value)}
               />
               <Button
                 colorScheme={"blue"}
                 isDisabled={isSubmitting}
-                onClick={handleSubmit}
+                onClick={handleEditSubmit}
               >
-                저장
+                수정 - 저장
+              </Button>
+            </Box>
+          )}
+
+          {isWriting && (
+            <Box>
+              <Textarea
+                value={replyComment}
+                onChange={(e) => setReplyComment(e.target.value)}
+              />
+              <Button
+                colorScheme={"blue"}
+                isDisabled={isSubmitting}
+                onClick={handleDuplicateSubmit}
+              >
+                댓글-댓글 저장
               </Button>
             </Box>
           )}
         </Box>
 
         {/*{hasAccess(comment.memberId) && (*/}
+
+        {isWriting || (
+          <Box>
+            <Button
+              size={"xs"}
+              colorScheme={"green"}
+              onClick={() => setIsWriting(true)}
+            >
+              <AddIcon />
+            </Button>
+          </Box>
+        )}
+        {isWriting && (
+          <Box>
+            <Button
+              size={"xs"}
+              colorScheme={"gray"}
+              onClick={() => setIsWriting(false)}
+            >
+              <NotAllowedIcon />
+            </Button>
+          </Box>
+        )}
+
         <Box>
           {isEditing || (
             <Button
@@ -131,6 +213,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
     </Box>
   );
 }
+
 //  코멘트 아이템 끝 -------------------------------
 
 // 여러개의 댓글 - CommentList
@@ -179,6 +262,19 @@ export function GameBoardCommentContainer() {
       .post("/api/comment/add", {
         game_board_id: comment.id,
         comment_content: comment.comment,
+        parent_id: comment.parent_id,
+      })
+      .then(() => {
+        toast({
+          description: "등록 성공",
+          status: "success",
+        });
+      })
+      .catch(() => {
+        toast({
+          description: "실패",
+          status: "error",
+        });
       })
       .finally(() => {
         setIsSubmitting(false);
