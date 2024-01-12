@@ -94,7 +94,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
         <Heading size="xs">
           ID:{comment.id} PID:{comment.parent_id}
         </Heading>
-        <Text fontSize="xs">{comment.reg_time}</Text>
+        <Text fontSize="xs">{comment.ago}</Text>
       </Flex>
       <Flex justifyContent="space-between" alignItems="center">
         <Box flex={1}>
