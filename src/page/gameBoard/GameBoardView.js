@@ -12,9 +12,26 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import GameBoardCommentContainer from "./GameBoardCommentContainer";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeartBroken } from "@fortawesome/free-solid-svg-icons/faHeartBroken";
 
+function LikeContainer({ like, onClick }) {
+  if (like === null) {
+    return <Spinner />;
+  }
+
+  return (
+    <Button variant="ghost" size="xl" onClick={onClick}>
+      {like.like && <FontAwesomeIcon icon={faHeart} size={"xl"} />}
+      {/*<FontAwesomeIcon icon={faHeart} size={"xl"} />*/}
+      {like.like || <FontAwesomeIcon icon={faHeartBroken} size={"xl"} />}
+    </Button>
+  );
+}
 export function GameBoardView(props) {
   const [board, setBoard] = useState(null);
+  const [like, setLike] = useState(null);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -31,6 +48,12 @@ export function GameBoardView(props) {
       });
   }, [id]);
 
+  useEffect(() => {
+    axios
+      .get("/api/like/gameboard/" + id)
+      .then((response) => setLike(response.data));
+  }, []);
+
   function handleDelete() {
     axios
       .delete("/api/gameboard/remove/" + id)
@@ -46,6 +69,19 @@ export function GameBoardView(props) {
           description: "실패",
           status: "error",
         });
+      });
+  }
+
+  function handleLike() {
+    axios
+      .post("/api/like", { game_board_id: board.id })
+      .then((response) => {
+        setLike(response.data);
+        console.log(like);
+        toast({ description: "성공", status: "success" });
+      })
+      .catch(() => {
+        toast({ description: "실패", status: "error" });
       });
   }
 
@@ -68,6 +104,7 @@ export function GameBoardView(props) {
             <Button onClick={handleDelete} colorScheme={"red"}>
               삭제
             </Button>
+            <LikeContainer onClick={handleLike} like={like} />
           </HStack>
           <Box
             border={"1px solid grey"}
