@@ -42,6 +42,8 @@ function GameBoardList() {
                 <Th>category</Th>
                 <Th>content</Th>
                 <Th>boardCount</Th>
+                <Th>boardLikeCount</Th>
+                <Th>boardCommentCount</Th>
                 <Th>regTime</Th>
               </Tr>
             </Thead>
@@ -59,6 +61,8 @@ function GameBoardList() {
                     <Td>{board.category}</Td>
                     <Td>{board.board_content}</Td>
                     <Td>{board.board_count}</Td>
+                    <Td>{board.count_like}</Td>
+                    <Td>{board.count_comment}</Td>
                     <Td>{board.reg_time}</Td>
                   </Tr>
                 ))}

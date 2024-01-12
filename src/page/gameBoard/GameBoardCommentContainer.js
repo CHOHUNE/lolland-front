@@ -91,13 +91,15 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
   return (
     <Box ml={`${comment.depth * 20}px`}>
       <Flex justifyContent="space-between">
-        <Heading size="xs">{comment.id}</Heading>
+        <Heading size="xs">
+          ID:{comment.id} PID:{comment.parent_id}
+        </Heading>
         <Text fontSize="xs">{comment.reg_time}</Text>
       </Flex>
       <Flex justifyContent="space-between" alignItems="center">
         <Box flex={1}>
           <Text sx={{ whiteSpace: "pre-wrap" }} pt="2" fontSize="sm">
-            {comment.comment_content}
+            내용: {comment.comment_content}
           </Text>
           {isEditing && (
             <Box>
