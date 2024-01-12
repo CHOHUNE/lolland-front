@@ -33,7 +33,7 @@ export function GearList() {
             <Td>카테고리</Td>
             <Td>제목</Td>
             <Td>컨텐츠</Td>
-            <Td>닉네임</Td>
+            {/*<Td>닉네임</Td>*/}
             <Td>조회수</Td>
             <Td>날짜</Td>
           </Tr>
@@ -51,10 +51,9 @@ export function GearList() {
                 <Td>{item.category}</Td>
                 <Td>{item.gear_title}</Td>
                 <Td>{item.gear_content}</Td>
-                <Td>{item.member_name}</Td>
+                {/*<Td>{item.member_name}</Td>*/}
                 <Td>{item.gear_views}</Td>
                 <Td>{item.gear_inserted}</Td>
-                {/*<Td>{item.member_name}</Td>*/}
               </Tr>
             ))
           )}

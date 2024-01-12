@@ -25,7 +25,7 @@ import { ProductEdit } from "./ProductEdit";
 import { MemberInfo } from "./page/member/MemberViewPage/MemberInfo";
 import { MemberManage } from "./page/member/MemberViewPage/MemberManage";
 import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
-import { GearListlayout } from "./GearListlayout";
+import { GearListlayout } from "./page/gearBoard/GearListlayout";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
