@@ -17,6 +17,7 @@ import {
   Flex,
   Divider,
 } from "@chakra-ui/react";
+import { GearList } from "./GearList";
 export function GearListlayout() {
   return (
     <Box w={"80%"} margin={"15px auto"}>
@@ -136,14 +137,11 @@ export function GearListlayout() {
               <Tab _selected={{ color: "white", bg: "orange.400" }}>인사</Tab>
             </TabList>
             <TabPanels>
+              {/* 전체 정보 */}
               <TabPanel>
-                <p>one!</p>
-                <p>one!</p>
-                <p>one!</p>
-                <p>one!</p>
-                <p>one!</p>
-                <p>one!</p>
+                <GearList />
               </TabPanel>
+              {/* 잡담정보 */}
               <TabPanel>
                 <p>two!</p>
                 <p>two!</p>
@@ -152,6 +150,19 @@ export function GearListlayout() {
                 <p>two!</p>
                 <p>two!</p>
               </TabPanel>
+              {/* 질문정보 */}
+              <TabPanel>
+                <GearList />
+              </TabPanel>
+              {/* 정보정보 */}
+              <TabPanel>
+                <GearList />
+              </TabPanel>
+              {/* 축하정보 */}
+
+              {/* 고민정보 */}
+
+              {/* 인사정보 */}
             </TabPanels>
           </Tabs>
         </Box>

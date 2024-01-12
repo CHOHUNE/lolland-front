@@ -101,7 +101,7 @@ export function NavBar() {
             <Button
               borderRadius={0}
               h={"70%"}
-              onClick={() => navigate("gearboard")}
+              onClick={() => navigate("/gearlistlayout")}
             >
               게임 장비 커뮤니티
             </Button>

@@ -25,7 +25,6 @@ export function GearList() {
 
   return (
     <Box>
-      <h1>게시물 리스트</h1>
       <Table>
         <Thead>
           <Tr>
