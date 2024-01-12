@@ -92,7 +92,16 @@ export function NavBar() {
   return (
     <Box>
       {/* ------------------- 상단 네브 바 ------------------- */}
-      <Flex justifyContent="space-between" p={5}>
+      <Flex
+        top={0}
+        justifyContent="space-between"
+        p={5}
+        w="full"
+        shadow="sm"
+        position="fixed"
+        zIndex={100}
+        backgroundColor="white"
+      >
         <Flex>
           <Box
             w="200px"
@@ -141,10 +150,8 @@ export function NavBar() {
         variant="soft-rounded"
         colorScheme="blackAlpha"
         px={10}
-        pb={5}
-        position="relative"
-        zIndex={20}
-        border="1px dashed blue"
+        py={3}
+        mt="90px"
       >
         <TabList>
           <HStack spacing={2}>
@@ -172,7 +179,13 @@ export function NavBar() {
             </Tab>
           </HStack>
         </TabList>
-        <TabPanels px={10}>
+        <TabPanels
+          px={10}
+          left={0}
+          zIndex={100}
+          backgroundColor="white"
+          position="fixed"
+        >
           <TabPanel
             fontSize="sm"
             onMouseEnter={() => setIndex(0)}
