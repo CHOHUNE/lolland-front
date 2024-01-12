@@ -23,10 +23,6 @@ export function GearBoard() {
 
   const categories = ["전체", "잡담", "질문", "정보", "축하", "고민", "인사"];
 
-  // useEffect(() => {
-  //   axios.get("/api/gearboard/getm").then((response) => response.data);
-  // }, []);
-
   function handleSave() {
     axios
       .post("/api/gearboard/save", {

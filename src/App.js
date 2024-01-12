@@ -25,6 +25,7 @@ import { ProductEdit } from "./ProductEdit";
 import { MemberInfo } from "./page/member/MemberViewPage/MemberInfo";
 import { MemberManage } from "./page/member/MemberViewPage/MemberManage";
 import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
+import { GearListlayout } from "./GearListlayout";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -68,6 +69,8 @@ const routes = createBrowserRouter(
       {/* 게임 장비 커뮤니티 */}
       <Route path="gearboard" element={<GearBoard />} />
       <Route path="gearlist" element={<GearList />} />
+      <Route path="gearlistlayout" element={<GearListlayout />} />
+
       <Route path="gearlist/gear_id/:gear_id" element={<GearView />} />
       <Route path="gearlist/edit/:gear_id" element={<GearEdit />} />
     </Route>,
