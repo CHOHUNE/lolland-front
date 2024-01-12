@@ -55,6 +55,7 @@ export function MemberInfo() {
         <CardBody>
           <Box mb={10}>id_님 정보를 보호하기 위해 비밀번호를 확인 합니다.</Box>
           <Input
+            type={"password"}
             onKeyDown={handleKeyDown}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
