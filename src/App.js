@@ -22,6 +22,7 @@ import { MemberInfo } from "./page/member/MemberViewPage/MemberInfo";
 import { MemberManage } from "./page/member/MemberViewPage/MemberManage";
 import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
 import { MemberAddressWrite } from "./page/member/MemberViewPage/MemberAddressWrite";
+import { MemberEdit } from "./page/member/MemberViewPage/MemberEdit";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -53,6 +54,7 @@ const routes = createBrowserRouter(
       <Route path="memberPage" element={<MemberView />}>
         <Route path="memberInfo" element={<MemberInfo />} />
         <Route path="memberInfo/memberManagePage" element={<MemberManage />} />
+        <Route path="memberEdit" element={<MemberEdit />} />
         <Route path="addressInfo" element={<MemberAddress />} />
         <Route path="addressWrite" element={<MemberAddressWrite />} />
       </Route>
