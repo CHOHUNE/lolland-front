@@ -76,12 +76,22 @@ export function GameBoardView(props) {
     axios
       .post("/api/like", { game_board_id: board.id })
       .then((response) => {
-        setLike(response.data);
-        console.log(like);
-        toast({ description: "성공", status: "success" });
+        setLike((prevLike) => ({
+          like: !prevLike.like, // 현재 상태의 반대로 like 상태를 토글합니다.
+          countLike: response.data.countLike, // 필요한 경우 카운트 업데이트
+        }));
+
+        const successMessage = !like.like
+          ? "좋아요를 눌렀습니다."
+          : "좋아요를 취소했습니다.";
+        const statusChange = !like.like ? "success" : "error";
+        toast({ description: successMessage, status: statusChange });
       })
       .catch(() => {
-        toast({ description: "실패", status: "error" });
+        toast({
+          description: "좋아요 처리 중 오류가 발생했습니다.",
+          status: "error",
+        });
       });
   }
 
