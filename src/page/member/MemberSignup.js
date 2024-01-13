@@ -9,6 +9,7 @@ import {
   Flex,
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   Input,
   useToast,
@@ -80,11 +81,39 @@ export function MemberSignup() {
   // 이메일 인증번호 상태 체크 -------------------------------------------------------------------------
   const [sendNumber, setSendNumber] = useState(false);
 
+  // 아이디 중복 버튼 활성화 상태 저장 ------------------------------------------------------------------------
+  const [checkIdButtonState, setCheckIdButtonState] = useState(false);
+
   // 네비게이트 -------------------------------------------------------------------------------------
   const navigate = useNavigate();
 
   // 토스트 ---------------------------------------------------------------------------------------
   const toast = useToast();
+
+  // 가입 버튼 활성화 상태 저장 ------------------------------------------------------------------------
+  const [signButtonState, setSignButtonState] = useState(false);
+
+  // 비밀번호와 비밀번호 확인이 다르면 가입 버튼 막기
+  useEffect(() => {
+    if (member_password === "") {
+      setSignButtonState(false);
+    } else {
+      if (member_password === member_password_checked) {
+        setSignButtonState(true);
+      } else {
+        setSignButtonState(false);
+      }
+    }
+  }, [member_password, member_password_checked]);
+
+  // 아이디 중복확인 버튼 활성화 되어있으면 가입버튼 막기
+  useEffect(() => {
+    if (checkIdButtonState) {
+      setSignButtonState(false);
+    } else {
+      setSignButtonState(true);
+    }
+  }, [checkIdButtonState]);
 
   useEffect(() => {
     setMember_email(member_email1 + "@" + member_email2);
@@ -135,8 +164,9 @@ export function MemberSignup() {
           description: "회원가입 성공하였습니다.",
           status: "success",
         });
-        navigate("/");
+        setSignButtonState(false);
       })
+      .then(() => navigate("/"))
       .catch((error) => {
         if (error.response && error.response.status === 400) {
           let errorMessage = error.response.data[0];
@@ -174,6 +204,28 @@ export function MemberSignup() {
     openPostcodePopup({ onComplete: handleComplete });
   };
 
+  // 아이디 중복 확인
+  function handleIdCheckButton() {
+    axios
+      .get("/api/member/checkId", {
+        params: {
+          member_login_id,
+        },
+      })
+      .then(() => {
+        toast({ description: "사용 가능한 아이디 입니다", status: "success" });
+      })
+      .then(() => setCheckIdButtonState(false))
+      .catch(
+        () =>
+          toast({
+            description: "이미 사용중인 아이디 입니다.",
+            status: "error",
+          }),
+        setSignButtonState(false),
+      );
+  }
+
   return (
     <Center mt={8} mb={8}>
       <Card w={"1000px"}>
@@ -209,11 +261,36 @@ export function MemberSignup() {
                 h={"50px"}
                 borderRadius={"0"}
                 value={member_login_id}
-                onChange={(e) => setMember_login_id(e.target.value)}
+                onChange={(e) => {
+                  setMember_login_id(e.target.value);
+                  setCheckIdButtonState(true);
+                }}
               />
-              <Button w={"140px"} h={"50px"} ml={"10px"}>
+
+              <Button
+                w={"140px"}
+                h={"50px"}
+                ml={"10px"}
+                onClick={handleIdCheckButton}
+                isDisabled={!checkIdButtonState}
+              >
                 중복확인
               </Button>
+            </Flex>
+            <Flex justifyContent={"center"}>
+              <FormLabel
+                w={"100px"}
+                fontSize={"1.1rem"}
+                lineHeight={"50px"}
+              ></FormLabel>
+              <FormHelperText
+                w={"63%"}
+                ml={120}
+                color={"gray"}
+                fontSize={"0.9rem"}
+              >
+                3자에서 20자 사이의 영문자와 숫자만 허용
+              </FormHelperText>
             </Flex>
           </FormControl>
           {/* 비밀번호 */}
@@ -233,7 +310,10 @@ export function MemberSignup() {
             </Flex>
           </FormControl>
           {/* 비밀번호 체크 */}
-          <FormControl mt={2}>
+          <FormControl
+            mt={2}
+            isInvalid={member_password != member_password_checked}
+          >
             <Flex justifyContent={"center"}>
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 비밀번호 확인
@@ -247,7 +327,16 @@ export function MemberSignup() {
                 onChange={(e) => setMember_password_checked(e.target.value)}
               />
             </Flex>
-            <FormErrorMessage>비밀번호가 다릅니다.</FormErrorMessage>
+            <Flex justifyContent={"center"}>
+              <FormLabel
+                w={"100px"}
+                fontSize={"1.1rem"}
+                lineHeight={"50px"}
+              ></FormLabel>
+              <FormErrorMessage w={"500px"} h={"50px"} fontSize={"1.1rem"}>
+                비밀번호가 다릅니다.
+              </FormErrorMessage>
+            </Flex>
           </FormControl>
           {/* 핸드폰번호 */}
           <FormControl mt={2}>
@@ -301,7 +390,9 @@ export function MemberSignup() {
                 w={"140px"}
                 h={"50px"}
                 borderRadius={"0"}
-                onChange={(e) => setMember_phone_number3(e.target.value)}
+                onChange={(e) => {
+                  setMember_phone_number3(e.target.value.slice(0, 4));
+                }}
               />
             </Flex>
           </FormControl>
@@ -429,9 +520,14 @@ export function MemberSignup() {
               <Button
                 w={"250px"}
                 h={"50px"}
-                style={{ backgroundColor: "#5F625C" }}
-                color={"whitesmoke"}
+                style={{
+                  backgroundColor: "black",
+                  color: "whitesmoke",
+                  fontSize: "1.1rem",
+                  fontWeight: "900",
+                }}
                 onClick={handleSingUpClick}
+                isDisabled={!signButtonState}
               >
                 가입하기
               </Button>
