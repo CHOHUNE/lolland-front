@@ -98,8 +98,9 @@ export function ProductEdit() {
   // ---------------------------------- 상세옵션선택 관련 로직 ----------------------------------
   const handleInputChange = (e, index) => {
     const newOptions = [...options];
-    newOptions[index] = e.target.value;
+    newOptions[index] = { ...newOptions[index], option_name: e.target.value };
     setOptions(newOptions);
+    console.log("options : " + options[0].option_name + options[0].option_id);
   };
 
   // ---------------------------------- 상세옵션선택 추가 로직 ----------------------------------
@@ -161,7 +162,6 @@ export function ProductEdit() {
     });
   }
 
-  console.log(removeMainImgs);
   return (
     <Box>
       {/* ------------------- 대분류 로직 ------------------- */}
