@@ -87,12 +87,21 @@ function App() {
       .then((response) => setLogin(response.data));
   }
 
+  // 로그인 상태 검증
   function isAuthenticated() {
     return login !== "";
   }
 
+  // 로그인한 유저가 (댓글, 작성글, 등등 의 주인) 자신인지 검증
+  // hasAccess 검증을 이용 하려면 회원 로그인 아이디를 프롭으로 전달 해주어야 합니다.
+  function hasAccess(userId) {
+    return login.member_login_id === userId;
+  }
+
   return (
-    <LoginContext.Provider value={{ login, fetchLogin, isAuthenticated }}>
+    <LoginContext.Provider
+      value={{ login, fetchLogin, isAuthenticated, hasAccess }}
+    >
       <RouterProvider router={routes} />
     </LoginContext.Provider>
   );
