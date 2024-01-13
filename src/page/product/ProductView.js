@@ -31,6 +31,7 @@ import {
 import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { selectOptions } from "@testing-library/user-event/dist/select-options"; // 빈 하트
+import { ReviewView } from "../review/ReviewView"; // 빈 하트
 
 export function ProductView() {
   const [product, setProduct] = useState(null);
@@ -284,6 +285,14 @@ export function ProductView() {
 
           <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
             <FormLabel w={"100px"} fontWeight="bold">
+              재고
+            </FormLabel>
+            <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
+              {product.product.total_stock}개
+            </Box>
+          </HStack>
+          <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
+            <FormLabel w={"100px"} fontWeight="bold">
               제조사
             </FormLabel>
             <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
@@ -477,6 +486,11 @@ export function ProductView() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      {/* --------------- 상품 상세 설명, 리뷰 , Q&A --------------- */}
+      <ReviewView
+        product_id={product.product_id}
+        product_content={product.product_content}
+      />
     </Box>
   );
 }
