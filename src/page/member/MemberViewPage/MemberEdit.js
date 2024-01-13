@@ -58,6 +58,18 @@ export function MemberEdit() {
   // 아이디 변경 인식 --------------------------------------------------------------------------------------
   const [nameChangeCheck, setNameChangeCheck] = useState(true);
 
+  // 회원 정보 변경 인식 --------------------------------------------------------------------------------------
+  // true 면 수정하기 버튼 비활셩화 false 일때 수정하기 버튼 활성화 되게 함
+  const [editChangeCheck, setEditChangeCheck] = useState(true);
+
+  useEffect(() => {
+    if (nameChangeCheck) {
+      setEditChangeCheck(false);
+    } else {
+      setEditChangeCheck(true);
+    }
+  }, [nameChangeCheck]);
+
   const navigate = useNavigate();
 
   const toast = useToast();
@@ -431,6 +443,7 @@ export function MemberEdit() {
                 fontWeight: "900",
               }}
               onClick={handleEditClick}
+              isDisabled={editChangeCheck}
             >
               수정 하기
             </Button>
