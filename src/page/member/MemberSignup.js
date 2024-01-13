@@ -256,6 +256,7 @@ export function MemberSignup() {
                 휴대폰번호
               </FormLabel>
               <Input
+                type={"number"}
                 id="member_phone_number1"
                 value={member_phone_number1}
                 maxLength={3}
@@ -273,6 +274,7 @@ export function MemberSignup() {
                 -
               </Box>
               <Input
+                type={"number"}
                 id="member_phone_number2"
                 ref={phoneInput2Ref}
                 value={member_phone_number2}
@@ -291,6 +293,7 @@ export function MemberSignup() {
                 -
               </Box>
               <Input
+                type={"number"}
                 id="member_phone_number3"
                 ref={phoneInput3Ref}
                 value={member_phone_number3}
