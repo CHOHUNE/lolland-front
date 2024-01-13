@@ -98,9 +98,32 @@ function App() {
     return login.member_login_id === userId;
   }
 
+  // 관리자인지 검증
+  function isAdmin() {
+    return login.member_type === "admin";
+  }
+
+  // 판매자인지 검증
+  function isSeller() {
+    return login.member_type === "seller";
+  }
+
+  // 일반 회원인지 검증
+  function isUser() {
+    return login.member_type === "user";
+  }
+
   return (
     <LoginContext.Provider
-      value={{ login, fetchLogin, isAuthenticated, hasAccess }}
+      value={{
+        login,
+        fetchLogin,
+        isAuthenticated,
+        hasAccess,
+        isAdmin,
+        isSeller,
+        isUser,
+      }}
     >
       <RouterProvider router={routes} />
     </LoginContext.Provider>
