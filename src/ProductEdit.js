@@ -27,8 +27,8 @@ export function ProductEdit() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
-  const [removeMainImgs, setRemoveMainImgs] = useState({}); // 이미지삭제
-  const [mainImg, setMainImg] = useState(null); // 이미지 추가
+  const [removeMainImgs, setRemoveMainImgs] = useState([]); // 이미지삭제
+  const [mainImg, setMainImg] = useState([]);
 
   const [previewImages, setPreviewImages] = useState([]);
 
@@ -44,12 +44,6 @@ export function ProductEdit() {
         setProduct(data);
         setSelectedCategory(data.product.category_id);
         setSelectedSubCategory(data.product.subcategory_id);
-        setRemoveMainImgs(
-          data.mainImgUrls.reduce(
-            (acc, _, index) => ({ ...acc, [index]: false }),
-            {},
-          ),
-        );
       })
       .catch((error) =>
         toast({
@@ -104,8 +98,9 @@ export function ProductEdit() {
   // ---------------------------------- 상세옵션선택 관련 로직 ----------------------------------
   const handleInputChange = (e, index) => {
     const newOptions = [...options];
-    newOptions[index] = e.target.value;
+    newOptions[index] = { ...newOptions[index], option_name: e.target.value };
     setOptions(newOptions);
+    console.log("options : " + options[0].option_name + options[0].option_id);
   };
 
   // ---------------------------------- 상세옵션선택 추가 로직 ----------------------------------
@@ -122,37 +117,34 @@ export function ProductEdit() {
   };
 
   // ------------------------------ 메인이미지 삭제 로직 ------------------------------
-  function handleRemoveMainImgSwitch(index) {
-    setProduct((prevProduct) => ({
-      ...prevProduct,
-      mainImgUrls: prevProduct.mainImgUrls.filter(
-        (_, imgIndex) => imgIndex !== index,
-      ),
-    }));
-
-    // 삭제할 이미지의 상태를 업데이트합니다.
-    setRemoveMainImgs((prev) => {
-      const newRemoveMainImgs = { ...prev };
-      delete newRemoveMainImgs[index];
-      return newRemoveMainImgs;
+  function handleRemoveMainImgSwitch(imgId) {
+    setRemoveMainImgs((prevImgs) => {
+      const findIndex = prevImgs.findIndex((item) => item === imgId);
+      if (findIndex > -1) {
+        // 이미 배열에 ID가 있으면 제거합니다.
+        return prevImgs.filter((item) => item !== imgId);
+      } else {
+        // 배열에 ID가 없으면 추가합니다.
+        return [...prevImgs, imgId];
+      }
     });
   }
 
   // 이미지 파일이 선택되었을 때 호출될 함수
   const handleImageChange = (event) => {
+    setMainImg(event.target.files);
+
     if (event.target.files) {
       const filesArray = Array.from(event.target.files).map((file) => {
-        return URL.createObjectURL(file); // 파일을 위한 Data URL을 생성합니다.
+        return URL.createObjectURL(file);
       });
-
-      setPreviewImages(filesArray); // 미리보기 이미지 목록을 업데이트합니다.
-
-      // 메모리 누수를 방지하기 위해, 컴포넌트가 언마운트될 때 URL을 해제합니다.
+      setPreviewImages(filesArray);
       return () =>
         filesArray.forEach((fileUrl) => URL.revokeObjectURL(fileUrl));
     }
   };
 
+  // ------------------------------ 저장 버튼 클릭시 실행될 로직 ------------------------------
   function handleUpdateClick() {
     axios.putForm("/api/product/edit", {
       product_id: product_id, //
@@ -163,8 +155,9 @@ export function ProductEdit() {
       company_name: product.company_name, //
       category_id: selectedCategory, //
       subcategory_id: selectedSubCategory, //
-      removeMainImgs: product.mainImgUrls, // 서버에 이미 있는 이미지 URL들
-      newImgs: previewImages, // 새로 업로드할 이미지 미리보기 URL들
+      // removeMainImgs: product.mainImgUrls, //v
+      removeMainImgs,
+      newImgs: mainImg, // 새로 업로드할 이미지 미리보기 URL들
       options: options,
     });
   }
@@ -279,20 +272,26 @@ export function ProductEdit() {
 
       {/* ------------------- 메인이미지 로직 ------------------- */}
       <Flex>
-        {product.mainImgUrls.map((imgUrl, index) => (
-          <Box key={index} my="5px">
+        {product.productImgs.map((productImg, index) => (
+          <Box key={productImg.main_img_id} my="5px">
             <FormControl display="flex" alignItems="center">
               <FormLabel htmlFor={`switch-${index}`}>
                 <FontAwesomeIcon color="red" icon={faTrashCan} />
               </FormLabel>
               <Switch
                 id={`switch-${index}`}
-                isChecked={removeMainImgs[index] || false}
+                isChecked={removeMainImgs.includes(productImg.main_img_id)}
                 colorScheme="red"
-                onChange={() => handleRemoveMainImgSwitch(index)}
+                onChange={() =>
+                  handleRemoveMainImgSwitch(productImg.main_img_id)
+                }
               />
             </FormControl>
-            <Image src={imgUrl} alt={`Main Image ${index}`} w="150px" />
+            <Image
+              src={productImg.main_img_uri}
+              alt={`Main Image ${index}`}
+              w="150px"
+            />
           </Box>
         ))}
       </Flex>

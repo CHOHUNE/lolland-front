@@ -41,11 +41,11 @@ export function ProductView() {
   const { product_id } = useParams();
   const [isFavorited, setIsFavorited] = useState(false);
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
   const navigate = useNavigate();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   // ---------------------------- 상품 렌더링 ----------------------------
   useEffect(() => {
@@ -71,8 +71,8 @@ export function ProductView() {
   };
 
   // ------------------------------ 썸네일 클릭 시 메인 이미지 변경 ------------------------------
-  const selectImage = (index) => {
-    setCurrentImageIndex(index);
+  const changeMainImage = (index) => {
+    setSelectedImageIndex(index);
   };
 
   const handleOptionChange = (e) => {
@@ -206,20 +206,32 @@ export function ProductView() {
       >
         {/* 메인 이미지 */}
         <Box p={2}>
-          {product.mainImgUrls && product.mainImgUrls.length > 0 && (
-            <Image
-              src={product.mainImgUrls[currentImageIndex]}
-              alt={product.product_name}
-              boxSize="400px"
-              objectFit="contain"
-            />
+          {product && product.productImgs && product.productImgs.length > 0 && (
+            <Box p={2}>
+              <Image
+                src={product.productImgs[selectedImageIndex].main_img_uri}
+                alt={`Product Image ${selectedImageIndex}`}
+                boxSize="400px"
+                objectFit="contain"
+              />
+            </Box>
           )}
+
           {/* 썸네일 이미지 */}
           <HStack justifyContent={"center"} mt={2}>
-            {product.mainImgUrls &&
-              product.mainImgUrls.map((imgUrl, index) => (
-                <Box key={index} onMouseEnter={() => selectImage(index)}>
-                  <Image src={imgUrl} boxSize="100px" objectFit="cover" />
+            {product &&
+              product.productImgs &&
+              product.productImgs.map((img, index) => (
+                <Box
+                  key={img.main_img_id}
+                  onClick={() => changeMainImage(index)}
+                  onMouseEnter={() => changeMainImage(index)} // 마우스 호버 시 메인 이미지 변경
+                >
+                  <Image
+                    src={img.main_img_uri}
+                    boxSize="100px"
+                    objectFit="cover"
+                  />
                 </Box>
               ))}
           </HStack>
@@ -322,34 +334,54 @@ export function ProductView() {
                         </Button>
                       </Box>
                       <HStack
-                        w={"74px"}
-                        border={"1px solid gray"}
-                        borderRadius={"10px"}
-                        bg={"white"}
-                        m={3}
+                        style={{
+                          display: "flex",
+                          width: "80px",
+                          border: "1px solid gray",
+                          borderRadius: "10px",
+                          backgroundColor: "white",
+                          margin: "3px",
+                        }}
                       >
                         {/* ------------------- 수량 증가 버튼 ------------------- */}
                         <Button
                           size={"xs"}
-                          bg={"none"}
-                          borderRight={"1px solid gray"}
-                          borderRadius={0}
-                          p={0}
+                          style={{
+                            width: "23px",
+                            background: "none",
+                            borderRight: "1px solid gray",
+                            borderRadius: 0,
+                            padding: 0,
+                          }}
                           onClick={() => increaseQuantity(key)}
                           _hover={{ bg: "none" }}
                           _active={{ bg: "none" }}
                         >
                           <ChevronUpIcon />
                         </Button>
-                        {/* ------------------- 수량 ------------------- */}
-                        <Box fontSize={"13px"}>{optionList.quantity}</Box>
+
+                        {/* ------------------- 수량 표시 ------------------- */}
+                        <Box
+                          style={{
+                            flex: 1,
+                            textAlign: "center",
+                            fontSize: "13px",
+                            width: "20px",
+                          }}
+                        >
+                          {optionList.quantity}
+                        </Box>
+
                         {/* ------------------- 수량 감소 버튼 ------------------- */}
                         <Button
                           size={"xs"}
-                          bg={"none"}
-                          borderLeft={"1px solid gray"}
-                          borderRadius={0}
-                          p={0}
+                          style={{
+                            width: "23px",
+                            background: "none",
+                            borderLeft: "1px solid gray",
+                            borderRadius: 0,
+                            padding: 0,
+                          }}
                           onClick={() => decreaseQuantity(key)}
                           _hover={{ bg: "none" }}
                           _active={{ bg: "none" }}
