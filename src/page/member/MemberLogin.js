@@ -110,8 +110,7 @@ export function MemberLogin() {
                 w={"200px"}
                 h={"20px"}
                 borderRadius={"0"}
-                bg={"none"}
-                _hover={"none"}
+                style={{ backgroundColor: "white" }}
               >
                 아이디 찾기
               </Button>
@@ -121,7 +120,7 @@ export function MemberLogin() {
                 h={"20px"}
                 borderRadius={"0"}
                 bg={"none"}
-                _hover={"none"}
+                style={{ backgroundColor: "white" }}
               >
                 비밀번호 찾기
               </Button>
