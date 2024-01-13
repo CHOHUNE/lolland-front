@@ -14,6 +14,7 @@ import {
   Th,
   Thead,
   Tr,
+  VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
@@ -30,7 +31,7 @@ function PageButton({ variant, pageNumber, children }) {
 
   function handleClick() {
     params.set("p", pageNumber);
-    navigate("/?" + params);
+    navigate("/gameboard/list?" + params);
   }
 
   return (
@@ -89,7 +90,7 @@ function SearchComponent() {
     const params = new URLSearchParams();
     params.set("k", keyword);
 
-    navigate("/?" + params);
+    navigate("/gameboard/list?" + params); // 경로 수정
   }
 
   return (
@@ -176,8 +177,10 @@ function GameBoardList() {
         </Button>
       </Center>
       <Center>
-        <SearchComponent />
-        <Pagination pageInfo={pageInfo} />
+        <VStack>
+          <SearchComponent />
+          <Pagination pageInfo={pageInfo} />
+        </VStack>
       </Center>
     </Box>
   );
