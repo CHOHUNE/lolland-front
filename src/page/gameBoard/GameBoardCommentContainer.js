@@ -92,7 +92,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
     <Box ml={`${comment.depth * 20}px`}>
       <Flex justifyContent="space-between">
         <Heading size="xs">
-          ID:{comment.id} PID:{comment.parent_id}
+          ID:{comment.id} PID:{comment.parent_id} DEP: {comment.depth}
         </Heading>
         <Text fontSize="xs">{comment.ago}</Text>
       </Flex>

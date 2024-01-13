@@ -56,9 +56,9 @@ const routes = createBrowserRouter(
       </Route>
 
       {/* 게시판관련 */}
-      <Route path="gameboard" element={<GameBoardList />} />
+      <Route path="gameboard/list" element={<GameBoardList />} />
       <Route path="gameboard/id/:id" element={<GameBoardView />} />
-      <Route path="gameboard/write" element={<GameBoardWrite />} />
+      <Route path="gameboard/list/write" element={<GameBoardWrite />} />
       <Route path="gameboard/edit/:id" element={<GameBoardEdit />} />
     </Route>,
   ),

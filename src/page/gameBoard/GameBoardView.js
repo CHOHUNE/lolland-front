@@ -8,6 +8,7 @@ import {
   Divider,
   HStack,
   Spinner,
+  Td,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -130,9 +131,11 @@ export function GameBoardView(props) {
             <Divider />
             <p> count: {board.board_count}</p>
             <Divider />
+
             <p> content :{board.board_content}</p>
             <Divider />
-            <p> reg_ time: {board.reg_time}</p>
+            {/*<p> reg_ time: {board.reg_time}</p>*/}
+            <p>{new Date(board.reg_time).toLocaleString()}</p>
           </Box>
           <HStack px={"10px"}>
             <GameBoardCommentContainer />
