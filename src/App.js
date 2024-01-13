@@ -23,6 +23,8 @@ import { MemberManage } from "./page/member/MemberViewPage/MemberManage";
 import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
 import { MemberAddressWrite } from "./page/member/MemberViewPage/MemberAddressWrite";
 import { MemberEdit } from "./page/member/MemberViewPage/MemberEdit";
+import { createContext, useEffect, useState } from "react";
+import axios from "axios";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -68,11 +70,31 @@ const routes = createBrowserRouter(
   ),
 );
 
+export const LoginContext = createContext(null);
+
 function App() {
+  const [login, setLogin] = useState("");
+
+  useEffect(() => {
+    fetchLogin();
+  }, []);
+
+  console.log(login);
+
+  function fetchLogin() {
+    axios
+      .get("/api/member/homepageLogin")
+      .then((response) => setLogin(response.data));
+  }
+
+  function isAuthenticated() {
+    return login !== "";
+  }
+
   return (
-    <>
+    <LoginContext.Provider value={{ login, fetchLogin, isAuthenticated }}>
       <RouterProvider router={routes} />
-    </>
+    </LoginContext.Provider>
   );
 }
 

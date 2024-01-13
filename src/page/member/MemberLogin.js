@@ -11,11 +11,14 @@ import {
   Input,
   useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { LoginContext } from "../../App";
 
 export function MemberLogin() {
+  const { fetchLogin } = useContext(LoginContext);
+
   // 회원 로그인 정보 입력
   const [member_login_id, setMember_login_id] = useState("");
   const [member_password, setMember_password] = useState("");
@@ -37,6 +40,9 @@ export function MemberLogin() {
       })
       .catch(() => {
         toast({ description: "로그인에 실패 하셨습니다.", status: "error" });
+      })
+      .finally(() => {
+        fetchLogin();
       });
   }
 
