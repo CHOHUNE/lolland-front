@@ -158,7 +158,7 @@ export function ProductEdit() {
       // removeMainImgs: product.mainImgUrls, //v
       removeMainImgs,
       newImgs: mainImg, // 새로 업로드할 이미지 미리보기 URL들
-      options: options,
+      options: JSON.stringify(options),
     });
   }
 

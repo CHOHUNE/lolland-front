@@ -30,6 +30,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 하트
 import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { selectOptions } from "@testing-library/user-event/dist/select-options"; // 빈 하트
 import { ReviewView } from "../review/ReviewView"; // 빈 하트
 
 export function ProductView() {
@@ -177,7 +178,25 @@ export function ProductView() {
   }
 
   // ------------------------------ 장바구니로 정보 전달 로직 ------------------------------
-  function handleBucketClick() {}
+  function handleBucketClick() {
+    axios
+      .post("/api/cart/add", {
+        product_id: product_id,
+        seletedOptionList: seletedOptionList,
+      })
+      .then(() => {
+        toast({
+          description: "장바구니로 이동되었습니다.",
+          status: "success",
+        });
+      })
+      .catch(() => {
+        toast({
+          description: "이동중 오류가 발생하였습니다.",
+          status: "error",
+        });
+      });
+  }
 
   return (
     <Box w="100%" p={5}>
@@ -263,14 +282,14 @@ export function ProductView() {
               {product.product.product_content}
             </Box>
           </HStack>
-          <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
-            <FormLabel w={"100px"} fontWeight="bold">
-              재고
-            </FormLabel>
-            <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
-              {product.product.total_stock}개
-            </Box>
-          </HStack>
+            <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
+                <FormLabel w={"100px"} fontWeight="bold">
+                    재고
+                </FormLabel>
+                <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
+                    {product.product.total_stock}개
+                </Box>
+            </HStack>
           <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
             <FormLabel w={"100px"} fontWeight="bold">
               제조사
