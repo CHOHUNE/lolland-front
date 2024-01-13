@@ -1,5 +1,4 @@
 import {
-  AbsoluteCenter,
   Button,
   ButtonGroup,
   Checkbox,
@@ -18,18 +17,20 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBagShopping,
   faCircleExclamation,
+  faHeart,
   faHome,
 } from "@fortawesome/free-solid-svg-icons";
 
 export function Cart() {
   const toast = useToast();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productList, setProductList] = useState([]);
   const [memberLoginId, setMemberLoginId] = useState(null);
@@ -39,6 +40,7 @@ export function Cart() {
   }, []);
 
   function fetchCart() {
+    setLoading(true);
     axios
       .get("/api/cart/fetch")
       .then((response) => {
@@ -46,12 +48,22 @@ export function Cart() {
         setMemberLoginId(response.data.member_login_id);
       })
       .catch((error) => {
-        toast({
-          title: "카트 불러오기에 실패하였습니다",
-          description: "다시 한번 확인해주세요: " + error.response.status,
-          status: "error",
-        });
-      });
+        if (error.response && error.response.status === 400) {
+          toast({
+            title: "권한이 없습니다",
+            description: "로그인 후 이용해주세요",
+            status: "warning",
+          });
+          navigate("/login");
+        } else {
+          toast({
+            title: "카트 불러오기에 실패하였습니다",
+            description: "다시 한번 확인해주세요: " + error.response.status,
+            status: "error",
+          });
+        }
+      })
+      .finally(() => setLoading(false));
   }
 
   // 전체 선택
@@ -152,11 +164,11 @@ export function Cart() {
       });
   }
 
-  if (productList === null) {
+  if (loading && productList === null) {
     return <Spinner />;
   }
 
-  if (productList.length === 0) {
+  if (!loading && productList.length === 0) {
     return (
       <Flex
         h="80vh"
@@ -170,15 +182,28 @@ export function Cart() {
         <Heading mb={10} opacity={0.3}>
           장바구니에 담긴 상품이 없습니다
         </Heading>
-        <Button
-          leftIcon={<FontAwesomeIcon icon={faHome} />}
-          borderRadius={0}
-          bgColor="black"
-          color="white"
-          onClick={() => navigate("/")}
-        >
-          홈으로 돌아가기
-        </Button>
+        <ButtonGroup>
+          <Button
+            leftIcon={<FontAwesomeIcon icon={faHeart} />}
+            borderRadius={0}
+            variant="outline"
+            color="black"
+            border="1px solid black"
+            isDisabled
+            onClick={() => navigate("/")}
+          >
+            찜한 목록 보기
+          </Button>
+          <Button
+            leftIcon={<FontAwesomeIcon icon={faHome} />}
+            borderRadius={0}
+            bgColor="black"
+            color="white"
+            onClick={() => navigate("/")}
+          >
+            홈으로 돌아가기
+          </Button>
+        </ButtonGroup>
       </Flex>
     );
   }

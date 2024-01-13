@@ -13,12 +13,18 @@ import {
   Text,
   Textarea,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane, faStar } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import {
+  faCommentSlash,
+  faPaperPlane,
+  faStar,
+} from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Qna } from "../qna/Qna";
+import { useNavigate } from "react-router-dom";
 
 const StarRating = ({ rating, setRating }) => {
   const [hover, setHover] = useState(null);
@@ -50,45 +56,16 @@ const StarRating = ({ rating, setRating }) => {
   );
 };
 
-export const ReviewView = () => {
+export const ReviewView = ({ product_id }) => {
   const [rating, setRating] = useState(0);
-  const id = 1; //TODO: product id 가져오는 거 만들기 (useParam이나 전달받기)
   const [review, setReview] = useState("");
-  // const [reviewList, setReviewList] = useState([]);
+  const [reviewList, setReviewList] = useState([]);
   const toast = useToast();
+  const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   fetchReview();
-  // }, []);
-
-  const member = { id: 1, member_login_id: "Admin", member_type: "user" };
-
-  const reviewList = [
-    {
-      review_id: 1,
-      product_id: 1,
-      member_login_id: member.member_login_id,
-      review_content: "테스트아무말1",
-      review_reg_time: "2019-01-21T05:47:08.644",
-      rating: 5,
-    },
-    {
-      review_id: 2,
-      product_id: 1,
-      member_login_id: member.member_login_id,
-      review_content: "테스트아무말2",
-      review_reg_time: "2019-01-21T05:47:08.644",
-      rating: 2,
-    },
-    {
-      review_id: 3,
-      product_id: 1,
-      member_login_id: member.member_login_id,
-      review_content: "테스트아무말3",
-      review_reg_time: "2019-01-21T05:47:08.644",
-      rating: 0,
-    },
-  ];
+  useEffect(() => {
+    fetchReview();
+  }, []);
 
   const Star = ({ rating }) => {
     const totalStars = 5;
@@ -111,12 +88,10 @@ export const ReviewView = () => {
 
   function fetchReview() {
     axios
-      .get("/api/review/fetch", {
-        product_id: id,
-      })
+      .get("/api/review/fetch", { params: { product_id: product_id } })
       .then((response) => {
         console.log(response.data);
-        // setReviewList(response.data);
+        setReviewList(response.data || []);
       })
       .catch((error) => {
         toast({
@@ -130,8 +105,7 @@ export const ReviewView = () => {
   function handleSubmit() {
     axios
       .post("/api/review/submit", {
-        product_id: id,
-        member_id: 1,
+        product_id: product_id,
         review_content: review,
         rate: rating,
       })
@@ -143,11 +117,20 @@ export const ReviewView = () => {
         fetchReview();
       })
       .catch((error) => {
-        toast({
-          title: "댓글 등록에 실패했습니다",
-          description: error.response.data,
-          status: "error",
-        });
+        if (error.response.status === 400) {
+          toast({
+            title: "비회원은 리뷰 등록이 불가능합니다",
+            description: "로그인 후 등록해주세요",
+            status: "error",
+          });
+          navigate("/login");
+        } else {
+          toast({
+            title: "댓글 등록에 실패했습니다",
+            description: error.response.data,
+            status: "error",
+          });
+        }
       });
   }
 
@@ -215,6 +198,14 @@ export const ReviewView = () => {
     _selected: { fontWeight: "bold", color: "black" },
   };
 
+  const formattedDate = (question_reg_time) => {
+    const date = new Date(question_reg_time);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
   function formattedLogId(member_login_id) {
     const formattedLoginId = member_login_id;
     if (formattedLoginId) {
@@ -225,19 +216,15 @@ export const ReviewView = () => {
     return "";
   }
 
-  const formattedDate = (question_reg_time) => {
-    const date = new Date(question_reg_time);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Adding 1 because months are zero-based
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  };
-
   return (
     <>
       <Tabs position="relative" variant="unstyled">
-        <TabList p={5} justifyContent="space-evenly" align="center">
+        <TabList
+          p={5}
+          justifyContent="space-evenly"
+          align="center"
+          border="1px dashed blue"
+        >
           <Tab {...tabStyles}>상품 설명</Tab>
           <Tab {...tabStyles}>리뷰 & 댓글 ({reviewList.length})</Tab>
           <Tab {...tabStyles}>Q&A</Tab>
@@ -293,7 +280,27 @@ export const ReviewView = () => {
                 </Box>
               ))
             ) : (
-              <Box justifyContent="center">아직 리뷰가 없는 상품입니다.</Box>
+              <Box
+                h="xs"
+                fontSize="md"
+                textAlign="center"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <VStack spacing={5}>
+                  <Text fontSize="2xl">
+                    <FontAwesomeIcon
+                      icon={faCommentSlash}
+                      size="lg"
+                      opacity={0.3}
+                    />
+                  </Text>
+                  <Text opacity={0.3} fontSize="2xl">
+                    아직 리뷰가 없는 상품입니다.
+                  </Text>
+                </VStack>
+              </Box>
             )}
           </TabPanel>
           {/* -------------------------- Q&A -------------------------- */}
