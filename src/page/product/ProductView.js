@@ -29,7 +29,8 @@ import {
   faHeart as fasHeart,
 } from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 하트
 import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons"; // 빈 하트
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { selectOptions } from "@testing-library/user-event/dist/select-options"; // 빈 하트
 
 export function ProductView() {
   const [product, setProduct] = useState(null);
@@ -176,7 +177,25 @@ export function ProductView() {
   }
 
   // ------------------------------ 장바구니로 정보 전달 로직 ------------------------------
-  function handleBucketClick() {}
+  function handleBucketClick() {
+    axios
+      .post("/api/cart/add", {
+        product_id: product_id,
+        seletedOptionList: seletedOptionList,
+      })
+      .then(() => {
+        toast({
+          description: "장바구니로 이동되었습니다.",
+          status: "success",
+        });
+      })
+      .catch(() => {
+        toast({
+          description: "이동중 오류가 발생하였습니다.",
+          status: "error",
+        });
+      });
+  }
 
   return (
     <Box w="100%" p={5}>
