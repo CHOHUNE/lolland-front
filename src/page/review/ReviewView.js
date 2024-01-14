@@ -91,7 +91,7 @@ export const ReviewView = ({ product_id }) => {
       .get("/api/review/fetch", { params: { product_id: product_id } })
       .then((response) => {
         console.log(response.data);
-        setReviewList(response.data || []);
+        setReviewList(response.data);
       })
       .catch((error) => {
         toast({
@@ -206,11 +206,12 @@ export const ReviewView = ({ product_id }) => {
 
     return `${year}-${month}-${day}`;
   };
+
   function formattedLogId(member_login_id) {
     const formattedLoginId = member_login_id;
     if (formattedLoginId) {
       const maskedLoginId =
-        member_login_id.slice(0, 3) + "*".repeat(formattedLoginId.length - 3);
+        member_login_id.slice(0, 2) + "*".repeat(formattedLoginId.length - 2);
       return maskedLoginId;
     }
     return "";
@@ -240,6 +241,7 @@ export const ReviewView = ({ product_id }) => {
 
           {/* -------------------------- 리뷰 & 댓글 -------------------------- */}
           <TabPanel>
+            {/* -------------------------- 리뷰 입력란 -------------------------- */}
             <StarRating rating={rating} setRating={setRating} />
             <Flex justifyContent="center" mx="20%" mb={10}>
               <Textarea
@@ -257,6 +259,7 @@ export const ReviewView = ({ product_id }) => {
                 onClick={handleSubmit}
               />
             </Flex>
+            {/* -------------------------- 리뷰 출력란 -------------------------- */}
             {reviewList && reviewList.length > 0 ? (
               reviewList.map((review, index) => (
                 <Box key={review.review_id} mx="20%" my={5}>
@@ -270,12 +273,14 @@ export const ReviewView = ({ product_id }) => {
                     >
                       {formattedLogId(review.member_login_id)}
                     </Text>
-                    <Star rating={review.rating} />
+                    <Star rating={review.rate} />
                     <Text opacity={0.6}>
                       {formattedDate(review.review_reg_time)}
                     </Text>
                   </HStack>
-                  <Text mb={6}>{review.review_content}</Text>
+                  <Text mb={6} whiteSpace="pre-wrap">
+                    {review.review_content}
+                  </Text>
                   {index < reviewList.length - 1 && <Divider />}
                 </Box>
               ))
