@@ -15,8 +15,10 @@ import {
   ModalHeader,
   ModalOverlay,
   Table,
+  Tbody,
   Td,
   Th,
+  Thead,
   Tr,
   useDisclosure,
   useToast,
@@ -67,9 +69,6 @@ export function MemberAddress() {
       .get("/api/memberAddress/loginUser")
       .then((response) => {
         setMemberAddress(response.data);
-      })
-      .then(() => {
-        console.log(memberAddress);
       })
       .catch(() => {
         toast({
@@ -125,39 +124,47 @@ export function MemberAddress() {
         </CardHeader>
         <CardBody>
           <Table>
-            <Tr>
-              <Th fontSize={"1.2rem"}>주소 별명</Th>
-              <Th fontSize={"1.2rem"}>우편 번호</Th>
-              <Th fontSize={"1.2rem"}>주소</Th>
-              <Th fontSize={"1.2rem"}>상세 주소</Th>
-              <Th fontSize={"1.2rem"}>기본 주소 여부</Th>
-            </Tr>
+            <Thead>
+              <Tr>
+                <Th fontSize={"1.2rem"}>주소 별명</Th>
+                <Th fontSize={"1.2rem"}>우편 번호</Th>
+                <Th fontSize={"1.2rem"}>주소</Th>
+                <Th fontSize={"1.2rem"}>상세 주소</Th>
+                <Th fontSize={"1.2rem"}>기본 주소 여부</Th>
+              </Tr>
+            </Thead>
 
-            {/* TODO : map 으로 주소 목록 읽어 들이자 */}
-            {memberAddress != null &&
-              memberAddress.map((address) => (
-                <>
-                  <Tr>
-                    <Td>{address.member_address_name}</Td>
-                    <Td>{address.member_post_code}</Td>
-                    <Td>{address.member_address}</Td>
-                    <Td>{address.member_detail_address}</Td>
-                    <Td>
-                      {address.member_address_type === "main" ? (
-                        <Box>메인주소</Box>
-                      ) : (
-                        <Box> - </Box>
-                      )}
-                    </Td>
-                  </Tr>
-                  <Flex gap={2} mt={2}>
-                    <Button onClick={openEditModal}>수정</Button>
-                    <Button onClick={() => openDeleteModal(address)}>
-                      삭제
-                    </Button>
-                  </Flex>
-                </>
-              ))}
+            <>
+              {/* TODO : map 으로 주소 목록 읽어 들이자 */}
+              {memberAddress != null &&
+                memberAddress.map((address) => (
+                  <Tbody key={address.id}>
+                    <Tr>
+                      <Td>{address.member_address_name}</Td>
+                      <Td>{address.member_post_code}</Td>
+                      <Td>{address.member_address}</Td>
+                      <Td>{address.member_detail_address}</Td>
+                      <Td>
+                        {address.member_address_type === "main" ? (
+                          <Box as="span">메인주소</Box>
+                        ) : (
+                          <Box as="span"> - </Box>
+                        )}
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td colSpan={5}>
+                        <Flex gap={2} mt={2}>
+                          <Button onClick={openEditModal}>수정</Button>
+                          <Button onClick={() => openDeleteModal(address)}>
+                            삭제
+                          </Button>
+                        </Flex>
+                      </Td>
+                    </Tr>
+                  </Tbody>
+                ))}
+            </>
           </Table>
         </CardBody>
 
