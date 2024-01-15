@@ -76,10 +76,10 @@ export function ProductView() {
     setSelectedImageIndex(index);
   };
 
+  // ------------------------------ 상세 옵션 관련 로직 ------------------------------
   const handleOptionChange = (e) => {
     const selectedValue = e.target.value;
     setSeletedOption(selectedValue);
-
     // 선택된 옵션을 찾아 해당 옵션 정보를 추가
     const selectedOptionInfo = option.find(
       (opt) => opt.option_id.toString() === selectedValue,
@@ -198,6 +198,38 @@ export function ProductView() {
       });
   }
 
+  // ----------------------------------- 상품 상세이미지 관련 로직 -----------------------------------
+  const renderProductDetailsImages = () => {
+    return product?.productDetailsImgs?.map((detailImg) => {
+      return (
+        <Image
+          key={detailImg.details_img_id}
+          src={detailImg.sub_img_uri}
+          alt={`Product Detail Image ${detailImg.details_img_id}`}
+          boxSize="100px"
+          objectFit="cover"
+        />
+      );
+    });
+  };
+
+  // ----------------------------------- 찜하기 -----------------------------------
+  const handleFavoriteClick = () => {
+    // 찜하기 상태 토글
+    const newFavoriteStatus = !isFavorited;
+    setIsFavorited(newFavoriteStatus);
+
+    // 서버에 찜하기 상태 전송
+    axios
+      .post("/api/productLike", {
+        product_id: product_id,
+        isFavorited: newFavoriteStatus,
+      })
+      .then(() => console.log("잘됨"))
+      .catch(() => console.log("안됨"))
+      .catch(() => console.log("끝"));
+  };
+
   return (
     <Box w="100%" p={5}>
       <Box w="80%">
@@ -266,6 +298,7 @@ export function ProductView() {
               {product.product.product_name}
             </Box>
           </HStack>
+
           <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
             <FormLabel w={"100px"} fontWeight="bold">
               금액
@@ -274,6 +307,7 @@ export function ProductView() {
               {formatPrice(product.product.product_price)}원
             </Box>
           </HStack>
+
           <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
             <FormLabel w={"100px"} fontWeight="bold">
               상품설명
@@ -282,22 +316,16 @@ export function ProductView() {
               {product.product.product_content}
             </Box>
           </HStack>
+
           <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
             <FormLabel w={"100px"} fontWeight="bold">
-              재고
+              총 재고
             </FormLabel>
             <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
               {product.product.total_stock}개
             </Box>
           </HStack>
-          <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
-            <FormLabel w={"100px"} fontWeight="bold">
-              재고
-            </FormLabel>
-            <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
-              {product.product.total_stock}개
-            </Box>
-          </HStack>
+
           <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
             <FormLabel w={"100px"} fontWeight="bold">
               제조사
@@ -305,6 +333,15 @@ export function ProductView() {
             <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
               {product.company_name}
             </Text>
+          </HStack>
+
+          <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
+            <FormLabel w={"100px"} fontWeight="bold">
+              배송비
+            </FormLabel>
+            <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
+              무료
+            </Box>
           </HStack>
 
           {/* 상세옵션 로직 */}
@@ -445,7 +482,7 @@ export function ProductView() {
               bg={"none"}
               borderRadius={0}
               border={"1px solid #eeeeee"}
-              onClick={() => setIsFavorited(!isFavorited)} // 클릭 시 상태 토글
+              onClick={handleFavoriteClick} // 클릭 시 상태 토글
             >
               <FontAwesomeIcon icon={isFavorited ? fasHeart : farHeart} />
             </Button>
@@ -493,6 +530,13 @@ export function ProductView() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <Box>
+        <Flex wrap="wrap" justify="center" gap={4}>
+          {renderProductDetailsImages()}
+        </Flex>
+      </Box>
+
       {/* --------------- 상품 상세 설명, 리뷰 , Q&A --------------- */}
       <ReviewView
         product_id={product_id}

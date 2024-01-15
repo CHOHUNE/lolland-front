@@ -17,7 +17,7 @@ import { ProductList } from "./page/product/ProductList";
 import { ProductView } from "./page/product/ProductView";
 import { ReviewView } from "./page/review/ReviewView";
 import { Cart } from "./page/Cart/Cart";
-import { ProductEdit } from "./ProductEdit";
+import { ProductEdit } from "./page/product/ProductEdit";
 import { MemberInfo } from "./page/member/MemberViewPage/MemberInfo";
 import { MemberManage } from "./page/member/MemberViewPage/MemberManage";
 import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
