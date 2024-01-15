@@ -63,12 +63,56 @@ const StarRating = ({ rate = 0, setRate }) => {
   );
 };
 
+// fetch에서 가져온 rate로 각 리뷰의 별점을 형식에 맞춰(5-입력한 별점 = 회색별) 출력하는 부분
+const Star = ({ initialRate, onRateChange, isEditing }) => {
+  const [currentRate, setCurrentRate] = useState(initialRate);
+
+  // 첫 rendering : review.rate 표시 (currentRate에 저장)
+  // 만약 사용자가 새로운 rate로 변경하면 onClick을 통해 currentRate 수정
+  // 만약 사용자가 같은 rate를 반복해서 누르면 (currentRate === ratingValue) 0으로 변경
+  const handleClick = (ratingValue) => {
+    console.log("===================");
+    console.log("ratingValue: " + ratingValue);
+    console.log("currentRate: " + currentRate);
+    if (isEditing) {
+      const newRating = currentRate === ratingValue ? 0 : ratingValue;
+      console.log("newRating: " + newRating);
+      // currentRate = newRating;
+      setCurrentRate(newRating);
+      onRateChange(newRating);
+    }
+    console.log("new Current rate: " + currentRate);
+  };
+
+  const realRate = isEditing ? currentRate : initialRate;
+
+  const totalStars = 5;
+  const stars = Array.from({ length: totalStars }).map((_, index) => {
+    const ratingValue = index + 1;
+    const starColor = ratingValue <= realRate ? "#FFE000" : "#EAEAE7";
+
+    return (
+      <FontAwesomeIcon
+        key={index}
+        icon={faStar}
+        color={starColor}
+        size="sm"
+        onClick={() => handleClick(ratingValue)}
+        cursor={isEditing ? "pointer" : "default"}
+      />
+    );
+  });
+
+  return <HStack spacing={1}>{stars}</HStack>;
+};
+
 export const ReviewView = ({ product_id }) => {
   const [rate, setRate] = useState(0);
   const [review, setReview] = useState("");
   const { hasAccess, isAdmin } = useContext(LoginContext);
   const [reviewList, setReviewList] = useState([]);
   const [isEditing, setIsEditing] = useState(null);
+  const [editingReview, setEditingReview] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
   const [editableRating, setEditableRating] = useState(0);
@@ -81,48 +125,6 @@ export const ReviewView = ({ product_id }) => {
   useEffect(() => {
     fetchReview();
   }, []);
-
-  // fetch에서 가져온 rate로 각 리뷰의 별점을 형식에 맞춰(5-입력한 별점 = 회색별) 출력하는 부분
-  const Star = ({ initialRate, onRateChange, isEditing }) => {
-    const [hover, setHover] = useState(0);
-
-    const handleHover = (index) => {
-      setHover(index + 1);
-    };
-
-    const handleLeave = () => {
-      setHover(0);
-    };
-
-    const handleClick = () => {
-      onRateChange(hover);
-    };
-
-    const displayedRate = isEditing ? hover : initialRate;
-
-    const totalStars = 5;
-    const stars = Array.from({ length: totalStars }).map((_, index) => {
-      const starColor =
-        (isEditing && hover > 0 && index < hover) ||
-        (!isEditing && index < initialRate)
-          ? "#FFE000"
-          : "#EAEAE7";
-
-      return (
-        <FontAwesomeIcon
-          key={index}
-          icon={faStar}
-          color={starColor}
-          size="sm"
-          onMouseEnter={() => handleHover(index)}
-          onMouseLeave={handleLeave}
-          onClick={handleClick}
-        />
-      );
-    });
-
-    return <HStack spacing={1}>{stars}</HStack>;
-  };
 
   function fetchReview() {
     axios
@@ -176,22 +178,26 @@ export const ReviewView = ({ product_id }) => {
 
   // 수정하는 리뷰 설정
   const handleEditReview = (review) => {
-    setIsEditing(review);
+    setIsEditing(true);
+    setEditingReview(review);
   };
 
   // 수정 취소
   const handleCancelEdit = () => {
-    setIsEditing(null);
+    setIsEditing(false);
+    setEditingReview(null);
   };
 
   // 수정 요청
   const handleUpdateReview = () => {
-    updateReview(isEditing);
-    setIsEditing(null);
+    updateReview(editingReview);
+    setIsEditing(false);
+    setEditingReview(null);
   };
 
   // 수정된 리뷰 전송
   function updateReview(editedReview) {
+    console.log(editedReview);
     axios
       .put("/api/review/update", {
         review_id: editedReview.review_id,
@@ -336,7 +342,7 @@ export const ReviewView = ({ product_id }) => {
                     <Star
                       initialRate={review.rate}
                       onRateChange={handleRatingChange}
-                      isEditing={isEditing === review}
+                      isEditing={isEditing}
                     />
                     {/* -------------------------- 시간 출력란 -------------------------- */}
                     <Text opacity={0.6}>
@@ -346,7 +352,8 @@ export const ReviewView = ({ product_id }) => {
                     <ButtonGroup>
                       {(hasAccess(review.member_login_id) || isAdmin()) && (
                         <>
-                          {isEditing === review ? (
+                          {isEditing &&
+                          editingReview.review_id === review.review_id ? (
                             <>
                               <IconButton
                                 icon={<FontAwesomeIcon icon={faPaperPlane} />}
@@ -382,15 +389,15 @@ export const ReviewView = ({ product_id }) => {
                       )}
                     </ButtonGroup>
                   </HStack>
-                  {isEditing === review ? (
+                  {isEditing && editingReview.review_id === review.review_id ? (
                     <Textarea
-                      value={review.review_content}
-                      onChange={(e) =>
-                        setIsEditing((prevReview) => ({
+                      value={editingReview.review_content}
+                      onChange={(e) => {
+                        setEditingReview((prevReview) => ({
                           ...prevReview,
                           review_content: e.target.value,
-                        }))
-                      }
+                        }));
+                      }}
                       mb={6}
                       whiteSpace="pre-wrap"
                     />
