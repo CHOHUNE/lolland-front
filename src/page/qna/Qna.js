@@ -244,20 +244,8 @@ export function Qna({ formattedLogId, formattedDate }) {
                         </Tr>
                         {question.answer_content && (
                           <Tr>
-                            <Td colSpan={4} px={10} py={6} bgColor="gray.100">
-                              <Text
-                                as="span"
-                                p={1}
-                                bgColor="black"
-                                color="white"
-                              >
-                                판매자 답변
-                              </Text>
-                              <Text
-                                whiteSpace="pre-wrap"
-                                lineHeight="30px"
-                                mt={5}
-                              >
+                            <Td colSpan={4} px={10} py={6} bgColor="#F4F4F4">
+                              <Text whiteSpace="pre-wrap" lineHeight="30px">
                                 {question.answer_content}
                               </Text>
                             </Td>
