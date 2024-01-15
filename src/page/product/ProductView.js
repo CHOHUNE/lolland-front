@@ -282,7 +282,14 @@ export function ProductView() {
               {product.product.product_content}
             </Box>
           </HStack>
-
+          <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
+            <FormLabel w={"100px"} fontWeight="bold">
+              재고
+            </FormLabel>
+            <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
+              {product.product.total_stock}개
+            </Box>
+          </HStack>
           <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
             <FormLabel w={"100px"} fontWeight="bold">
               재고
@@ -488,7 +495,7 @@ export function ProductView() {
       </Modal>
       {/* --------------- 상품 상세 설명, 리뷰 , Q&A --------------- */}
       <ReviewView
-        product_id={product.product_id}
+        product_id={product_id}
         product_content={product.product_content}
       />
     </Box>
