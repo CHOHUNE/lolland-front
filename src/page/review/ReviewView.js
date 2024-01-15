@@ -33,14 +33,12 @@ import { useNavigate } from "react-router-dom";
 import loginProvider, { LoginContext } from "../../component/LoginProvider";
 
 // 리뷰 등록할 때 별점 부분
-const StarRating = ({ rate = 0, setRate }) => {
+const StarRating = ({ rate, setRate }) => {
   const [hover, setHover] = useState(null);
-
   return (
     <Flex justifyContent="space-evenly" p={3} my={2} mx="40%">
       {[...Array(5)].map((star, index) => {
         const ratingValue = index + 1;
-
         return (
           <Box
             as="label"
@@ -307,7 +305,7 @@ export const ReviewView = ({ product_id }) => {
           {/* -------------------------- 리뷰 & 댓글 -------------------------- */}
           <TabPanel>
             {/* -------------------------- 리뷰 입력란 -------------------------- */}
-            <StarRating rating={rate} setRate={setRate} />
+            <StarRating rate={rate} setRate={setRate} />
             <Flex justifyContent="center" mx="20%" mb={10}>
               <Textarea
                 value={review}
