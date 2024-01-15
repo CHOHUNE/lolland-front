@@ -60,6 +60,7 @@ export function MemberAddress() {
   // 삭제 모달 열기 -----------------------------------------------------------------
   const openDeleteModal = (address) => {
     setSelectedAddress(address);
+    console.log(address);
     onDeleteOpen();
   };
 
@@ -90,25 +91,32 @@ export function MemberAddress() {
 
   // 삭제 버튼 클릭 -----------------------------------------------------------------
   function handleDeleteClick() {
-    axios
-      .delete("/api/memberAddress/deleteAddress/" + selectedAddress.id)
-      .then(() => {
-        onDeleteClose();
-        toast({
-          description:
-            selectedAddress.member_address_name + " 주소가 삭제 되었습니다.",
-          status: "success",
-        });
-      })
-      .then(() => {
-        setAddressState(true);
-      })
-      .catch(() => {
-        toast({
-          description: "삭제 중 문제가 발생하였습니다.",
-          status: "error",
-        });
+    if (selectedAddress.member_address_type === "main") {
+      toast({
+        description: "기본 주소지는 삭제 불가능 합니다.",
+        status: "error",
       });
+    } else {
+      axios
+        .delete("/api/memberAddress/deleteAddress/" + selectedAddress.id)
+        .then(() => {
+          onDeleteClose();
+          toast({
+            description:
+              selectedAddress.member_address_name + " 주소가 삭제 되었습니다.",
+            status: "success",
+          });
+        })
+        .then(() => {
+          setAddressState(true);
+        })
+        .catch(() => {
+          toast({
+            description: "삭제 중 문제가 발생하였습니다.",
+            status: "error",
+          });
+        });
+    }
   }
 
   return (
