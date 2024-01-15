@@ -35,7 +35,7 @@ export function GameBoardWrite(props) {
           description: "글 작성 완료",
           status: "success",
         });
-        navigate("/gameboard");
+        navigate("/gameboard/list");
       })
       .catch(() => {
         toast({
