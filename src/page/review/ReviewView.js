@@ -1,5 +1,7 @@
 import {
   Box,
+  Button,
+  ButtonGroup,
   Divider,
   Flex,
   HStack,
@@ -19,24 +21,31 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCommentSlash,
   faPaperPlane,
+  faPenToSquare,
   faStar,
+  faTrashCan,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Qna } from "../qna/Qna";
 import { useNavigate } from "react-router-dom";
+import loginProvider, { LoginContext } from "../../component/LoginProvider";
 
-const StarRating = ({ rating, setRating }) => {
+// 리뷰 등록할 때 별점 부분
+const StarRating = ({ rate = 0, setRate }) => {
   const [hover, setHover] = useState(null);
+
   return (
     <Flex justifyContent="space-evenly" p={3} my={2} mx="40%">
       {[...Array(5)].map((star, index) => {
         const ratingValue = index + 1;
+
         return (
           <Box
             as="label"
             key={index}
-            color={ratingValue <= (hover || rating) ? "#FFE000" : "#EAEAE7"}
+            color={ratingValue <= (hover || rate) ? "#FFE000" : "#EAEAE7"}
             onMouseEnter={() => setHover(ratingValue)}
             onMouseLeave={() => setHover(null)}
           >
@@ -45,9 +54,7 @@ const StarRating = ({ rating, setRating }) => {
               cursor={"pointer"}
               size="2xl"
               transition="color 200ms"
-              onClick={() =>
-                setRating(rating === ratingValue ? 0 : ratingValue)
-              }
+              onClick={() => setRate(rate === ratingValue ? 0 : ratingValue)}
             />
           </Box>
         );
@@ -57,21 +64,25 @@ const StarRating = ({ rating, setRating }) => {
 };
 
 export const ReviewView = ({ product_id }) => {
-  const [rating, setRating] = useState(0);
+  const [rate, setRate] = useState(0);
   const [review, setReview] = useState("");
+  const { hasAccess, isAdmin } = useContext(LoginContext);
   const [reviewList, setReviewList] = useState([]);
+  const [isEditing, setIsEditing] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
 
+  // 첫 로딩 시 리뷰 리스트 가져오기
   useEffect(() => {
     fetchReview();
   }, []);
 
-  const Star = ({ rating }) => {
+  // fetch에서 가져온 rate로 각 리뷰의 별점을 형식에 맞춰(5-입력한 별점 = 회색별) 출력하는 부분
+  const Star = ({ rate }) => {
     const totalStars = 5;
 
     const stars = Array.from({ length: totalStars }).map((_, index) => {
-      const starColor = index < rating ? "#FFE000" : "#EAEAE7";
+      const starColor = index < rate ? "#FFE000" : "#EAEAE7";
 
       return (
         <FontAwesomeIcon
@@ -107,7 +118,7 @@ export const ReviewView = ({ product_id }) => {
       .post("/api/review/submit", {
         product_id: product_id,
         review_content: review,
-        rate: rating,
+        rate: rate,
       })
       .then((response) => {
         toast({
@@ -134,62 +145,82 @@ export const ReviewView = ({ product_id }) => {
       });
   }
 
-  // function updateReview() {
-  //   axios
-  //     .put("/api/review/update", {
-  //       review_id: review_id,
-  //       review_content: review,
-  //       rate: rating,
-  //     })
-  //     .then(() => {
-  //       toast({
-  //         description: "리뷰를 성공적으로 수정하였습니다",
-  //         status: "success",
-  //       });
-  //       fetchReview();
-  //     })
-  //     .catch((error) => {
-  //       if(error.response.status === 500) {
-  //         toast({
-  //           title: "수정 중 오류 발생",
-  //           description: "백엔드 코드를 점검해주세요",
-  //           status: "error"
-  //         });
-  //       } else {
-  //         toast({
-  //           title: "수정 중 오류 발생",
-  //           description: "다시 한번 시도해주시거나, 관리자에게 문의해주세요",
-  //           status: "error"
-  //         })
-  //       }
-  //     });
-  // }
+  // ------------------------- 리뷰 수정 ------------------------- //
 
-  // function deleteReview() {
-  //   axios
-  //     .delete("/api/review/delete", { review_id })
-  //     .then((response) => {
-  //       toast({
-  //         description: "리뷰가 성공적으로 삭제되었습니다",
-  //         status: "success",
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       if (error.response.status === 500) {
-  //         toast({
-  //           title: "리뷰 삭제 중 에러 발생",
-  //           description: "백엔드 코드를 점검해주세요",
-  //           status: "error",
-  //         });
-  //       } else {
-  //         toast({
-  //           title: "리뷰 삭제 중 에러 발생",
-  //           description: "다시 한번 시도해주시거나, 관리자에게 문의해주세요",
-  //           status: "error",
-  //         });
-  //       }
-  //     });
-  // }
+  // 수정하는 리뷰 설정
+  const handleEditReview = (review) => {
+    setIsEditing(review);
+  };
+
+  // 수정 취소
+  const handleCancelEdit = () => {
+    setIsEditing(null);
+  };
+
+  // 수정 요청
+  const handleUpdateReview = () => {
+    updateReview(isEditing);
+    setIsEditing(null);
+  };
+
+  // 수정된 리뷰 전송
+  function updateReview(editedReview) {
+    axios
+      .put("/api/review/update", {
+        review_id: editedReview.review_id,
+        review_content: editedReview.review_content,
+        rate: editedReview.rate,
+      })
+      .then(() => {
+        toast({
+          description: "리뷰를 성공적으로 수정하였습니다",
+          status: "success",
+        });
+        fetchReview();
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          toast({
+            title: "수정 중 오류 발생",
+            description: "백엔드 코드를 점검해주세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "수정 중 오류 발생",
+            description: "다시 한번 시도해주시거나, 관리자에게 문의해주세요",
+            status: "error",
+          });
+        }
+      });
+  }
+
+  // 리뷰 삭제 요청
+  function deleteReview({ review_id }) {
+    axios
+      .delete("/api/review/delete", { review_id })
+      .then((response) => {
+        toast({
+          description: "리뷰가 성공적으로 삭제되었습니다",
+          status: "success",
+        });
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          toast({
+            title: "리뷰 삭제 중 에러 발생",
+            description: "백엔드 코드를 점검해주세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "리뷰 삭제 중 에러 발생",
+            description: "다시 한번 시도해주시거나, 관리자에게 문의해주세요",
+            status: "error",
+          });
+        }
+      });
+  }
 
   const tabStyles = {
     w: "30%",
@@ -242,7 +273,7 @@ export const ReviewView = ({ product_id }) => {
           {/* -------------------------- 리뷰 & 댓글 -------------------------- */}
           <TabPanel>
             {/* -------------------------- 리뷰 입력란 -------------------------- */}
-            <StarRating rating={rating} setRating={setRating} />
+            <StarRating rating={rate} setRate={setRate} />
             <Flex justifyContent="center" mx="20%" mb={10}>
               <Textarea
                 value={review}
@@ -273,14 +304,81 @@ export const ReviewView = ({ product_id }) => {
                     >
                       {formattedLogId(review.member_login_id)}
                     </Text>
-                    <Star rating={review.rate} />
+                    {/* -------------------------- 별점 출력란 -------------------------- */}
+                    {isEditing === review ? (
+                      //  ff
+                      <></>
+                    ) : (
+                      <Star rate={review.rate} />
+                    )}
+                    {/* -------------------------- 시간 출력란 -------------------------- */}
                     <Text opacity={0.6}>
                       {formattedDate(review.review_reg_time)}
                     </Text>
+                    {/* -------------------------- 수정(취소) / 삭제 버튼 출력란 --------------------------*/}
+                    <ButtonGroup>
+                      {(hasAccess(review.member_login_id) || isAdmin()) && (
+                        <>
+                          {isEditing === review ? (
+                            <>
+                              <IconButton
+                                icon={<FontAwesomeIcon icon={faPaperPlane} />}
+                                variant="ghost"
+                                colorScheme="blue"
+                                onClick={handleUpdateReview}
+                              />
+                              <IconButton
+                                icon={<FontAwesomeIcon icon={faTrashCan} />}
+                                variant="ghost"
+                                color="black"
+                                _hover={{ color: "white", bgColor: "black" }}
+                                onClick={() => deleteReview(review)}
+                              />
+                              <IconButton
+                                icon={<FontAwesomeIcon icon={faXmark} />}
+                                variant="ghost"
+                                colorScheme="red"
+                                onClick={handleCancelEdit}
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <IconButton
+                                icon={<FontAwesomeIcon icon={faPenToSquare} />}
+                                variant="ghost"
+                                colorScheme="purple"
+                                onClick={() => handleEditReview(review)}
+                              />
+                              <IconButton
+                                icon={<FontAwesomeIcon icon={faTrashCan} />}
+                                variant="ghost"
+                                color="black"
+                                _hover={{ color: "white", bgColor: "black" }}
+                                onClick={() => deleteReview(review)}
+                              />
+                            </>
+                          )}
+                        </>
+                      )}
+                    </ButtonGroup>
                   </HStack>
-                  <Text mb={6} whiteSpace="pre-wrap">
-                    {review.review_content}
-                  </Text>
+                  {isEditing === review ? (
+                    <Textarea
+                      value={review.review_content}
+                      onChange={(e) =>
+                        setIsEditing((prevReview) => ({
+                          ...prevReview,
+                          review_content: e.target.value,
+                        }))
+                      }
+                      mb={6}
+                      whiteSpace="pre-wrap"
+                    />
+                  ) : (
+                    <Text mb={6} whiteSpace="pre-wrap">
+                      {review.review_content}
+                    </Text>
+                  )}
                   {index < reviewList.length - 1 && <Divider />}
                 </Box>
               ))
