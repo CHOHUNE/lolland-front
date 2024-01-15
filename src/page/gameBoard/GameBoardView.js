@@ -140,7 +140,13 @@ export function GameBoardView(props) {
           </Box>
           {board.files.map((file) => (
             <Box key={file.id}>
-              <Image width={"100%"} src={file.file_url} alt={file.file_name} />
+              <Image
+                width={"100%"}
+                src={file.file_url}
+                alt={file.file_name}
+                borderRadius={"full"}
+                boxSize={"150px"}
+              />
             </Box>
           ))}
           <HStack px={"10px"}>
