@@ -71,6 +71,11 @@ export const ReviewView = ({ product_id }) => {
   const [isEditing, setIsEditing] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
+  const [editableRating, setEditableRating] = useState(0);
+
+  const handleRatingChange = (newRating) => {
+    setEditableRating(newRating);
+  };
 
   // 첫 로딩 시 리뷰 리스트 가져오기
   useEffect(() => {
@@ -78,11 +83,30 @@ export const ReviewView = ({ product_id }) => {
   }, []);
 
   // fetch에서 가져온 rate로 각 리뷰의 별점을 형식에 맞춰(5-입력한 별점 = 회색별) 출력하는 부분
-  const Star = ({ rate }) => {
-    const totalStars = 5;
+  const Star = ({ initialRate, onRateChange, isEditing }) => {
+    const [hover, setHover] = useState(0);
 
+    const handleHover = (index) => {
+      setHover(index + 1);
+    };
+
+    const handleLeave = () => {
+      setHover(0);
+    };
+
+    const handleClick = () => {
+      onRateChange(hover);
+    };
+
+    const displayedRate = isEditing ? hover : initialRate;
+
+    const totalStars = 5;
     const stars = Array.from({ length: totalStars }).map((_, index) => {
-      const starColor = index < rate ? "#FFE000" : "#EAEAE7";
+      const starColor =
+        (isEditing && hover > 0 && index < hover) ||
+        (!isEditing && index < initialRate)
+          ? "#FFE000"
+          : "#EAEAE7";
 
       return (
         <FontAwesomeIcon
@@ -90,6 +114,9 @@ export const ReviewView = ({ product_id }) => {
           icon={faStar}
           color={starColor}
           size="sm"
+          onMouseEnter={() => handleHover(index)}
+          onMouseLeave={handleLeave}
+          onClick={handleClick}
         />
       );
     });
@@ -196,14 +223,15 @@ export const ReviewView = ({ product_id }) => {
   }
 
   // 리뷰 삭제 요청
-  function deleteReview({ review_id }) {
+  function deleteReview(review_id) {
     axios
-      .delete("/api/review/delete", { review_id })
+      .delete(`/api/review/delete?review_id=${review_id}`)
       .then((response) => {
         toast({
           description: "리뷰가 성공적으로 삭제되었습니다",
           status: "success",
         });
+        fetchReview();
       })
       .catch((error) => {
         if (error.response.status === 500) {
@@ -305,12 +333,11 @@ export const ReviewView = ({ product_id }) => {
                       {formattedLogId(review.member_login_id)}
                     </Text>
                     {/* -------------------------- 별점 출력란 -------------------------- */}
-                    {isEditing === review ? (
-                      //  ff
-                      <></>
-                    ) : (
-                      <Star rate={review.rate} />
-                    )}
+                    <Star
+                      initialRate={review.rate}
+                      onRateChange={handleRatingChange}
+                      isEditing={isEditing === review}
+                    />
                     {/* -------------------------- 시간 출력란 -------------------------- */}
                     <Text opacity={0.6}>
                       {formattedDate(review.review_reg_time)}
@@ -326,13 +353,6 @@ export const ReviewView = ({ product_id }) => {
                                 variant="ghost"
                                 colorScheme="blue"
                                 onClick={handleUpdateReview}
-                              />
-                              <IconButton
-                                icon={<FontAwesomeIcon icon={faTrashCan} />}
-                                variant="ghost"
-                                color="black"
-                                _hover={{ color: "white", bgColor: "black" }}
-                                onClick={() => deleteReview(review)}
                               />
                               <IconButton
                                 icon={<FontAwesomeIcon icon={faXmark} />}
@@ -354,7 +374,7 @@ export const ReviewView = ({ product_id }) => {
                                 variant="ghost"
                                 color="black"
                                 _hover={{ color: "white", bgColor: "black" }}
-                                onClick={() => deleteReview(review)}
+                                onClick={() => deleteReview(review.review_id)}
                               />
                             </>
                           )}
