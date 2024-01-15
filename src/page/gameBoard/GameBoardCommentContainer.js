@@ -27,11 +27,22 @@ function CommentForm({ isSubmitting, onSubmit }) {
 
   function handleSubmit() {
     onSubmit({ comment });
+    setComment("");
+  }
+  function handleKeyDown(e) {
+    if (e.key === "Enter" && !e.s) {
+      e.preventDefault();
+      handleSubmit();
+    }
   }
 
   return (
     <Box>
-      <Textarea value={comment} onChange={(e) => setComment(e.target.value)} />
+      <Textarea
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
       <Button isDisabled={isSubmitting} onClick={handleSubmit}>
         쓰기
       </Button>
