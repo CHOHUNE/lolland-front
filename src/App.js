@@ -24,6 +24,7 @@ import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
 import { MemberAddressWrite } from "./page/member/MemberViewPage/MemberAddressWrite";
 import { MemberEdit } from "./page/member/MemberViewPage/MemberEdit";
 import LoginProvider from "./component/LoginProvider";
+import { ProductLike } from "./page/productLike/ProductLike";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -42,8 +43,6 @@ const routes = createBrowserRouter(
       {/* 장바구니 */}
       <Route path="/cart" element={<Cart />} />
 
-      {/* 찜하기 */}
-
       {/* Q&A */}
 
       {/* 결제 */}
@@ -57,6 +56,8 @@ const routes = createBrowserRouter(
         <Route path="memberEdit" element={<MemberEdit />} />
         <Route path="addressInfo" element={<MemberAddress />} />
         <Route path="addressWrite" element={<MemberAddressWrite />} />
+        {/* 상품 찜하기 목록 - gns14585 - */}
+        <Route path="productLike" element={<ProductLike />} />
       </Route>
 
       {/* 게시판관련 */}

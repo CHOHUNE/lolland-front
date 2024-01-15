@@ -40,7 +40,7 @@ export function ProductView() {
   const [seletedOptionList, setSeletedOptionList] = useState({});
 
   const { product_id } = useParams();
-  const [isFavorited, setIsFavorited] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false); // 찜하기
 
   const navigate = useNavigate();
   const toast = useToast();
@@ -61,6 +61,20 @@ export function ProductView() {
       .get("/api/product/option/" + product_id)
       .then((response) => setOption(response.data));
   }, [product_id]);
+
+  // ---------------------------- 찜하기 관련 로직 ----------------------------
+  useEffect(() => {
+    axios
+      .get("/api/productLike/" + product_id)
+      .then((response) => {
+        setIsFavorited(response.data.productLike);
+      })
+      .catch((error) => {
+        console.error("Error fetching product like status:", error);
+      });
+  }, [product_id]);
+
+  // ---------------------------- 로딩로직 ----------------------------
 
   if (product === null) {
     return <Spinner />;
@@ -215,19 +229,23 @@ export function ProductView() {
 
   // ----------------------------------- 찜하기 -----------------------------------
   const handleFavoriteClick = () => {
-    // 찜하기 상태 토글
+    // 현재 하트 상태 토글
     const newFavoriteStatus = !isFavorited;
+
+    // UI를 먼저 업데이트하고 서버 요청을 보냄
     setIsFavorited(newFavoriteStatus);
 
-    // 서버에 찜하기 상태 전송
+    // 서버에 좋아요 상태 전송
     axios
       .post("/api/productLike", {
         product_id: product_id,
         isFavorited: newFavoriteStatus,
       })
-      .then(() => console.log("잘됨"))
-      .catch(() => console.log("안됨"))
-      .catch(() => console.log("끝"));
+      .catch((error) => {
+        // 에러가 발생한 경우, 상태를 다시 원래대로 돌림
+        console.error("에러 발생:", error);
+        setIsFavorited(!newFavoriteStatus);
+      });
   };
 
   return (
@@ -332,6 +350,15 @@ export function ProductView() {
             </FormLabel>
             <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
               {product.company_name}
+            </Text>
+          </HStack>
+
+          <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
+            <FormLabel w={"100px"} fontWeight="bold">
+              평점
+            </FormLabel>
+            <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
+              {product.product.average_rate}
             </Text>
           </HStack>
 
@@ -482,7 +509,7 @@ export function ProductView() {
               bg={"none"}
               borderRadius={0}
               border={"1px solid #eeeeee"}
-              onClick={handleFavoriteClick} // 클릭 시 상태 토글
+              onClick={handleFavoriteClick}
             >
               <FontAwesomeIcon icon={isFavorited ? fasHeart : farHeart} />
             </Button>
