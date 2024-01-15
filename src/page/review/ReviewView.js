@@ -50,7 +50,7 @@ const StarRating = ({ rating, setRating }) => {
   );
 };
 
-export function ReviewView() {
+export const ReviewView = () => {
   const [rating, setRating] = useState(0);
   const id = 1; //TODO: product id 가져오는 거 만들기 (useParam이나 전달받기)
   const [review, setReview] = useState("");
@@ -307,4 +307,4 @@ export function ReviewView() {
       </Tabs>
     </>
   );
-}
+};

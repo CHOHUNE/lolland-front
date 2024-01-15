@@ -8,13 +8,31 @@ import {
   Divider,
   HStack,
   Spinner,
+  Td,
   useToast,
   VStack,
 } from "@chakra-ui/react";
 import GameBoardCommentContainer from "./GameBoardCommentContainer";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeartBroken } from "@fortawesome/free-solid-svg-icons/faHeartBroken";
 
+function LikeContainer({ like, onClick }) {
+  if (like === null) {
+    return <Spinner />;
+  }
+
+  return (
+    <Button variant="ghost" size="xl" onClick={onClick}>
+      {like.like && <FontAwesomeIcon icon={faHeart} size={"xl"} />}
+      {/*<FontAwesomeIcon icon={faHeart} size={"xl"} />*/}
+      {like.like || <FontAwesomeIcon icon={faHeartBroken} size={"xl"} />}
+    </Button>
+  );
+}
 export function GameBoardView(props) {
   const [board, setBoard] = useState(null);
+  const [like, setLike] = useState(null);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -31,6 +49,12 @@ export function GameBoardView(props) {
       });
   }, [id]);
 
+  useEffect(() => {
+    axios
+      .get("/api/like/gameboard/" + id)
+      .then((response) => setLike(response.data));
+  }, []);
+
   function handleDelete() {
     axios
       .delete("/api/gameboard/remove/" + id)
@@ -44,6 +68,29 @@ export function GameBoardView(props) {
       .catch((error) => {
         toast({
           description: "실패",
+          status: "error",
+        });
+      });
+  }
+
+  function handleLike() {
+    axios
+      .post("/api/like", { game_board_id: board.id })
+      .then((response) => {
+        setLike((prevLike) => ({
+          like: !prevLike.like, // 현재 상태의 반대로 like 상태를 토글합니다.
+          countLike: response.data.countLike, // 필요한 경우 카운트 업데이트
+        }));
+
+        const successMessage = !like.like
+          ? "좋아요를 눌렀습니다."
+          : "좋아요를 취소했습니다.";
+        const statusChange = !like.like ? "success" : "error";
+        toast({ description: successMessage, status: statusChange });
+      })
+      .catch(() => {
+        toast({
+          description: "좋아요 처리 중 오류가 발생했습니다.",
           status: "error",
         });
       });
@@ -68,6 +115,7 @@ export function GameBoardView(props) {
             <Button onClick={handleDelete} colorScheme={"red"}>
               삭제
             </Button>
+            <LikeContainer onClick={handleLike} like={like} />
           </HStack>
           <Box
             border={"1px solid grey"}
@@ -83,9 +131,11 @@ export function GameBoardView(props) {
             <Divider />
             <p> count: {board.board_count}</p>
             <Divider />
+
             <p> content :{board.board_content}</p>
             <Divider />
-            <p> reg_ time: {board.reg_time}</p>
+            {/*<p> reg_ time: {board.reg_time}</p>*/}
+            <p>{new Date(board.reg_time).toLocaleString()}</p>
           </Box>
           <HStack px={"10px"}>
             <GameBoardCommentContainer />

@@ -3,6 +3,10 @@ import {
   Box,
   Button,
   Center,
+  Flex,
+  Input,
+  Select,
+  Spinner,
   Table,
   TableContainer,
   Tbody,
@@ -10,25 +14,111 @@ import {
   Th,
   Thead,
   Tr,
+  VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  faAngleLeft,
+  faAngleRight,
+  faSearch,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+function PageButton({ variant, pageNumber, children }) {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+
+  function handleClick() {
+    params.set("p", pageNumber);
+    navigate("/gameboard/list?" + params);
+  }
+
+  return (
+    <Button variant={variant} onClick={handleClick}>
+      {children}
+    </Button>
+  );
+}
+
+function Pagination({ pageInfo }) {
+  const pageNumbers = [];
+
+  const navigate = useNavigate();
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <Center mt={5} mb={40}>
+      <Box>
+        {pageInfo.prevPageNumber && (
+          <PageButton variant="ghost" pageNumber={pageInfo.prevPageNumber}>
+            <FontAwesomeIcon icon={faAngleLeft} />
+          </PageButton>
+        )}
+
+        {pageNumbers.map((pageNumber) => (
+          <PageButton
+            key={pageNumber}
+            variant={
+              pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
+            }
+            pageNumber={pageNumber}
+          >
+            {pageNumber}
+          </PageButton>
+        ))}
+
+        {pageInfo.nextPageNumber && (
+          <PageButton variant="ghost" pageNumber={pageInfo.nextPageNumber}>
+            <FontAwesomeIcon icon={faAngleRight} />
+          </PageButton>
+        )}
+      </Box>
+    </Center>
+  );
+}
+
+function SearchComponent() {
+  const [keyword, setKeyword] = useState("");
+  const navigate = useNavigate();
+
+  function handleSearch() {
+    // /?k=keyword&c=all
+    const params = new URLSearchParams();
+    params.set("k", keyword);
+
+    navigate("/gameboard/list?" + params); // 경로 수정
+  }
+
+  return (
+    <Flex>
+      <Input value={keyword} onChange={(e) => setKeyword(e.target.value)} />
+      <Button onClick={handleSearch}>검색</Button>
+    </Flex>
+  );
+}
 
 function GameBoardList() {
   const [gameBoardList, setGameBoardList] = useState(null);
+  const [pageInfo, setPageInfo] = useState(null);
+
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const location = useLocation();
 
   useEffect(() => {
-    // 데이터가 이미 가져와진 상태이면 다시 요청하지 않음
-    if (!gameBoardList) {
-      axios
-        .get("/api/gameboard")
-        .then((response) => setGameBoardList(response.data))
-        .catch((error) =>
-          console.error("데이터를 가져오는 중 에러 발생:", error),
-        );
-    }
-  }, [gameBoardList]);
+    axios.get("/api/gameboard/list?" + params).then((response) => {
+      setGameBoardList(response.data.gameBoardList);
+      setPageInfo(response.data.pageInfo);
+    });
+  }, [location]);
+
+  if (gameBoardList === null) {
+    return <Spinner />;
+  }
 
   return (
     <Box py={"100px"}>
@@ -42,6 +132,8 @@ function GameBoardList() {
                 <Th>category</Th>
                 <Th>content</Th>
                 <Th>boardCount</Th>
+                <Th>boardLikeCount</Th>
+                <Th>boardCommentCount</Th>
                 <Th>regTime</Th>
               </Tr>
             </Thead>
@@ -59,7 +151,16 @@ function GameBoardList() {
                     <Td>{board.category}</Td>
                     <Td>{board.board_content}</Td>
                     <Td>{board.board_count}</Td>
-                    <Td>{board.reg_time}</Td>
+                    <Td>{board.count_like}</Td>
+                    <Td>{board.count_comment}</Td>
+                    <Td>
+                      {new Date(board.reg_time).toLocaleDateString("ko-KR", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </Td>
+                    {/*<Td>{board.reg_time}</Td>*/}
                   </Tr>
                 ))}
             </Tbody>
@@ -74,6 +175,12 @@ function GameBoardList() {
         >
           글 작성
         </Button>
+      </Center>
+      <Center>
+        <VStack>
+          <SearchComponent />
+          <Pagination pageInfo={pageInfo} />
+        </VStack>
       </Center>
     </Box>
   );

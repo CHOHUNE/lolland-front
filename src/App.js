@@ -40,7 +40,6 @@ const routes = createBrowserRouter(
       <Route path="/review" element={<ReviewView />} />
 
       {/* 장바구니 */}
-      {/* 이걸로 로그인 완성되면 수정 <Route path="/cart/:member_id" element={<Cart />} />*/}
       <Route path="/cart" element={<Cart />} />
 
       {/* 찜하기 */}
@@ -61,9 +60,9 @@ const routes = createBrowserRouter(
       </Route>
 
       {/* 게시판관련 */}
-      <Route path="gameboard" element={<GameBoardList />} />
+      <Route path="gameboard/list" element={<GameBoardList />} />
       <Route path="gameboard/id/:id" element={<GameBoardView />} />
-      <Route path="gameboard/write" element={<GameBoardWrite />} />
+      <Route path="gameboard/list/write" element={<GameBoardWrite />} />
       <Route path="gameboard/edit/:id" element={<GameBoardEdit />} />
     </Route>,
   ),
