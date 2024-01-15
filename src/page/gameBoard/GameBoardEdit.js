@@ -49,7 +49,8 @@ export function GameBoardEdit(props) {
       .putForm("/api/gameboard/edit", {
         id: board.id,
         title: board.title,
-        content: board.content,
+        board_content: board.board_content,
+        category: board.category,
         removeFileIds,
         uploadFiles,
       })
