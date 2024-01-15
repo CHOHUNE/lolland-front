@@ -157,7 +157,7 @@ export function NavBar() {
           <TabList px={10} py={3}>
             <HStack spacing={2}>
               <Tab
-                onClick={() => navigate("/gameboard")}
+                onClick={() => navigate("/gameboard/list")}
                 onMouseEnter={() => {
                   setIndex(0);
                   setOverlayVisible(true);

@@ -292,6 +292,14 @@ export function ProductView() {
           </HStack>
           <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
             <FormLabel w={"100px"} fontWeight="bold">
+              재고
+            </FormLabel>
+            <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
+              {product.product.total_stock}개
+            </Box>
+          </HStack>
+          <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
+            <FormLabel w={"100px"} fontWeight="bold">
               제조사
             </FormLabel>
             <Text fontWeight={400} mt={-2} border={"none"} flex={1}>

@@ -100,7 +100,6 @@ export function ProductEdit() {
     const newOptions = [...options];
     newOptions[index] = { ...newOptions[index], option_name: e.target.value };
     setOptions(newOptions);
-    console.log("options : " + options[0].option_name + options[0].option_id);
   };
 
   // ---------------------------------- 상세옵션선택 추가 로직 ----------------------------------
@@ -317,14 +316,20 @@ export function ProductEdit() {
       {/* ------------------- 상세옵션 로직 ------------------- */}
       <Box>
         {options.map((option, index) => (
-          <FormControl key={index}>
-            <FormLabel>{index + 1}번째 상세옵션추가</FormLabel>
-            <Input
-              value={option.option_name}
-              placeholder="예) 화이트/청축"
-              onChange={(e) => handleInputChange(e, index)}
-            />
-          </FormControl>
+          <Flex>
+            <FormControl key={index}>
+              <FormLabel>{index + 1}번째 상세옵션추가</FormLabel>
+              <Input
+                value={option.option_name}
+                placeholder="예) 화이트/청축"
+                onChange={(e) => handleInputChange(e, index)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>수량</FormLabel>
+              <Input type="number" value={option.stock} />
+            </FormControl>
+          </Flex>
         ))}
         <Flex justifyContent="center" mt={4}>
           <Button colorScheme="teal" onClick={handleAddInput}>
