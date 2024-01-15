@@ -214,11 +214,21 @@ export function MemberAddress() {
           <Table>
             <Thead>
               <Tr>
-                <Th fontSize={"1.2rem"}>주소 별명</Th>
-                <Th fontSize={"1.2rem"}>우편 번호</Th>
-                <Th fontSize={"1.2rem"}>주소</Th>
-                <Th fontSize={"1.2rem"}>상세 주소</Th>
-                <Th fontSize={"1.2rem"}>기본 주소 여부</Th>
+                <Th fontSize={"1.2rem"} w={"130px"} textAlign={"center"}>
+                  주소 별명
+                </Th>
+                <Th fontSize={"1.2rem"} w={"130px"} textAlign={"center"}>
+                  우편 번호
+                </Th>
+                <Th fontSize={"1.2rem"} w={"250px"} textAlign={"center"}>
+                  주소
+                </Th>
+                <Th fontSize={"1.2rem"} w={"200px"} textAlign={"center"}>
+                  상세 주소
+                </Th>
+                <Th fontSize={"1.2rem"} w={"170px"} textAlign={"center"}>
+                  기본 주소 여부
+                </Th>
               </Tr>
             </Thead>
 
@@ -228,11 +238,15 @@ export function MemberAddress() {
                 memberAddress.map((address) => (
                   <Tbody key={address.id}>
                     <Tr>
-                      <Td>{address.member_address_name}</Td>
-                      <Td>{address.member_post_code}</Td>
-                      <Td>{address.member_address}</Td>
-                      <Td>{address.member_detail_address}</Td>
-                      <Td>
+                      <Td textAlign={"center"}>
+                        {address.member_address_name}
+                      </Td>
+                      <Td textAlign={"center"}>{address.member_post_code}</Td>
+                      <Td textAlign={"center"}>{address.member_address}</Td>
+                      <Td w={"130px"} textAlign={"center"}>
+                        {address.member_detail_address}
+                      </Td>
+                      <Td w={"130px"} textAlign={"center"}>
                         {address.member_address_type === "main" ? (
                           <Box as="span">메인주소</Box>
                         ) : (
