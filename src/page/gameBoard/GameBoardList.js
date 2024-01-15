@@ -131,9 +131,10 @@ function GameBoardList() {
                 <Th>title</Th>
                 <Th>category</Th>
                 <Th>content</Th>
-                <Th>boardCount</Th>
+                <Th>boardClickCount</Th>
                 <Th>boardLikeCount</Th>
                 <Th>boardCommentCount</Th>
+                <Th>boardCountFile</Th>
                 <Th>regTime</Th>
               </Tr>
             </Thead>
@@ -153,6 +154,7 @@ function GameBoardList() {
                     <Td>{board.board_count}</Td>
                     <Td>{board.count_like}</Td>
                     <Td>{board.count_comment}</Td>
+                    <Td>{board.countFile}</Td>
                     <Td>
                       {new Date(board.reg_time).toLocaleDateString("ko-KR", {
                         year: "numeric",

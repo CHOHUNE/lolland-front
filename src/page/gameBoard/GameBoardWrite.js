@@ -5,6 +5,7 @@ import {
   Button,
   Center,
   FormControl,
+  FormHelperText,
   FormLabel,
   Input,
   Select,
@@ -18,6 +19,7 @@ export function GameBoardWrite(props) {
   const [board_content, setBoard_content] = useState("");
   const [category, setCategory] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadFiles, setUploadFiles] = useState(null);
 
   let toast = useToast();
   let navigate = useNavigate();
@@ -25,10 +27,11 @@ export function GameBoardWrite(props) {
   function handleSubmit() {
     setIsSubmitting(true);
     axios
-      .post("/api/gameboard/write", {
+      .postForm("/api/gameboard/write", {
         title,
         board_content,
         category,
+        uploadFiles,
       })
       .then((response) => {
         toast({
@@ -43,7 +46,9 @@ export function GameBoardWrite(props) {
           status: "error",
         });
       })
-      .finally(() => setIsSubmitting(true));
+      .finally
+      // () => setIsSubmitting(true)
+      ();
   }
 
   return (
@@ -71,6 +76,18 @@ export function GameBoardWrite(props) {
               value={board_content}
               onChange={(e) => setBoard_content(e.target.value)}
             />
+          </FormControl>
+          <FormControl>
+            <FormLabel>이미지</FormLabel>
+            <Input
+              type={"file"}
+              accept={"image/*"}
+              multiple
+              onChange={(e) => setUploadFiles(e.target.files)}
+            />
+            <FormHelperText>
+              한 개 파일은 1MB 이내, 총 용량으 10MB 이내로 첨부 하세요.
+            </FormHelperText>
           </FormControl>
 
           <Button

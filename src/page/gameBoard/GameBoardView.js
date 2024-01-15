@@ -8,6 +8,7 @@ import {
   Divider,
   HStack,
   Spinner,
+  Image,
   Td,
   useToast,
   VStack,
@@ -131,12 +132,17 @@ export function GameBoardView(props) {
             <Divider />
             <p> count: {board.board_count}</p>
             <Divider />
-
             <p> content :{board.board_content}</p>
             <Divider />
             {/*<p> reg_ time: {board.reg_time}</p>*/}
             <p>{new Date(board.reg_time).toLocaleString()}</p>
+            <Divider />
           </Box>
+          {board.files.map((file) => (
+            <Box key={file.id}>
+              <Image width={"100%"} src={file.file_url} alt={file.file_name} />
+            </Box>
+          ))}
           <HStack px={"10px"}>
             <GameBoardCommentContainer />
           </HStack>
