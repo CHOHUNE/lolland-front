@@ -63,8 +63,9 @@ export function GameBoardWrite(props) {
             }}
           >
             <option value="공지">공지</option>
-            <option value="자유">자유</option>
-            <option value="롤">롤</option>
+            <option value="잡담">잡담</option>
+            <option value="질문">질문</option>
+            <option value="정보">정보</option>
           </Select>
           <FormControl>
             <FormLabel>제목</FormLabel>

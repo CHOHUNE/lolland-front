@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
+  ButtonGroup,
   Center,
+  Divider,
   Flex,
   Input,
   Select,
@@ -122,6 +124,48 @@ function GameBoardList() {
 
   return (
     <Box py={"100px"}>
+      <Center>
+        <ButtonGroup
+          variant={"ouline"}
+          spacing={"6"}
+          border={"1px solid grey"}
+          my={"50px"}
+        >
+          <Button
+            onClick={() => navigate("")}
+            _hover={{ bgColor: "red.500", color: "white" }}
+          >
+            전체
+          </Button>
+          <Button
+            onClick={() => navigate("?k=공지")}
+            _hover={{ bgColor: "red.500", color: "white" }}
+          >
+            공지
+          </Button>
+          <Button
+            colorScheme={"blue"}
+            onClick={() => navigate("?k=잡담")}
+            _hover={{ bgColor: "red.500", color: "white" }}
+          >
+            잡담
+          </Button>
+          <Button
+            colorScheme={"blue"}
+            onClick={() => navigate("?k=질문")}
+            _hover={{ bgColor: "red.500", color: "white" }}
+          >
+            질문
+          </Button>
+          <Button
+            colorScheme={"blue"}
+            onClick={() => navigate("?k=정보")}
+            _hover={{ bgColor: "red.500", color: "white" }}
+          >
+            정보
+          </Button>
+        </ButtonGroup>
+      </Center>
       <Center>
         <TableContainer>
           <Table size="sm">
