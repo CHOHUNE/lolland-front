@@ -11,6 +11,7 @@ import {
   StackDivider,
   Text,
   Textarea,
+  Tooltip,
   useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
@@ -25,6 +26,7 @@ import LoginProvider, { LoginContext } from "../../component/LoginProvider";
 
 function CommentForm({ isSubmitting, onSubmit }) {
   const [comment, setComment] = useState("");
+  const { isAuthenticated, hasAccess } = useContext(LoginContext);
 
   function handleSubmit() {
     onSubmit({ comment });
@@ -44,9 +46,11 @@ function CommentForm({ isSubmitting, onSubmit }) {
         onChange={(e) => setComment(e.target.value)}
         onKeyDown={handleKeyDown}
       />
-      <Button isDisabled={isSubmitting} onClick={handleSubmit}>
-        쓰기
-      </Button>
+      <Tooltip isDisabled={isAuthenticated()} hasArrow label={"로그인 하세요"}>
+        <Button isDisabled={isSubmitting} onClick={handleSubmit}>
+          쓰기
+        </Button>
+      </Tooltip>
     </Box>
   );
 }
@@ -261,7 +265,7 @@ export function GameBoardCommentContainer() {
       })
       .catch(() => {
         toast({
-          description: "실패",
+          description: "로그인 후 이용 해주세요.",
           status: "error",
         });
       })

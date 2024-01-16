@@ -120,7 +120,7 @@ function GameBoardList() {
       setGameBoardList(response.data.gameBoardList);
       setPageInfo(response.data.pageInfo);
     });
-  }, [location]);
+  }, [location, isAuthenticated]);
 
   if (gameBoardList === null) {
     return <Spinner />;
