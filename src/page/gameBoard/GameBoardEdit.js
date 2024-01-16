@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useImmer } from "use-immer";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -7,17 +7,25 @@ import {
   Button,
   Center,
   FormControl,
+  FormHelperText,
   FormLabel,
   Input,
+  Image,
   Select,
   Spinner,
+  Switch,
   Textarea,
   useToast,
 } from "@chakra-ui/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import loginProvider, { LoginContext } from "../../component/LoginProvider";
 
 export function GameBoardEdit(props) {
   const [board, updateBoard] = useImmer(null);
   const { id } = useParams();
+  const [removeFileIds, setRemoveFileIds] = useState([]);
+  const [uploadFiles, setUploadFiles] = useState(null);
 
   let toast = useToast();
   let navigate = useNavigate();
@@ -39,7 +47,14 @@ export function GameBoardEdit(props) {
 
   function handlesubmit() {
     axios
-      .put("/api/gameboard/edit", board)
+      .putForm("/api/gameboard/edit", {
+        id: board.id,
+        title: board.title,
+        board_content: board.board_content,
+        category: board.category,
+        removeFileIds,
+        uploadFiles,
+      })
       .then(() => {
         toast({
           description: "수정 성공",
@@ -60,6 +75,16 @@ export function GameBoardEdit(props) {
           });
         }
       });
+  }
+
+  function handleRemoveFileSwitch(e) {
+    if (e.target.checked) {
+      // removeFileIds 에 추가
+      setRemoveFileIds([...removeFileIds, e.target.value]);
+    } else {
+      // removeFileIds 에서 삭제
+      setRemoveFileIds(removeFileIds.filter((item) => item !== e.target.value));
+    }
   }
 
   function handleDelete() {
@@ -123,6 +148,41 @@ export function GameBoardEdit(props) {
                 })
               }
             />
+          </FormControl>
+
+          {/* 이미지 출력 */}
+          {board.files.length > 0 &&
+            board.files.map((file) => (
+              <Box key={file.id} my="5px" border="3px solid black">
+                <FormControl display="flex" alignItems="center">
+                  <FormLabel>
+                    <FontAwesomeIcon color="red" icon={faTrashCan} />
+                  </FormLabel>
+                  <Switch
+                    value={file.id}
+                    colorScheme="red"
+                    onChange={handleRemoveFileSwitch}
+                  />
+                </FormControl>
+                <Box>
+                  <Image src={file.url} alt={file.name} width="100%" />
+                </Box>
+              </Box>
+            ))}
+
+          {/* 추가할 파일 선택 */}
+          <FormControl>
+            <FormLabel>이미지</FormLabel>
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => setUploadFiles(e.target.files)}
+            />
+
+            <FormHelperText>
+              한 개 파일은 1MB 이내, 총 용량은 10MB 이내로 첨부하세요.
+            </FormHelperText>
           </FormControl>
 
           <Button onClick={handlesubmit} colorScheme="blue">

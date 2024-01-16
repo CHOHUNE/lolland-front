@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import {
   Box,
   Button,
   Center,
   FormControl,
+  FormHelperText,
   FormLabel,
   Input,
   Select,
@@ -12,12 +13,15 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { LoginContext } from "../../component/LoginProvider";
 
 export function GameBoardWrite(props) {
   const [title, setTitle] = useState("");
   const [board_content, setBoard_content] = useState("");
   const [category, setCategory] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadFiles, setUploadFiles] = useState(null);
+  const { isAuthenticated } = useContext(LoginContext);
 
   let toast = useToast();
   let navigate = useNavigate();
@@ -25,10 +29,11 @@ export function GameBoardWrite(props) {
   function handleSubmit() {
     setIsSubmitting(true);
     axios
-      .post("/api/gameboard/write", {
+      .postForm("/api/gameboard/write", {
         title,
         board_content,
         category,
+        uploadFiles,
       })
       .then((response) => {
         toast({
@@ -43,7 +48,9 @@ export function GameBoardWrite(props) {
           status: "error",
         });
       })
-      .finally(() => setIsSubmitting(true));
+      .finally
+      // () => setIsSubmitting(true)
+      ();
   }
 
   return (
@@ -58,8 +65,9 @@ export function GameBoardWrite(props) {
             }}
           >
             <option value="공지">공지</option>
-            <option value="자유">자유</option>
-            <option value="롤">롤</option>
+            <option value="잡담">잡담</option>
+            <option value="질문">질문</option>
+            <option value="정보">정보</option>
           </Select>
           <FormControl>
             <FormLabel>제목</FormLabel>
@@ -72,7 +80,18 @@ export function GameBoardWrite(props) {
               onChange={(e) => setBoard_content(e.target.value)}
             />
           </FormControl>
-
+          <FormControl>
+            <FormLabel>이미지</FormLabel>
+            <Input
+              type={"file"}
+              accept={"image/*"}
+              multiple
+              onChange={(e) => setUploadFiles(e.target.files)}
+            />
+            <FormHelperText>
+              한 개 파일은 1MB 이내, 총 용량으 10MB 이내로 첨부 하세요.
+            </FormHelperText>
+          </FormControl>
           <Button
             onClick={handleSubmit}
             colorScheme="blue"
