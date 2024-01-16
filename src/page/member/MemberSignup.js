@@ -144,9 +144,9 @@ export function MemberSignup() {
     setRandomNumber(newRandomNumber);
 
     axios
-      .post("/api/member/sendCodeMail", {
+      .post("/api/memberEmail/sendCodeMail", {
         member_email,
-        randomNumber: newRandomNumber,
+        message: newRandomNumber,
       })
       .then(() => {
         toast({
@@ -255,8 +255,6 @@ export function MemberSignup() {
 
   // 인증 번호 확인 클릭 -----------------------------------------------------------------
   function handleCodeCheckClick() {
-    console.log(randomNumber);
-    console.log(randomNumberCheck);
     if (randomNumberCheck === randomNumber.toString()) {
       toast({ description: "인증번호가 맞았습니다.", status: "success" });
       setEmailCodeCheckedState(true);
