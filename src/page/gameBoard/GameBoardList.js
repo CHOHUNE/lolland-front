@@ -222,6 +222,7 @@ function GameBoardList() {
           my="20px"
           onClick={() => {
             if (isAuthenticated()) {
+              // 괄호 추가
               navigate("write");
             } else {
               toast({ description: "로그인 후 글 작성" });

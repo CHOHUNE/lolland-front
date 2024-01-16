@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Box,
   Button,
@@ -21,6 +21,7 @@ import {
   NotAllowedIcon,
 } from "@chakra-ui/icons";
 import { useParams } from "react-router-dom";
+import LoginProvider, { LoginContext } from "../../component/LoginProvider";
 
 function CommentForm({ isSubmitting, onSubmit }) {
   const [comment, setComment] = useState("");
@@ -56,6 +57,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
   const [commentEdited, setCommentEdited] = useState(comment.comment_content);
   const [replyComment, setReplyComment] = useState("");
   const toast = useToast();
+  const { isAuthenticated, hasAccess } = useContext(LoginContext);
 
   function handleDuplicateSubmit() {
     setIsSubmitting(true);
@@ -65,6 +67,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
         parent_id: comment.id,
         comment_content: replyComment,
         game_board_id: comment.game_board_id,
+        member_id: comment.member_id,
       })
       .then(() => {
         toast({ description: "성공", status: "success" });
@@ -145,56 +148,60 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
           )}
         </Box>
 
-        {isWriting || (
-          <Box>
-            <Button
-              size="xs"
-              colorScheme="green"
-              onClick={() => setIsWriting(true)}
-            >
-              <AddIcon />
-            </Button>
-          </Box>
-        )}
-        {isWriting && (
-          <Box>
-            <Button
-              size="xs"
-              colorScheme="gray"
-              onClick={() => setIsWriting(false)}
-            >
-              <NotAllowedIcon />
-            </Button>
-          </Box>
-        )}
-
         <Box>
-          {isEditing || (
-            <Button
-              size="xs"
-              colorScheme="purple"
-              onClick={() => setIsEditing(true)}
-            >
-              <EditIcon />
-            </Button>
+          {isAuthenticated() && (
+            <>
+              {isWriting || (
+                <Button
+                  size="xs"
+                  colorScheme="green"
+                  onClick={() => setIsWriting(true)}
+                >
+                  <AddIcon />
+                </Button>
+              )}
+              {isWriting && (
+                <Button
+                  size="xs"
+                  colorScheme="gray"
+                  onClick={() => setIsWriting(false)}
+                >
+                  <NotAllowedIcon />
+                </Button>
+              )}
+            </>
           )}
-          {isEditing && (
-            <Button
-              size="xs"
-              colorScheme="gray"
-              onClick={() => setIsEditing(false)}
-            >
-              <NotAllowedIcon />
-            </Button>
-          )}
-          <Button
-            onClick={() => onDelete(comment.id)}
-            size="xs"
-            colorScheme="red"
-          >
-            <DeleteIcon />
-          </Button>
         </Box>
+
+        {hasAccess(comment.member_id) && (
+          <Box>
+            {isEditing || (
+              <Button
+                size="xs"
+                colorScheme="purple"
+                onClick={() => setIsEditing(true)}
+              >
+                <EditIcon />
+              </Button>
+            )}
+            {isEditing && (
+              <Button
+                size="xs"
+                colorScheme="gray"
+                onClick={() => setIsEditing(false)}
+              >
+                <NotAllowedIcon />
+              </Button>
+            )}
+            <Button
+              onClick={() => onDelete(comment.id)}
+              size="xs"
+              colorScheme="red"
+            >
+              <DeleteIcon />
+            </Button>
+          </Box>
+        )}
       </Flex>
     </Box>
   );
@@ -244,6 +251,7 @@ export function GameBoardCommentContainer() {
         game_board_id: id,
         comment_content: comment.comment,
         parent_id: null,
+        member_id: comment.member_id,
       })
       .then(() => {
         toast({

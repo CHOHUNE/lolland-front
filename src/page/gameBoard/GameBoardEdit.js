@@ -26,7 +26,6 @@ export function GameBoardEdit(props) {
   const { id } = useParams();
   const [removeFileIds, setRemoveFileIds] = useState([]);
   const [uploadFiles, setUploadFiles] = useState(null);
-  const { isAuthenticated, hasAccess } = useContext(LoginContext);
 
   let toast = useToast();
   let navigate = useNavigate();

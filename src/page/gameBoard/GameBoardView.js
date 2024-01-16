@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -17,6 +17,7 @@ import GameBoardCommentContainer from "./GameBoardCommentContainer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeartBroken } from "@fortawesome/free-solid-svg-icons/faHeartBroken";
+import { LoginContext } from "../../component/LoginProvider";
 
 function LikeContainer({ like, onClick }) {
   if (like === null) {
@@ -38,6 +39,7 @@ export function GameBoardView(props) {
   const { id } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
+  const { isAuthenticated, hasAccess } = useContext(LoginContext);
 
   useEffect(() => {
     axios
@@ -107,15 +109,20 @@ export function GameBoardView(props) {
         <VStack py={"100px"}>
           <HStack>
             <Button onClick={() => navigate(-1)}> 이전 </Button>
-            <Button
-              colorScheme={"purple"}
-              onClick={() => navigate("/gameboard/edit/" + id)}
-            >
-              수정
-            </Button>
-            <Button onClick={handleDelete} colorScheme={"red"}>
-              삭제
-            </Button>
+            {hasAccess(board.member_id) && (
+              <Button
+                colorScheme={"purple"}
+                onClick={() => navigate("/gameboard/edit/" + id)}
+              >
+                수정
+              </Button>
+            )}
+
+            {hasAccess(board.member_id) && (
+              <Button onClick={handleDelete} colorScheme={"red"}>
+                삭제
+              </Button>
+            )}
             <LikeContainer onClick={handleLike} like={like} />
           </HStack>
           <Box
