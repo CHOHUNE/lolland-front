@@ -24,6 +24,7 @@ import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
 import { MemberAddressWrite } from "./page/member/MemberViewPage/MemberAddressWrite";
 import { MemberEdit } from "./page/member/MemberViewPage/MemberEdit";
 import LoginProvider from "./component/LoginProvider";
+import { MemberFindId } from "./page/member/MemberFindId";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -51,6 +52,7 @@ const routes = createBrowserRouter(
       {/* 회원관련 */}
       <Route path="signup" element={<MemberSignup />} />
       <Route path="login" element={<MemberLogin />} />
+      <Route path="findId" element={<MemberFindId />} />
       <Route path="memberPage" element={<MemberView />}>
         <Route path="memberInfo" element={<MemberInfo />} />
         <Route path="memberInfo/memberManagePage" element={<MemberManage />} />
