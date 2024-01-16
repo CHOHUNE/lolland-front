@@ -17,6 +17,7 @@ import {
   InputRightElement,
   Select,
   Skeleton,
+  Spinner,
   Table,
   TableContainer,
   Tag,
@@ -124,7 +125,7 @@ export function QnaView({
   isAdmin,
 }) {
   const [qnaList, setQnaList] = useState([]);
-  const [pageInfo, setPageInfo] = useState(null);
+  const [pageInfo, setPageInfo] = useState();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -134,28 +135,61 @@ export function QnaView({
   const [editedQuestion, setEditedQuestion] = useState([]);
   const [viewMode, setViewMode] = useState(false);
 
-  const [params] = useSearchParams();
   const location = useLocation();
 
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState("all");
 
   function handleSearch() {
-    const params = new URLSearchParams();
-    params.set("k", keyword);
-    params.set("c", category);
-    params.set("product_id", product_id);
-    navigate("/?" + params);
+    const paramsSearch = new URLSearchParams();
+    paramsSearch.set("product_id", product_id);
+    paramsSearch.set("k", keyword);
+    paramsSearch.set("c", category);
+    axios
+      .get("/api/qna/list?" + paramsSearch)
+      .then((response) => {
+        console.log(response);
+        setQnaList(response.data.qnaList);
+        setPageInfo(response.data.pageInfo);
+      })
+      .catch((error) => {
+        if (error.response.status === 400) {
+          toast({
+            title: "Bad Request",
+            description: "프론트엔드 코드와 백엔드 파라미터를 확인해주세요",
+            status: "error",
+          });
+        } else if (error.response.status === 500) {
+          toast({
+            title: "Internal Server Error",
+            description: "백엔드 코드를 확인해주세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "QNA 리스트 불러오기에 실패하였습니다",
+            description: "계속되면 관리자에게 문의해주세요",
+            status: "error",
+          });
+        }
+      });
   }
 
   useEffect(() => {
-    fetchQna(params);
-  }, [location]);
+    fetchQna();
+  }, []);
 
   function fetchQna() {
+    const params = new URLSearchParams({
+      product_id: product_id,
+      k: keyword,
+      c: category,
+    });
+
     axios
-      .get("/api/qna/list" + params)
+      .get("/api/qna/list?" + params)
       .then((response) => {
+        console.log(response);
         setQnaList(response.data.qnaList);
         setPageInfo(response.data.pageInfo);
       })
@@ -189,6 +223,10 @@ export function QnaView({
       setOpenId(questionId);
     }
   };
+
+  if (pageInfo === null) {
+    return <Spinner />;
+  }
 
   function handleViewMember() {
     axios
