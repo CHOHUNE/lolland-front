@@ -39,6 +39,11 @@ export function MemberNavBar() {
     navigate("/memberPage/addressInfo");
   }
 
+  // 찜 목록 클릭시 로직
+  function handleLikeList() {
+    navigate("/memberPage/productLike");
+  }
+
   return (
     <Card>
       <CardHeader fontSize={"1.5rem"} color={"#5F625C"} fontWeight={"900"}>
@@ -95,7 +100,11 @@ export function MemberNavBar() {
           <Box border={"1px solid whitesmoke"}></Box>
           <FormControl>
             <Flex justify={"space-between"}>
-              <FormLabel _hover={{ cursor: "pointer" }} fontWeight={"900"}>
+              <FormLabel
+                _hover={{ cursor: "pointer" }}
+                fontWeight={"900"}
+                onClick={handleLikeList}
+              >
                 찜 목록 >
               </FormLabel>
               <Box>
