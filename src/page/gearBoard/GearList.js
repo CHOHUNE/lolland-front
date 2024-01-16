@@ -12,16 +12,16 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export function GearList() {
+export function GearList({ category }) {
   const [gearboardList, setGearboardList] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     axios
-      .get("/api/gearboard/list")
+      .get("/api/gearboard/list?category=" + category)
       .then((response) => setGearboardList(response.data));
-  }, []);
+  }, [category]);
 
   return (
     <Box>

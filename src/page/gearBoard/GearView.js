@@ -4,27 +4,29 @@ import {
   Card,
   CardBody,
   CardFooter,
+  CardHeader,
   Flex,
-  Text,
   FormControl,
   FormLabel,
-  Image,
   Heading,
+  Image,
   Input,
   Spinner,
   Stack,
-  useToast,
-  CardHeader,
-  TabList,
   Tab,
-  TabPanels,
+  TabList,
   TabPanel,
+  TabPanels,
   Tabs,
+  Text,
+  useToast,
 } from "@chakra-ui/react";
-import { useNavigate, useParams, useResolvedPath } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useImmer } from "use-immer";
 import { useEffect } from "react";
 import axios from "axios";
+import * as PropTypes from "prop-types";
+import { GearCommentContainer } from "./comment/GearCommentContainer";
 
 export function GearView() {
   const { gear_id } = useParams();
@@ -50,11 +52,11 @@ export function GearView() {
   }
 
   return (
-    <Box>
-      <FormControl>
-        <FormLabel> {gear_id}번 게시물</FormLabel>
-      </FormControl>
-
+    <Box w={"80%"} m={"0 auto"}>
+      <Heading size="lg" mt={"20px"}>
+        {gear_id}번 게시물
+      </Heading>
+      <br />
       <FormControl>
         <FormLabel>category</FormLabel>
         <Input value={gearboard.category} />
@@ -84,6 +86,7 @@ export function GearView() {
         </FormControl>
       </Flex>
 
+      <br />
       {/*  게시물 작성자  */}
       <Card
         w={"100%"}
@@ -158,6 +161,7 @@ export function GearView() {
           </Flex>
         </Stack>
       </Card>
+      <br />
       <Button
         colorScheme={"orange"}
         onClick={() => navigate("/gearlist/edit/" + gear_id)}
@@ -165,9 +169,11 @@ export function GearView() {
         수정
       </Button>
       <Button colorScheme={"red"} onClick={handleRemove}>
-        {" "}
         삭제
       </Button>
+
+      {/* 댓글 기능 추가 */}
+      <GearCommentContainer />
     </Box>
   );
 }

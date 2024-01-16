@@ -70,7 +70,6 @@ const routes = createBrowserRouter(
       <Route path="gearboard" element={<GearBoard />} />
       <Route path="gearlist" element={<GearList />} />
       <Route path="gearlistlayout" element={<GearListlayout />} />
-
       <Route path="gearlist/gear_id/:gear_id" element={<GearView />} />
       <Route path="gearlist/edit/:gear_id" element={<GearEdit />} />
     </Route>,

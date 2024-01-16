@@ -18,7 +18,15 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import { GearList } from "./GearList";
+import { useState } from "react";
+
+function Pageing() {
+  return null;
+}
+
 export function GearListlayout() {
+  const [category, setCategory] = useState("전체");
+
   return (
     <Box w={"80%"} margin={"15px auto"}>
       <Flex>
@@ -128,41 +136,78 @@ export function GearListlayout() {
           {/*게시판 리스트*/}
           <Tabs variant="unstyled">
             <TabList m={"20px"} mr={"20px"}>
-              <Tab _selected={{ color: "white", bg: "blue.500" }}>전체</Tab>
-              <Tab _selected={{ color: "white", bg: "orange.400" }}>잡담</Tab>
-              <Tab _selected={{ color: "white", bg: "orange.400" }}>질문</Tab>
-              <Tab _selected={{ color: "white", bg: "orange.400" }}>정보</Tab>
-              <Tab _selected={{ color: "white", bg: "orange.400" }}>축하</Tab>
-              <Tab _selected={{ color: "white", bg: "orange.400" }}>고민</Tab>
-              <Tab _selected={{ color: "white", bg: "orange.400" }}>인사</Tab>
+              <Tab
+                _selected={{ color: "white", bg: "blue.500" }}
+                onClick={(e) => setCategory("전체")}
+              >
+                전체
+              </Tab>
+              <Tab
+                _selected={{ color: "white", bg: "orange.400" }}
+                onClick={(e) => setCategory("잡담")}
+              >
+                잡담
+              </Tab>
+              <Tab
+                _selected={{ color: "white", bg: "orange.400" }}
+                onClick={(e) => setCategory("질문")}
+              >
+                질문
+              </Tab>
+              <Tab
+                _selected={{ color: "white", bg: "orange.400" }}
+                onClick={(e) => setCategory("정보")}
+              >
+                정보
+              </Tab>
+              <Tab
+                _selected={{ color: "white", bg: "orange.400" }}
+                onClick={(e) => setCategory("축하")}
+              >
+                축하
+              </Tab>
+              <Tab
+                _selected={{ color: "white", bg: "orange.400" }}
+                onClick={(e) => setCategory("고민")}
+              >
+                고민
+              </Tab>
+              <Tab
+                _selected={{ color: "white", bg: "orange.400" }}
+                onClick={(e) => setCategory("인사")}
+              >
+                인사
+              </Tab>
             </TabList>
             <TabPanels>
               {/* 전체 정보 */}
               <TabPanel>
-                <GearList />
+                <GearList category={category} />
               </TabPanel>
               {/* 잡담정보 */}
               <TabPanel>
-                <p>two!</p>
-                <p>two!</p>
-                <p>two!</p>
-                <p>two!</p>
-                <p>two!</p>
-                <p>two!</p>
+                <GearList category={category} />
               </TabPanel>
               {/* 질문정보 */}
               <TabPanel>
-                <GearList />
+                <GearList category={category} />
               </TabPanel>
               {/* 정보정보 */}
               <TabPanel>
-                <GearList />
+                <GearList category={category} />
               </TabPanel>
               {/* 축하정보 */}
-
+              <TabPanel>
+                <GearList category={category} />
+              </TabPanel>
               {/* 고민정보 */}
-
+              <TabPanel>
+                <GearList category={category} />
+              </TabPanel>
               {/* 인사정보 */}
+              <TabPanel>
+                <GearList category={category} />
+              </TabPanel>
             </TabPanels>
           </Tabs>
         </Box>

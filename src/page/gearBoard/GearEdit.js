@@ -44,12 +44,12 @@ export function GearEdit() {
       })
       .then(() => {
         toast({ description: "수정이 완료 되었습니다", status: "success" });
-        navigate("/gearlist");
+        navigate("/gearlistlayout");
       });
   }
 
   return (
-    <Box>
+    <Box w={"80%"} m={"0 auto"}>
       <FormControl>
         <FormLabel> {gear_id}번 게시물</FormLabel>
       </FormControl>
@@ -92,6 +92,7 @@ export function GearEdit() {
           }
         ></Textarea>
       </FormControl>
+
       <Button colorScheme={"blue"} onClick={handleSave}>
         저장
       </Button>
