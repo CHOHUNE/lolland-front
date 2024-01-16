@@ -27,8 +27,10 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
+  faPaperPlane,
   faPenToSquare,
   faTrashCan,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { Fragment, useEffect, useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
@@ -49,6 +51,9 @@ export function QnaView({
 
   const [openId, setOpenId] = useState(null);
   const [isWriting, setIsWriting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedQuestion, setEditedQuestion] = useState([]);
+  const [viewMode, setViewMode] = useState(false);
 
   useEffect(() => {
     fetchQna();
@@ -99,6 +104,7 @@ export function QnaView({
         },
       })
       .then((response) => {
+        console.log(response.data);
         setQnaList(response.data);
       })
       .catch((error) => {
@@ -124,14 +130,13 @@ export function QnaView({
       });
   }
 
-  function handleEditQna(qna) {
+  function handleEditQna() {
+    setIsEditing(false);
     axios
-      .put("/api/qna/edit", {
-        params: {
-          question_id: qna.question_id,
-          // question_title : ?
-          // question_content: ?
-        },
+      .put("/api/qna/update", {
+        question_id: editedQuestion.question_id,
+        question_title: editedQuestion.question_title,
+        question_content: editedQuestion.question_content,
       })
       .then(() => {
         toast({
@@ -139,6 +144,8 @@ export function QnaView({
           description: "판매자가 새로운 답변을 달 때까지 기다려주세요",
           status: "success",
         });
+        fetchQna();
+        setEditedQuestion([]);
       })
       .catch((error) => {
         if (error.response.status === 400) {
@@ -218,26 +225,44 @@ export function QnaView({
               </InputRightElement>
             </InputGroup>
             <ButtonGroup size="md">
-              <Button
-                borderRadius={0}
-                variant="undefined"
-                border="1px solid black"
-                bgColor="white"
-                onClick={() => {
-                  if (isAuthenticated()) {
-                    handleViewMember();
-                  } else {
-                    toast({
-                      title: "문의는 로그인 후 열람 가능합니다",
-                      description: "먼저 로그인 해주세요",
-                      status: "error",
-                    });
-                    navigate("/login");
-                  }
-                }}
-              >
-                내 글 보기
-              </Button>
+              {viewMode ? (
+                <Button
+                  borderRadius={0}
+                  w="100px"
+                  variant="undefined"
+                  border="1px solid black"
+                  bgColor="white"
+                  onClick={() => {
+                    setViewMode(false);
+                    fetchQna();
+                  }}
+                >
+                  전체 보기
+                </Button>
+              ) : (
+                <Button
+                  w="100px"
+                  borderRadius={0}
+                  variant="undefined"
+                  border="1px solid black"
+                  bgColor="white"
+                  onClick={() => {
+                    if (isAuthenticated()) {
+                      setViewMode(true);
+                      handleViewMember();
+                    } else {
+                      toast({
+                        title: "문의는 로그인 후 열람 가능합니다",
+                        description: "먼저 로그인 해주세요",
+                        status: "error",
+                      });
+                      navigate("/login");
+                    }
+                  }}
+                >
+                  내 글 보기
+                </Button>
+              )}
               <Button
                 variant="undefined"
                 borderRadius={0}
@@ -322,29 +347,87 @@ export function QnaView({
                                   display="flex"
                                   justifyContent="flex-end"
                                 >
-                                  <IconButton
-                                    icon={
-                                      <FontAwesomeIcon icon={faPenToSquare} />
-                                    }
-                                    variant="ghost"
-                                    colorScheme="purple"
-                                    onClick={() => handleEditQna(qna)}
-                                  />
-                                  <IconButton
-                                    icon={<FontAwesomeIcon icon={faTrashCan} />}
-                                    variant="ghost"
-                                    color="black"
-                                    _hover={{
-                                      color: "white",
-                                      bgColor: "black",
-                                    }}
-                                    onClick={() => handleDeleteQna(qna)}
-                                  />
+                                  {isEditing ? (
+                                    <>
+                                      <Input
+                                        border="1px solid black"
+                                        value={editedQuestion.question_title}
+                                        onChange={(e) => {
+                                          setEditedQuestion((prevQ) => {
+                                            return {
+                                              ...prevQ,
+                                              question_title: e.target.value,
+                                            };
+                                          });
+                                        }}
+                                      />
+                                      <IconButton
+                                        icon={
+                                          <FontAwesomeIcon
+                                            icon={faPaperPlane}
+                                          />
+                                        }
+                                        colorScheme="blue"
+                                        variant="ghost"
+                                        onClick={() => handleEditQna()}
+                                      />
+                                      <IconButton
+                                        icon={
+                                          <FontAwesomeIcon icon={faXmark} />
+                                        }
+                                        colorScheme="red"
+                                        variant="ghost"
+                                        onClick={() => {
+                                          setEditedQuestion(qna);
+                                          setIsEditing(false);
+                                        }}
+                                      />
+                                    </>
+                                  ) : (
+                                    <>
+                                      <IconButton
+                                        icon={
+                                          <FontAwesomeIcon
+                                            icon={faPenToSquare}
+                                          />
+                                        }
+                                        variant="ghost"
+                                        colorScheme="blackAlpha"
+                                        onClick={() => {
+                                          setIsEditing(true);
+                                          setEditedQuestion(qna);
+                                        }}
+                                      />
+                                      <IconButton
+                                        icon={
+                                          <FontAwesomeIcon icon={faTrashCan} />
+                                        }
+                                        variant="ghost"
+                                        colorScheme="red"
+                                        onClick={() => handleDeleteQna(qna)}
+                                      />
+                                    </>
+                                  )}
                                 </ButtonGroup>
                               )}
-                              <Text whiteSpace="pre-wrap" lineHeight="30px">
-                                {qna.question_content}
-                              </Text>
+                              {isEditing ? (
+                                <Textarea
+                                  mt={5}
+                                  value={editedQuestion.question_content}
+                                  onChange={(e) => {
+                                    setEditedQuestion((prevQ) => {
+                                      return {
+                                        ...prevQ,
+                                        question_content: e.target.value,
+                                      };
+                                    });
+                                  }}
+                                />
+                              ) : (
+                                <Text whiteSpace="pre-wrap" lineHeight="30px">
+                                  {qna.question_content}
+                                </Text>
+                              )}
                             </Td>
                           </Tr>
                           {qna.answer_content && (

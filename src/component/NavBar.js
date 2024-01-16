@@ -11,10 +11,11 @@ import {
   TabPanels,
   Tabs,
   Text,
+  Tooltip,
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -24,14 +25,17 @@ import {
   faUserPlus,
   faMagnifyingGlass,
   faPowerOff,
+  faUsersGear,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { LoginContext } from "./LoginProvider";
 
 export function NavBar() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [index, setIndex] = useState(null);
   const toast = useToast();
+  const { isAdmin, isAuthenticated, hasAccess } = useContext(LoginContext);
 
   // 카테고리 불러오기
   useEffect(() => {
@@ -127,24 +131,51 @@ export function NavBar() {
             <IconButton icon={<FontAwesomeIcon icon={faMagnifyingGlass} />} />
             <IconButton
               icon={<FontAwesomeIcon icon={faBagShopping} />}
-              onClick={() => navigate("/cart")}
+              onClick={() => {
+                if (isAuthenticated()) {
+                  navigate("/cart");
+                } else {
+                  navigate("/login");
+                }
+              }}
             />
-            <IconButton
-              icon={<FontAwesomeIcon icon={faUser} />}
-              onClick={() => navigate("/memberPage")}
-            />
-            <IconButton
-              icon={<FontAwesomeIcon icon={faUserPlus} />}
-              onClick={() => navigate("/signup")}
-            />
-            <IconButton
-              icon={<FontAwesomeIcon icon={faPowerOff} />}
-              onClick={() => navigate("/login")}
-            />
-            <IconButton
-              icon={<FontAwesomeIcon icon={faArrowRightFromBracket} />}
-              onClick={handleLogoutClick}
-            />
+            {isAuthenticated() ? (
+              <>
+                <IconButton
+                  icon={<FontAwesomeIcon icon={faUser} />}
+                  onClick={() => navigate("/memberPage")}
+                />
+                {isAdmin() && (
+                  <IconButton icon={<FontAwesomeIcon icon={faUsersGear} />} />
+                )}
+                <IconButton
+                  icon={<FontAwesomeIcon icon={faArrowRightFromBracket} />}
+                  onClick={handleLogoutClick}
+                />
+              </>
+            ) : (
+              <>
+                <Tooltip
+                  label="로그인 해주세요!"
+                  hasArrow
+                  fontSize="xs"
+                  bgColor="orange"
+                  color="black"
+                  borderRadius={10}
+                  gutter={0}
+                  isOpen={true}
+                >
+                  <IconButton
+                    icon={<FontAwesomeIcon icon={faPowerOff} />}
+                    onClick={() => navigate("/login")}
+                  />
+                </Tooltip>
+                <IconButton
+                  icon={<FontAwesomeIcon icon={faUserPlus} />}
+                  onClick={() => navigate("/signup")}
+                />
+              </>
+            )}
           </ButtonGroup>
         </Flex>
         {/* ------------------- 하단 네브바 ------------------- */}
