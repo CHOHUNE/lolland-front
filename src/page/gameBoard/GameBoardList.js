@@ -141,10 +141,6 @@ function GameBoardList() {
     return <Spinner />;
   }
 
-  const normalBoard = gameBoardList.filter(
-    (board) => board.category !== "공지",
-  );
-
   return (
     <Box py={"100px"}>
       <Center>
@@ -167,32 +163,30 @@ function GameBoardList() {
               </Tr>
             </Thead>
             <Tbody>
-              {top
-                .filter((topTen) => topTen.category !== "공지")
-                .map((topTen) => (
-                  <Tr
-                    key={topTen.id}
-                    _hover={{ cursor: "pointer" }}
-                    onClick={() => navigate("/gameboard/id/" + topTen.id)}
-                    borderRadius="10px"
-                  >
-                    <Td>{topTen.id}</Td>
-                    <Td>{topTen.title}</Td>
-                    <Td>{topTen.category}</Td>
-                    <Td>{topTen.board_content}</Td>
-                    <Td>{topTen.board_count}</Td>
-                    <Td>{topTen.count_like}</Td>
-                    <Td>{topTen.count_comment}</Td>
-                    <Td>{topTen.countFile}</Td>
-                    <Td>
-                      {new Date(topTen.reg_time).toLocaleDateString("ko-KR", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </Td>
-                  </Tr>
-                ))}
+              {top.map((topTen) => (
+                <Tr
+                  key={topTen.id}
+                  _hover={{ cursor: "pointer" }}
+                  onClick={() => navigate("/gameboard/id/" + topTen.id)}
+                  borderRadius="10px"
+                >
+                  <Td>{topTen.id}</Td>
+                  <Td>{topTen.title}</Td>
+                  <Td>{topTen.category}</Td>
+                  <Td>{topTen.board_content}</Td>
+                  <Td>{topTen.board_count}</Td>
+                  <Td>{topTen.count_like}</Td>
+                  <Td>{topTen.count_comment}</Td>
+                  <Td>{topTen.countFile}</Td>
+                  <Td>
+                    {new Date(topTen.reg_time).toLocaleDateString("ko-KR", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </Td>
+                </Tr>
+              ))}
             </Tbody>
           </Table>
         </TableContainer>
@@ -314,7 +308,7 @@ function GameBoardList() {
               </Tr>
             </Thead>
             <Tbody>
-              {normalBoard.map((board) => (
+              {gameBoardList.map((board) => (
                 <Tr
                   key={board.id}
                   _hover={{ cursor: "pointer" }}
