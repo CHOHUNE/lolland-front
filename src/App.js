@@ -45,7 +45,6 @@ const routes = createBrowserRouter(
       <Route path="edit/:product_id" element={<ProductEdit />} />
 
       {/* 리뷰 */}
-      <Route path="/review" element={<ReviewView />} />
 
       {/* 장바구니 */}
       <Route path="/cart" element={<Cart />} />

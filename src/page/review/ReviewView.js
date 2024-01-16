@@ -1,5 +1,7 @@
 import {
   Box,
+  Button,
+  ButtonGroup,
   Divider,
   Flex,
   HStack,
@@ -19,14 +21,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCommentSlash,
   faPaperPlane,
+  faPenToSquare,
   faStar,
+  faTrashCan,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { Qna } from "../qna/Qna";
+import { QnaView } from "../qna/QnaView";
 import { useNavigate } from "react-router-dom";
+import loginProvider, { LoginContext } from "../../component/LoginProvider";
 
-const StarRating = ({ rating, setRating }) => {
+// 리뷰 등록할 때 별점 부분
+const StarRating = ({ rate, setRate }) => {
   const [hover, setHover] = useState(null);
   return (
     <Flex justifyContent="space-evenly" p={3} my={2} mx="40%">
@@ -36,7 +43,7 @@ const StarRating = ({ rating, setRating }) => {
           <Box
             as="label"
             key={index}
-            color={ratingValue <= (hover || rating) ? "#FFE000" : "#EAEAE7"}
+            color={ratingValue <= (hover || rate) ? "#FFE000" : "#EAEAE7"}
             onMouseEnter={() => setHover(ratingValue)}
             onMouseLeave={() => setHover(null)}
           >
@@ -45,9 +52,7 @@ const StarRating = ({ rating, setRating }) => {
               cursor={"pointer"}
               size="2xl"
               transition="color 200ms"
-              onClick={() =>
-                setRating(rating === ratingValue ? 0 : ratingValue)
-              }
+              onClick={() => setRate(rate === ratingValue ? 0 : ratingValue)}
             />
           </Box>
         );
@@ -56,35 +61,68 @@ const StarRating = ({ rating, setRating }) => {
   );
 };
 
+// fetch에서 가져온 rate로 각 리뷰의 별점을 형식에 맞춰(5-입력한 별점 = 회색별) 출력하는 부분
+const Star = ({ initialRate, onRateChange, isEditing }) => {
+  const [currentRate, setCurrentRate] = useState(initialRate);
+
+  // 첫 rendering : review.rate 표시 (currentRate에 저장)
+  // 만약 사용자가 새로운 rate로 변경하면 onClick을 통해 currentRate 수정
+  // 만약 사용자가 같은 rate를 반복해서 누르면 (currentRate === ratingValue) 0으로 변경
+  const handleClick = (ratingValue) => {
+    console.log("===================");
+    console.log("ratingValue: " + ratingValue);
+    console.log("currentRate: " + currentRate);
+    if (isEditing) {
+      const newRating = currentRate === ratingValue ? 0 : ratingValue;
+      console.log("newRating: " + newRating);
+      // currentRate = newRating;
+      setCurrentRate(newRating);
+      onRateChange(newRating);
+    }
+    console.log("new Current rate: " + currentRate);
+  };
+
+  const realRate = isEditing ? currentRate : initialRate;
+
+  const totalStars = 5;
+  const stars = Array.from({ length: totalStars }).map((_, index) => {
+    const ratingValue = index + 1;
+    const starColor = ratingValue <= realRate ? "#FFE000" : "#EAEAE7";
+
+    return (
+      <FontAwesomeIcon
+        key={index}
+        icon={faStar}
+        color={starColor}
+        size="sm"
+        onClick={() => handleClick(ratingValue)}
+        cursor={isEditing ? "pointer" : "default"}
+      />
+    );
+  });
+
+  return <HStack spacing={1}>{stars}</HStack>;
+};
+
 export const ReviewView = ({ product_id }) => {
-  const [rating, setRating] = useState(0);
+  const [rate, setRate] = useState(0);
   const [review, setReview] = useState("");
+  const { hasAccess, isAdmin, isAuthenticated } = useContext(LoginContext);
   const [reviewList, setReviewList] = useState([]);
+  const [isEditing, setIsEditing] = useState(null);
+  const [editingReview, setEditingReview] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
+  const [editableRating, setEditableRating] = useState(0);
 
+  const handleRatingChange = (newRating) => {
+    setEditableRating(newRating);
+  };
+
+  // 첫 로딩 시 리뷰 리스트 가져오기
   useEffect(() => {
     fetchReview();
   }, []);
-
-  const Star = ({ rating }) => {
-    const totalStars = 5;
-
-    const stars = Array.from({ length: totalStars }).map((_, index) => {
-      const starColor = index < rating ? "#FFE000" : "#EAEAE7";
-
-      return (
-        <FontAwesomeIcon
-          key={index}
-          icon={faStar}
-          color={starColor}
-          size="sm"
-        />
-      );
-    });
-
-    return <HStack spacing={1}>{stars}</HStack>;
-  };
 
   function fetchReview() {
     axios
@@ -103,93 +141,118 @@ export const ReviewView = ({ product_id }) => {
   }
 
   function handleSubmit() {
+    if (isAuthenticated()) {
+      axios
+        .post("/api/review/submit", {
+          product_id: product_id,
+          review_content: review,
+          rate: rate,
+        })
+        .then((response) => {
+          toast({
+            description: "리뷰를 성공적으로 등록했습니다",
+            status: "success",
+          });
+          fetchReview();
+        })
+        .catch((error) => {
+          toast({
+            title: "댓글 등록에 실패했습니다",
+            description: error.response.data,
+            status: "error",
+          });
+        });
+    } else {
+      toast({
+        title: "비회원은 리뷰를 등록할 수 없습니다",
+        description: "로그인 후 다시 시도해주세요",
+        status: "error",
+      });
+      navigate("/login");
+    }
+  }
+
+  // ------------------------- 리뷰 수정 ------------------------- //
+
+  // 수정하는 리뷰 설정
+  const handleEditReview = (review) => {
+    setIsEditing(true);
+    setEditingReview(review);
+  };
+
+  // 수정 취소
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditingReview(null);
+  };
+
+  // 수정 요청
+  const handleUpdateReview = () => {
+    updateReview(editingReview);
+    setIsEditing(false);
+    setEditingReview(null);
+  };
+
+  // 수정된 리뷰 전송
+  function updateReview(editedReview) {
+    console.log(editedReview);
     axios
-      .post("/api/review/submit", {
-        product_id: product_id,
-        review_content: review,
-        rate: rating,
+      .put("/api/review/update", {
+        review_id: editedReview.review_id,
+        review_content: editedReview.review_content,
+        rate: editedReview.rate,
       })
-      .then((response) => {
+      .then(() => {
         toast({
-          description: "리뷰를 성공적으로 등록했습니다",
+          description: "리뷰를 성공적으로 수정하였습니다",
           status: "success",
         });
         fetchReview();
       })
       .catch((error) => {
-        if (error.response.status === 400) {
+        if (error.response.status === 500) {
           toast({
-            title: "비회원은 리뷰 등록이 불가능합니다",
-            description: "로그인 후 등록해주세요",
+            title: "수정 중 오류 발생",
+            description: "백엔드 코드를 점검해주세요",
             status: "error",
           });
-          navigate("/login");
         } else {
           toast({
-            title: "댓글 등록에 실패했습니다",
-            description: error.response.data,
+            title: "수정 중 오류 발생",
+            description: "다시 한번 시도해주시거나, 관리자에게 문의해주세요",
             status: "error",
           });
         }
       });
   }
 
-  // function updateReview() {
-  //   axios
-  //     .put("/api/review/update", {
-  //       review_id: review_id,
-  //       review_content: review,
-  //       rate: rating,
-  //     })
-  //     .then(() => {
-  //       toast({
-  //         description: "리뷰를 성공적으로 수정하였습니다",
-  //         status: "success",
-  //       });
-  //       fetchReview();
-  //     })
-  //     .catch((error) => {
-  //       if(error.response.status === 500) {
-  //         toast({
-  //           title: "수정 중 오류 발생",
-  //           description: "백엔드 코드를 점검해주세요",
-  //           status: "error"
-  //         });
-  //       } else {
-  //         toast({
-  //           title: "수정 중 오류 발생",
-  //           description: "다시 한번 시도해주시거나, 관리자에게 문의해주세요",
-  //           status: "error"
-  //         })
-  //       }
-  //     });
-  // }
-
-  // function deleteReview() {
-  //   axios
-  //     .delete("/api/review/delete", { review_id })
-  //     .then((response) => {
-  //       toast({
-  //         description: "리뷰가 성공적으로 삭제되었습니다",
-  //         status: "success",
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       if (error.response.status === 500) {
-  //         toast({
-  //           title: "리뷰 삭제 중 에러 발생",
-  //           description: "백엔드 코드를 점검해주세요",
-  //           status: "error",
-  //         });
-  //       } else {
-  //         toast({
-  //           title: "리뷰 삭제 중 에러 발생",
-  //           description: "다시 한번 시도해주시거나, 관리자에게 문의해주세요",
-  //           status: "error",
-  //         });
-  //       }
-  //     });
-  // }
+  // 리뷰 삭제 요청
+  function deleteReview(review_id) {
+    axios
+      .delete(`/api/review/delete?review_id=${review_id}`)
+      .then((response) => {
+        toast({
+          description: "리뷰가 성공적으로 삭제되었습니다",
+          status: "success",
+        });
+        fetchReview();
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          toast({
+            title: "리뷰 삭제 중 에러 발생",
+            description: "백엔드 코드를 점검해주세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "리뷰 삭제 중 에러 발생",
+            description: "다시 한번 시도해주시거나, 관리자에게 문의해주세요",
+            status: "error",
+          });
+        }
+      });
+  }
 
   const tabStyles = {
     w: "30%",
@@ -220,12 +283,7 @@ export const ReviewView = ({ product_id }) => {
   return (
     <>
       <Tabs position="relative" variant="unstyled">
-        <TabList
-          p={5}
-          justifyContent="space-evenly"
-          align="center"
-          border="1px dashed blue"
-        >
+        <TabList p={5} justifyContent="space-evenly" align="center">
           <Tab {...tabStyles}>상품 설명</Tab>
           <Tab {...tabStyles}>리뷰 & 댓글 ({reviewList.length})</Tab>
           <Tab {...tabStyles}>Q&A</Tab>
@@ -242,7 +300,7 @@ export const ReviewView = ({ product_id }) => {
           {/* -------------------------- 리뷰 & 댓글 -------------------------- */}
           <TabPanel>
             {/* -------------------------- 리뷰 입력란 -------------------------- */}
-            <StarRating rating={rating} setRating={setRating} />
+            <StarRating rate={rate} setRate={setRate} />
             <Flex justifyContent="center" mx="20%" mb={10}>
               <Textarea
                 value={review}
@@ -273,14 +331,74 @@ export const ReviewView = ({ product_id }) => {
                     >
                       {formattedLogId(review.member_login_id)}
                     </Text>
-                    <Star rating={review.rate} />
+                    {/* -------------------------- 별점 출력란 -------------------------- */}
+                    <Star
+                      initialRate={review.rate}
+                      onRateChange={handleRatingChange}
+                      isEditing={isEditing}
+                    />
+                    {/* -------------------------- 시간 출력란 -------------------------- */}
                     <Text opacity={0.6}>
                       {formattedDate(review.review_reg_time)}
                     </Text>
+                    {/* -------------------------- 수정(취소) / 삭제 버튼 출력란 --------------------------*/}
+                    <ButtonGroup>
+                      {(hasAccess(review.member_login_id) || isAdmin()) && (
+                        <>
+                          {isEditing &&
+                          editingReview.review_id === review.review_id ? (
+                            <>
+                              <IconButton
+                                icon={<FontAwesomeIcon icon={faPaperPlane} />}
+                                variant="ghost"
+                                colorScheme="blue"
+                                onClick={handleUpdateReview}
+                              />
+                              <IconButton
+                                icon={<FontAwesomeIcon icon={faXmark} />}
+                                variant="ghost"
+                                colorScheme="red"
+                                onClick={handleCancelEdit}
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <IconButton
+                                icon={<FontAwesomeIcon icon={faPenToSquare} />}
+                                variant="ghost"
+                                colorScheme="purple"
+                                onClick={() => handleEditReview(review)}
+                              />
+                              <IconButton
+                                icon={<FontAwesomeIcon icon={faTrashCan} />}
+                                variant="ghost"
+                                color="black"
+                                _hover={{ color: "white", bgColor: "black" }}
+                                onClick={() => deleteReview(review.review_id)}
+                              />
+                            </>
+                          )}
+                        </>
+                      )}
+                    </ButtonGroup>
                   </HStack>
-                  <Text mb={6} whiteSpace="pre-wrap">
-                    {review.review_content}
-                  </Text>
+                  {isEditing && editingReview.review_id === review.review_id ? (
+                    <Textarea
+                      value={editingReview.review_content}
+                      onChange={(e) => {
+                        setEditingReview((prevReview) => ({
+                          ...prevReview,
+                          review_content: e.target.value,
+                        }));
+                      }}
+                      mb={6}
+                      whiteSpace="pre-wrap"
+                    />
+                  ) : (
+                    <Text mb={6} whiteSpace="pre-wrap">
+                      {review.review_content}
+                    </Text>
+                  )}
                   {index < reviewList.length - 1 && <Divider />}
                 </Box>
               ))
@@ -310,9 +428,13 @@ export const ReviewView = ({ product_id }) => {
           </TabPanel>
           {/* -------------------------- Q&A -------------------------- */}
           <TabPanel>
-            <Qna
+            <QnaView
+              product_id={product_id}
               formattedLogId={formattedLogId}
               formattedDate={formattedDate}
+              isAuthenticated={isAuthenticated}
+              hasAccess={hasAccess}
+              isAdmin={isAdmin}
             />
           </TabPanel>
         </TabPanels>
