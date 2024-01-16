@@ -122,6 +122,7 @@ export function MemberLogin() {
                 borderRadius={"0"}
                 bg={"none"}
                 style={{ backgroundColor: "white" }}
+                onClick={() => navigate("/findPassword")}
               >
                 비밀번호 찾기
               </Button>
