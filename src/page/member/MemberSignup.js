@@ -134,6 +134,25 @@ export function MemberSignup() {
 
   function handleEmailCodeClick() {
     setSendNumber(true);
+    const randomNumber = Math.floor(Math.random() * 100000);
+
+    axios
+      .post("/api/member/sendCodeMail", {
+        member_email,
+        randomNumber,
+      })
+      .then(() => {
+        toast({
+          description: "인증번호를 입력해주세요.",
+          status: "success",
+        });
+      })
+      .catch(() => {
+        toast({
+          description: "인증번호 발송중 문제가 발생하였습니다.",
+          status: "error",
+        });
+      });
   }
 
   function handleSingUpClick() {
