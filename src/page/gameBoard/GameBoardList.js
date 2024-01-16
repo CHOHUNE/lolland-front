@@ -137,34 +137,34 @@ function GameBoardList() {
         >
           <Button
             onClick={() => navigate("")}
-            _hover={{ bgColor: "red.500", color: "white" }}
+            _hover={{ bgColor: "whitesmoke", color: "black" }}
           >
             전체
           </Button>
           <Button
             onClick={() => navigate("?k=공지")}
-            _hover={{ bgColor: "red.500", color: "white" }}
+            _hover={{ bgColor: "whitesmoke", color: "black" }}
           >
             공지
           </Button>
           <Button
             colorScheme={"blue"}
             onClick={() => navigate("?k=잡담")}
-            _hover={{ bgColor: "red.500", color: "white" }}
+            _hover={{ bgColor: "whitesmoke", color: "black" }}
           >
             잡담
           </Button>
           <Button
             colorScheme={"blue"}
             onClick={() => navigate("?k=질문")}
-            _hover={{ bgColor: "red.500", color: "white" }}
+            _hover={{ bgColor: "whitesmoke", color: "black" }}
           >
             질문
           </Button>
           <Button
             colorScheme={"blue"}
             onClick={() => navigate("?k=정보")}
-            _hover={{ bgColor: "red.500", color: "white" }}
+            _hover={{ bgColor: "whitesmoke", color: "black" }}
           >
             정보
           </Button>
@@ -172,7 +172,7 @@ function GameBoardList() {
       </Center>
       <Center>
         <TableContainer>
-          <Table size="sm">
+          <Table size="sm" border={"1px solid whitesmoke"}>
             <Thead>
               <Tr>
                 <Th>id</Th>
@@ -189,30 +189,33 @@ function GameBoardList() {
 
             <Tbody>
               {gameBoardList &&
-                gameBoardList.map((board) => (
-                  <Tr
-                    key={board.id}
-                    _hover={{ cursor: "pointer" }}
-                    onClick={() => navigate("/gameboard/id/" + board.id)}
-                  >
-                    <Td>{board.id}</Td>
-                    <Td>{board.title}</Td>
-                    <Td>{board.category}</Td>
-                    <Td>{board.board_content}</Td>
-                    <Td>{board.board_count}</Td>
-                    <Td>{board.count_like}</Td>
-                    <Td>{board.count_comment}</Td>
-                    <Td>{board.countFile}</Td>
-                    <Td>
-                      {new Date(board.reg_time).toLocaleDateString("ko-KR", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </Td>
-                    {/*<Td>{board.reg_time}</Td>*/}
-                  </Tr>
-                ))}
+                gameBoardList
+                  .filter((board) => board.category !== "공지")
+                  .map((board) => (
+                    <Tr
+                      key={board.id}
+                      _hover={{ cursor: "pointer" }}
+                      onClick={() => navigate("/gameboard/id/" + board.id)}
+                      borderRadius="10px"
+                    >
+                      <Td>{board.id}</Td>
+                      <Td>{board.title}</Td>
+                      <Td>{board.category}</Td>
+                      <Td>{board.board_content}</Td>
+                      <Td>{board.board_count}</Td>
+                      <Td>{board.count_like}</Td>
+                      <Td>{board.count_comment}</Td>
+                      <Td>{board.countFile}</Td>
+                      <Td>
+                        {new Date(board.reg_time).toLocaleDateString("ko-KR", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </Td>
+                      {/*<Td>{board.reg_time}</Td>*/}
+                    </Tr>
+                  ))}
             </Tbody>
           </Table>
         </TableContainer>

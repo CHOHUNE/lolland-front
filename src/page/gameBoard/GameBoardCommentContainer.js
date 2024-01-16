@@ -32,20 +32,24 @@ function CommentForm({ isSubmitting, onSubmit }) {
     onSubmit({ comment });
     setComment("");
   }
-  function handleKeyDown(e) {
-    if (e.key === "Enter" && !e.s) {
-      e.preventDefault();
-      handleSubmit();
+
+  // handle Enter key Sumbit
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSubmit();
+      }
     }
-  }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleSubmit]);
 
   return (
     <Box>
-      <Textarea
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
+      <Textarea value={comment} onChange={(e) => setComment(e.target.value)} />
       <Tooltip isDisabled={isAuthenticated()} hasArrow label={"로그인 하세요"}>
         <Button isDisabled={isSubmitting} onClick={handleSubmit}>
           쓰기
