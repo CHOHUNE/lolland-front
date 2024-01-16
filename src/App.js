@@ -17,10 +17,15 @@ import { ProductList } from "./page/product/ProductList";
 import { ProductView } from "./page/product/ProductView";
 import { ReviewView } from "./page/review/ReviewView";
 import { Cart } from "./page/Cart/Cart";
+import { GearBoard } from "./page/gearBoard/GearBoard";
+import { GearList } from "./page/gearBoard/GearList";
+import { GearView } from "./page/gearBoard/GearView";
+import { GearEdit } from "./page/gearBoard/GearEdit";
 import { ProductEdit } from "./page/product/ProductEdit";
 import { MemberInfo } from "./page/member/MemberViewPage/MemberInfo";
 import { MemberManage } from "./page/member/MemberViewPage/MemberManage";
 import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
+import { GearListlayout } from "./page/gearBoard/GearListlayout";
 import { MemberAddressWrite } from "./page/member/MemberViewPage/MemberAddressWrite";
 import { MemberEdit } from "./page/member/MemberViewPage/MemberEdit";
 import LoginProvider from "./component/LoginProvider";
@@ -65,6 +70,13 @@ const routes = createBrowserRouter(
       <Route path="gameboard/id/:id" element={<GameBoardView />} />
       <Route path="gameboard/list/write" element={<GameBoardWrite />} />
       <Route path="gameboard/edit/:id" element={<GameBoardEdit />} />
+
+      {/* 게임 장비 커뮤니티 */}
+      <Route path="gearboard" element={<GearBoard />} />
+      <Route path="gearlist" element={<GearList />} />
+      <Route path="gearlistlayout" element={<GearListlayout />} />
+      <Route path="gearlist/gear_id/:gear_id" element={<GearView />} />
+      <Route path="gearlist/edit/:gear_id" element={<GearEdit />} />
     </Route>,
   ),
 );
