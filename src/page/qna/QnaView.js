@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Center,
   Collapse,
   Flex,
   FormControl,
@@ -10,7 +11,11 @@ import {
   IconButton,
   Input,
   InputGroup,
+  InputLeftAddon,
+  InputLeftElement,
+  InputRightAddon,
   InputRightElement,
+  Select,
   Skeleton,
   Table,
   TableContainer,
@@ -26,6 +31,8 @@ import {
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faAngleLeft,
+  faAngleRight,
   faMagnifyingGlass,
   faPaperPlane,
   faPenToSquare,
@@ -33,9 +40,80 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { Fragment, useEffect, useState } from "react";
-import { Form, useNavigate } from "react-router-dom";
+import {
+  Form,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import axios from "axios";
 import { QnaWrite } from "../qna/QnaWrite";
+
+function PageButton({ variant, pageNumber, children, product_id }) {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+
+  function handleClick() {
+    params.set("product_id", product_id);
+    params.set("p", pageNumber);
+    navigate("/?" + params);
+  }
+
+  return (
+    <Button variant={variant} onClick={handleClick}>
+      {children}
+    </Button>
+  );
+}
+
+function Pagination({ pageInfo, product_id }) {
+  const pageNumbers = [];
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <Center mt={5} mb={40}>
+      <Box>
+        <Flex justifyContent="center">
+          {pageInfo.prevPageNumber && (
+            <PageButton
+              variant="ghost"
+              product_id={product_id}
+              pageNumber={pageInfo.prevPageNumber}
+            >
+              <FontAwesomeIcon icon={faAngleLeft} />
+            </PageButton>
+          )}
+
+          {pageNumbers.map((pageNumber) => (
+            <PageButton
+              key={pageNumber}
+              variant={
+                pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
+              }
+              product_id={product_id}
+              pageNumber={pageNumber}
+            >
+              {pageNumber}
+            </PageButton>
+          ))}
+
+          {pageInfo.nextPageNumber && (
+            <PageButton
+              variant="ghost"
+              product_id={product_id}
+              pageNumber={pageInfo.nextPageNumber}
+            >
+              <FontAwesomeIcon icon={faAngleRight} />
+            </PageButton>
+          )}
+        </Flex>
+      </Box>
+    </Center>
+  );
+}
 
 export function QnaView({
   product_id,
@@ -46,6 +124,7 @@ export function QnaView({
   isAdmin,
 }) {
   const [qnaList, setQnaList] = useState([]);
+  const [pageInfo, setPageInfo] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -55,15 +134,30 @@ export function QnaView({
   const [editedQuestion, setEditedQuestion] = useState([]);
   const [viewMode, setViewMode] = useState(false);
 
+  const [params] = useSearchParams();
+  const location = useLocation();
+
+  const [keyword, setKeyword] = useState("");
+  const [category, setCategory] = useState("all");
+
+  function handleSearch() {
+    const params = new URLSearchParams();
+    params.set("k", keyword);
+    params.set("c", category);
+    params.set("product_id", product_id);
+    navigate("/?" + params);
+  }
+
   useEffect(() => {
-    fetchQna();
-  }, []);
+    fetchQna(params);
+  }, [location]);
 
   function fetchQna() {
     axios
-      .get("/api/qna/list", { params: { product_id: product_id } })
+      .get("/api/qna/list" + params)
       .then((response) => {
-        setQnaList(response.data);
+        setQnaList(response.data.qnaList);
+        setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
         if (error.response.status === 400) {
@@ -217,10 +311,30 @@ export function QnaView({
         />
       ) : (
         <>
-          <Flex justifyContent="center" mx="25%" gap={2} my={10}>
+          <Flex justifyContent="center" mx="15%" gap={2} my={10}>
             <InputGroup>
-              <Input borderRadius={0} placeholder="검색어를 입력해주세요" />
-              <InputRightElement bgColor="black">
+              <InputLeftElement w="20%">
+                <Select
+                  border="1px solid black"
+                  borderRadius={0}
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  <option selected value="all">
+                    전체
+                  </option>
+                  <option value="title">제목</option>
+                  <option value="content">내용</option>
+                  <option value="id">아이디</option>
+                </Select>
+              </InputLeftElement>
+              <Input
+                borderRadius={0}
+                textIndent="20%"
+                placeholder="검색어를 입력해주세요"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+              />
+              <InputRightElement bgColor="black" onClick={handleSearch}>
                 <FontAwesomeIcon icon={faMagnifyingGlass} color="white" />
               </InputRightElement>
             </InputGroup>
@@ -453,6 +567,7 @@ export function QnaView({
               </Tbody>
             </Table>
           </TableContainer>
+          <Pagination product_id={product_id} pageInfo={pageInfo} />
         </>
       )}
     </>

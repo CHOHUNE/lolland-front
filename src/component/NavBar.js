@@ -35,7 +35,8 @@ export function NavBar() {
   const [categories, setCategories] = useState([]);
   const [index, setIndex] = useState(null);
   const toast = useToast();
-  const { fetchLogin, isAdmin, isAuthenticated, hasAccess } = useContext(LoginContext);
+  const { fetchLogin, isAdmin, isAuthenticated, hasAccess } =
+    useContext(LoginContext);
 
   // 카테고리 불러오기
   useEffect(() => {
@@ -234,7 +235,7 @@ export function NavBar() {
             px={10}
             left={0}
             right={0}
-            top="54px"
+            top="53px"
             zIndex={100}
             backgroundColor="white"
             position="absolute"
