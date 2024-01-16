@@ -21,11 +21,15 @@ import { GearBoard } from "./page/gearBoard/GearBoard";
 import { GearList } from "./page/gearBoard/GearList";
 import { GearView } from "./page/gearBoard/GearView";
 import { GearEdit } from "./page/gearBoard/GearEdit";
-import { ProductEdit } from "./ProductEdit";
+import { ProductEdit } from "./page/product/ProductEdit";
 import { MemberInfo } from "./page/member/MemberViewPage/MemberInfo";
 import { MemberManage } from "./page/member/MemberViewPage/MemberManage";
 import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
 import { GearListlayout } from "./page/gearBoard/GearListlayout";
+import { MemberAddressWrite } from "./page/member/MemberViewPage/MemberAddressWrite";
+import { MemberEdit } from "./page/member/MemberViewPage/MemberEdit";
+import LoginProvider from "./component/LoginProvider";
+import { ProductLike } from "./page/productLike/ProductLike";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -42,10 +46,7 @@ const routes = createBrowserRouter(
       <Route path="/review" element={<ReviewView />} />
 
       {/* 장바구니 */}
-      {/* 이걸로 로그인 완성되면 수정 <Route path="/cart/:member_id" element={<Cart />} />*/}
       <Route path="/cart" element={<Cart />} />
-
-      {/* 찜하기 */}
 
       {/* Q&A */}
 
@@ -57,13 +58,17 @@ const routes = createBrowserRouter(
       <Route path="memberPage" element={<MemberView />}>
         <Route path="memberInfo" element={<MemberInfo />} />
         <Route path="memberInfo/memberManagePage" element={<MemberManage />} />
+        <Route path="memberEdit" element={<MemberEdit />} />
         <Route path="addressInfo" element={<MemberAddress />} />
+        <Route path="addressWrite" element={<MemberAddressWrite />} />
+        {/* 상품 찜하기 목록 - gns14585 - */}
+        <Route path="productLike" element={<ProductLike />} />
       </Route>
 
       {/* 게시판관련 */}
-      <Route path="gameboard" element={<GameBoardList />} />
+      <Route path="gameboard/list" element={<GameBoardList />} />
       <Route path="gameboard/id/:id" element={<GameBoardView />} />
-      <Route path="gameboard/write" element={<GameBoardWrite />} />
+      <Route path="gameboard/list/write" element={<GameBoardWrite />} />
       <Route path="gameboard/edit/:id" element={<GameBoardEdit />} />
 
       {/* 게임 장비 커뮤니티 */}
@@ -78,9 +83,9 @@ const routes = createBrowserRouter(
 
 function App() {
   return (
-    <>
+    <LoginProvider>
       <RouterProvider router={routes} />
-    </>
+    </LoginProvider>
   );
 }
 

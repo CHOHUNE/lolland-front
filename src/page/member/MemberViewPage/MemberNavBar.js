@@ -39,10 +39,20 @@ export function MemberNavBar() {
     navigate("/memberPage/addressInfo");
   }
 
+  // 찜 목록 클릭시 로직
+  function handleLikeList() {
+    navigate("/memberPage/productLike");
+  }
+
   return (
     <Card>
       <CardHeader fontSize={"1.5rem"} color={"#5F625C"} fontWeight={"900"}>
-        {member.member_login_id} 님의 페이지
+        <Flex justifyContent={"space-between"}>
+          <Box>{member.member_login_id} 님의 페이지</Box>
+          {member.member_type === "user" && <Box>일반 회원 입니다.</Box>}
+          {member.member_type === "seller" && <Box>판매자 입니다.</Box>}
+          {member.member_type === "admin" && <Box>관리자 입니다.</Box>}
+        </Flex>
       </CardHeader>
 
       <CardBody border={"1px solid black"} bg={"black"} color={"whitesmoke"}>
@@ -90,7 +100,11 @@ export function MemberNavBar() {
           <Box border={"1px solid whitesmoke"}></Box>
           <FormControl>
             <Flex justify={"space-between"}>
-              <FormLabel _hover={{ cursor: "pointer" }} fontWeight={"900"}>
+              <FormLabel
+                _hover={{ cursor: "pointer" }}
+                fontWeight={"900"}
+                onClick={handleLikeList}
+              >
                 찜 목록 >
               </FormLabel>
               <Box>

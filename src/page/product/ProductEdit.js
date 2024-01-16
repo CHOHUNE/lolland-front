@@ -27,8 +27,10 @@ export function ProductEdit() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
-  const [removeMainImgs, setRemoveMainImgs] = useState({}); // 이미지삭제
-  const [mainImg, setMainImg] = useState(null); // 이미지 추가
+  const [removeMainImgs, setRemoveMainImgs] = useState([]); // 메인이미지삭제
+  const [mainImg, setMainImg] = useState([]); // 메인이미지
+  const [removeContentImgs, setRemoveContentImgs] = useState([]); // 삭제할 설명 이미지 ID 목록
+  const [newContentImgs, setNewContentImgs] = useState([]); // 새로 추가할 설명 이미지 파일 목록
 
   const [previewImages, setPreviewImages] = useState([]);
 
@@ -44,12 +46,6 @@ export function ProductEdit() {
         setProduct(data);
         setSelectedCategory(data.product.category_id);
         setSelectedSubCategory(data.product.subcategory_id);
-        setRemoveMainImgs(
-          data.mainImgUrls.reduce(
-            (acc, _, index) => ({ ...acc, [index]: false }),
-            {},
-          ),
-        );
       })
       .catch((error) =>
         toast({
@@ -101,10 +97,16 @@ export function ProductEdit() {
     return <Spinner />;
   }
 
-  // ---------------------------------- 상세옵션선택 관련 로직 ----------------------------------
+  // ---------------------------------- 상세옵션선택 상품명 로직 ----------------------------------
   const handleInputChange = (e, index) => {
     const newOptions = [...options];
-    newOptions[index] = e.target.value;
+    newOptions[index] = { ...newOptions[index], option_name: e.target.value };
+    setOptions(newOptions);
+  };
+  // ---------------------------------- 상세옵션선택 수량 로직 ----------------------------------
+  const handleStockChange = (e, index) => {
+    const newOptions = [...options];
+    newOptions[index] = { ...newOptions[index], stock: e.target.value };
     setOptions(newOptions);
   };
 
@@ -122,51 +124,82 @@ export function ProductEdit() {
   };
 
   // ------------------------------ 메인이미지 삭제 로직 ------------------------------
-  function handleRemoveMainImgSwitch(index) {
-    setProduct((prevProduct) => ({
-      ...prevProduct,
-      mainImgUrls: prevProduct.mainImgUrls.filter(
-        (_, imgIndex) => imgIndex !== index,
-      ),
-    }));
-
-    // 삭제할 이미지의 상태를 업데이트합니다.
-    setRemoveMainImgs((prev) => {
-      const newRemoveMainImgs = { ...prev };
-      delete newRemoveMainImgs[index];
-      return newRemoveMainImgs;
+  function handleRemoveMainImgSwitch(imgId) {
+    setRemoveMainImgs((prevImgs) => {
+      const findIndex = prevImgs.findIndex((item) => item === imgId);
+      if (findIndex > -1) {
+        // 이미 배열에 ID가 있으면 제거합니다.
+        return prevImgs.filter((item) => item !== imgId);
+      } else {
+        // 배열에 ID가 없으면 추가합니다.
+        return [...prevImgs, imgId];
+      }
     });
   }
 
   // 이미지 파일이 선택되었을 때 호출될 함수
   const handleImageChange = (event) => {
+    setMainImg(event.target.files);
+
     if (event.target.files) {
       const filesArray = Array.from(event.target.files).map((file) => {
-        return URL.createObjectURL(file); // 파일을 위한 Data URL을 생성합니다.
+        return URL.createObjectURL(file);
       });
-
-      setPreviewImages(filesArray); // 미리보기 이미지 목록을 업데이트합니다.
-
-      // 메모리 누수를 방지하기 위해, 컴포넌트가 언마운트될 때 URL을 해제합니다.
+      setPreviewImages(filesArray);
       return () =>
         filesArray.forEach((fileUrl) => URL.revokeObjectURL(fileUrl));
     }
   };
 
-  function handleUpdateClick() {
-    axios.putForm("/api/product/edit", {
-      product_id: product_id, //
-      product_name: product.product.product_name, //
-      product_price: product.product.product_price, //
-      product_content: product.product.product_content, //
-      total_stock: product.product.total_stock, //
-      company_name: product.company_name, //
-      category_id: selectedCategory, //
-      subcategory_id: selectedSubCategory, //
-      removeMainImgs: product.mainImgUrls, // 서버에 이미 있는 이미지 URL들
-      newImgs: previewImages, // 새로 업로드할 이미지 미리보기 URL들
-      options: options,
+  // 새로운 설명 이미지 파일 목록을 상태에 추가
+  const handleContentImageChange = (event) => {
+    setNewContentImgs(event.target.files);
+  };
+
+  // 설명 이미지 삭제 핸들러
+  const handleRemoveContentImage = (imgId) => {
+    setRemoveContentImgs((prevImgs) => {
+      if (prevImgs.includes(imgId)) {
+        // 이미 배열에 ID가 있으면 제거합니다.
+        return prevImgs.filter((item) => item !== imgId);
+      } else {
+        // 배열에 ID가 없으면 추가합니다.
+        return [...prevImgs, imgId];
+      }
     });
+  };
+
+  // ------------------------------ 저장 버튼 클릭시 실행될 로직 ------------------------------
+  function handleUpdateClick() {
+    axios
+      .putForm("/api/product/edit", {
+        product_id: product_id, //
+        product_name: product.product.product_name,
+        product_price: product.product.product_price,
+        product_content: product.product.product_content,
+        total_stock: product.product.total_stock,
+        company_name: product.company_name,
+        category_id: selectedCategory,
+        subcategory_id: selectedSubCategory,
+        removeMainImgs, // 메인이미지 변경
+        newImgs: mainImg, // 메인이미지 추가
+        removeContentImgs,
+        newContentImgs: newContentImgs, // 설명이미지 추가
+        options: JSON.stringify(options),
+      })
+      .then(() => {
+        toast({
+          description: product.product_name + "상품 변경 되었습니다.",
+          status: "success",
+        });
+        navigate("/product/list");
+      })
+      .catch(() => {
+        toast({
+          description: "변경 중 오류 발생하였습니다.",
+          status: "error",
+        });
+      });
   }
 
   return (
@@ -279,20 +312,26 @@ export function ProductEdit() {
 
       {/* ------------------- 메인이미지 로직 ------------------- */}
       <Flex>
-        {product.mainImgUrls.map((imgUrl, index) => (
-          <Box key={index} my="5px">
+        {product.productImgs.map((productImg, index) => (
+          <Box key={productImg.main_img_id} my="5px">
             <FormControl display="flex" alignItems="center">
               <FormLabel htmlFor={`switch-${index}`}>
                 <FontAwesomeIcon color="red" icon={faTrashCan} />
               </FormLabel>
               <Switch
                 id={`switch-${index}`}
-                isChecked={removeMainImgs[index] || false}
+                isChecked={removeMainImgs.includes(productImg.main_img_id)}
                 colorScheme="red"
-                onChange={() => handleRemoveMainImgSwitch(index)}
+                onChange={() =>
+                  handleRemoveMainImgSwitch(productImg.main_img_id)
+                }
               />
             </FormControl>
-            <Image src={imgUrl} alt={`Main Image ${index}`} w="150px" />
+            <Image
+              src={productImg.main_img_uri}
+              alt={`Main Image ${index}`}
+              w="150px"
+            />
           </Box>
         ))}
       </Flex>
@@ -315,17 +354,65 @@ export function ProductEdit() {
         ))}
       </Flex>
 
+      {/* ------------------- 설명이미지 로직 ------------------- */}
+      <Flex>
+        {product.productDetailsImgs.map((productDetailsImg, index) => (
+          <Box key={productDetailsImg.details_img_id} my="5px">
+            <FormControl display="flex" alignItems="center">
+              <FormLabel htmlFor={`switch-${index}`}>
+                <FontAwesomeIcon color="red" icon={faTrashCan} />
+              </FormLabel>
+              <Switch
+                id={`content-switch-${index}`} // 고유한 id를 사용해야 합니다.
+                isChecked={removeContentImgs.includes(
+                  productDetailsImg.details_img_id,
+                )}
+                colorScheme="red"
+                onChange={() =>
+                  handleRemoveContentImage(productDetailsImg.details_img_id)
+                }
+              />
+            </FormControl>
+            <Image
+              src={productDetailsImg.sub_img_uri}
+              alt={`Main Image ${index}`}
+              w="150px"
+            />
+          </Box>
+        ))}
+      </Flex>
+
+      <FormControl>
+        <FormLabel>설명 이미지</FormLabel>
+        <Input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleContentImageChange}
+        />
+      </FormControl>
+
       {/* ------------------- 상세옵션 로직 ------------------- */}
       <Box>
         {options.map((option, index) => (
-          <FormControl key={index}>
-            <FormLabel>{index + 1}번째 상세옵션추가</FormLabel>
-            <Input
-              value={option.option_name}
-              placeholder="예) 화이트/청축"
-              onChange={(e) => handleInputChange(e, index)}
-            />
-          </FormControl>
+          <Flex>
+            <FormControl key={index}>
+              <FormLabel>{index + 1}번째 상세옵션추가</FormLabel>
+              <Input
+                value={option.option_name}
+                placeholder="예) 화이트/청축"
+                onChange={(e) => handleInputChange(e, index)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>수량</FormLabel>
+              <Input
+                type="number"
+                value={option.stock || ""} // 수량이 없으면 빈 문자열
+                onChange={(e) => handleStockChange(e, index)}
+              />
+            </FormControl>
+          </Flex>
         ))}
         <Flex justifyContent="center" mt={4}>
           <Button colorScheme="teal" onClick={handleAddInput}>

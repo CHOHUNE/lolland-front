@@ -16,6 +16,14 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverFooter,
+  PopoverHeader,
+  PopoverTrigger,
   Select,
   Spinner,
   Text,
@@ -29,7 +37,9 @@ import {
   faHeart as fasHeart,
 } from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 하트
 import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons"; // 빈 하트
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { selectOptions } from "@testing-library/user-event/dist/select-options"; // 빈 하트
+import { ReviewView } from "../review/ReviewView"; // 빈 하트
 
 export function ProductView() {
   const [product, setProduct] = useState(null);
@@ -38,13 +48,13 @@ export function ProductView() {
   const [seletedOptionList, setSeletedOptionList] = useState({});
 
   const { product_id } = useParams();
-  const [isFavorited, setIsFavorited] = useState(false);
-
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isFavorited, setIsFavorited] = useState(false); // 찜하기
 
   const navigate = useNavigate();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   // ---------------------------- 상품 렌더링 ----------------------------
   useEffect(() => {
@@ -60,6 +70,20 @@ export function ProductView() {
       .then((response) => setOption(response.data));
   }, [product_id]);
 
+  // ---------------------------- 찜한 내역 가져오는 렌더링 ----------------------------
+  useEffect(() => {
+    axios
+      .get("/api/productLike/" + product_id)
+      .then((response) => {
+        setIsFavorited(response.data.productLike);
+      })
+      .catch((error) => {
+        console.error("Error fetching product like status:", error);
+      });
+  }, [product_id]);
+
+  // ---------------------------- 로딩로직 ----------------------------
+
   if (product === null) {
     return <Spinner />;
   }
@@ -70,10 +94,11 @@ export function ProductView() {
   };
 
   // ------------------------------ 썸네일 클릭 시 메인 이미지 변경 ------------------------------
-  const selectImage = (index) => {
-    setCurrentImageIndex(index);
+  const changeMainImage = (index) => {
+    setSelectedImageIndex(index);
   };
 
+  // ------------------------------ 상세 옵션 관련 로직 ------------------------------
   const handleOptionChange = (e) => {
     const selectedValue = e.target.value;
     setSeletedOption(selectedValue);
@@ -82,14 +107,14 @@ export function ProductView() {
     const selectedOptionInfo = option.find(
       (opt) => opt.option_id.toString() === selectedValue,
     );
+
     if (selectedOptionInfo) {
       setSeletedOptionList((prev) => ({
         ...prev,
         [selectedOptionInfo.option_id]: {
+          ...prev[selectedOptionInfo.option_id],
           ...selectedOptionInfo,
-          quantity: prev[selectedOptionInfo.option_id]
-            ? prev[selectedOptionInfo.option_id].quantity
-            : 1, // 기존에 선택된 옵션이면 기존 수량 유지, 새로 추가되면 수량을 1로 설정
+          quantity: prev[selectedOptionInfo.option_id]?.quantity || 1,
         },
       }));
     }
@@ -105,13 +130,31 @@ export function ProductView() {
 
   // ------------------------------ 수량 증가 로직 ------------------------------
   const increaseQuantity = (key) => {
-    setSeletedOptionList((prevDetails) => ({
-      ...prevDetails,
-      [key]: {
-        ...prevDetails[key],
-        quantity: prevDetails[key].quantity + 1,
-      },
-    }));
+    setSeletedOptionList((prevDetails) => {
+      const currentQuantity = prevDetails[key].quantity;
+      const maxQuantity = prevDetails[key].stock; // 'stock'이 재고 수량을 나타냄
+
+      // 수량이 재고 수량 이하인 경우에만 증가
+      if (currentQuantity < maxQuantity) {
+        return {
+          ...prevDetails,
+          [key]: {
+            ...prevDetails[key],
+            quantity: currentQuantity + 1,
+          },
+        };
+      } else {
+        // 재고 수량을 초과하는 경우, 변경 없이 현재 상태를 반환
+        toast({
+          title: "재고 수량 초과",
+          description: "더 이상 수량을 늘릴 수 없습니다.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+        return prevDetails;
+      }
+    });
   };
 
   // ------------------------------ 수량 감소 로직 ------------------------------
@@ -176,11 +219,71 @@ export function ProductView() {
   }
 
   // ------------------------------ 장바구니로 정보 전달 로직 ------------------------------
-  function handleBucketClick() {}
+  function handleBucketClick() {
+    axios
+      .post("/api/cart/add", {
+        product_id: product_id,
+        seletedOptionList: seletedOptionList,
+      })
+      .then(() => {
+        toast({
+          description: "장바구니로 이동되었습니다.",
+          status: "success",
+        });
+      })
+      .catch(() => {
+        toast({
+          description: "이동중 오류가 발생하였습니다.",
+          status: "error",
+        });
+      });
+  }
+
+  // ----------------------------------- 상품 상세이미지 관련 로직 -----------------------------------
+  const renderProductDetailsImages = () => {
+    return product?.productDetailsImgs?.map((detailImg) => {
+      return (
+        <Image
+          key={detailImg.details_img_id}
+          src={detailImg.sub_img_uri}
+          alt={`Product Detail Image ${detailImg.details_img_id}`}
+          boxSize="100px"
+          objectFit="cover"
+        />
+      );
+    });
+  };
+
+  // ----------------------------------- 찜하기 -----------------------------------
+  const handleFavoriteClick = () => {
+    // 현재 하트 상태 토글
+    const newFavoriteStatus = !isFavorited;
+    // UI를 먼저 업데이트하고 서버 요청을 보냄
+    setIsFavorited(newFavoriteStatus);
+    // 서버에 좋아요 상태 전송
+    axios
+      .post("/api/productLike", {
+        product_id: product_id,
+        isFavorited: newFavoriteStatus,
+      })
+      .then(() => {
+        toast({
+          description: "상품 찜목록에 저장되었습니다.",
+          status: "success",
+        });
+      })
+      .catch((error) => {
+        toast({
+          description: "찜목록으로 이동되지 않았습니다.",
+          status: "error",
+        });
+        setIsFavorited(!newFavoriteStatus);
+      });
+  };
 
   return (
-    <Box w="100%" p={5}>
-      <Box w="80%">
+    <Box mx={"15%"} p={5}>
+      <Box>
         {/* ------------------------------ 상품 수정, 삭제 ------------------------------ */}
         <Button
           colorScheme="blue"
@@ -193,230 +296,333 @@ export function ProductView() {
         </Button>
       </Box>
 
-      <Flex>
-        {product.category_name} > {product.subcategory_name}
-      </Flex>
-      <Flex
-        direction="row"
-        justify="center"
-        align="center"
-        maxW="1200px"
-        m="auto"
-      >
-        {/* 메인 이미지 */}
-        <Box p={2}>
-          {product.mainImgUrls && product.mainImgUrls.length > 0 && (
-            <Image
-              src={product.mainImgUrls[currentImageIndex]}
-              alt={product.product_name}
-              boxSize="400px"
-              objectFit="contain"
-            />
-          )}
-          {/* 썸네일 이미지 */}
-          <HStack justifyContent={"center"} mt={2}>
-            {product.mainImgUrls &&
-              product.mainImgUrls.map((imgUrl, index) => (
-                <Box key={index} onMouseEnter={() => selectImage(index)}>
-                  <Image src={imgUrl} boxSize="100px" objectFit="cover" />
-                </Box>
-              ))}
-          </HStack>
+      {/* ---------------------- 카테고리 순서 ---------------------- */}
+      <Box minW={"800px"}>
+        <Box justify="center" align="start" maxW="100%" m="auto" mt={10} mb={7}>
+          <Text ml={4} fontSize={"0.9rem"}>
+            {product.category_name} > {product.subcategory_name}
+          </Text>
+        </Box>
+        <Box justify="center" align="start" maxW="100%" m="auto">
+          {/* ---------------------- 상품명 ---------------------- */}
+          <Text ml={4} fontWeight={"bold"} fontSize={"1.7rem"}>
+            [{product.company_name}]{product.product.product_name}
+          </Text>
+
+          {/* ---------------------- 상품설명 ---------------------- */}
+          <Text ml={4} color={"gray"} fontSize={"0.9rem"}>
+            {product.product.product_content}
+          </Text>
         </Box>
 
-        {/* 상품 정보 컨테이너 */}
-        <VStack w="60%" ml={5}>
-          <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
-            <FormLabel w={"100px"} fontWeight="bold">
-              상품명
-            </FormLabel>
-            <Box mt={-2} border={"none"} flex={1}>
-              {product.product.product_name}
-            </Box>
-          </HStack>
-          <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
-            <FormLabel w={"100px"} fontWeight="bold">
-              금액
-            </FormLabel>
-            <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
-              {formatPrice(product.product.product_price)}원
-            </Box>
-          </HStack>
-          <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
-            <FormLabel w={"100px"} fontWeight="bold">
-              상품설명
-            </FormLabel>
-            <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
-              {product.product.product_content}
-            </Box>
-          </HStack>
-          <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
-            <FormLabel w={"100px"} fontWeight="bold">
-              재고
-            </FormLabel>
-            <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
-              {product.product.total_stock}개
-            </Box>
-          </HStack>
-          <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
-            <FormLabel w={"100px"} fontWeight="bold">
-              제조사
-            </FormLabel>
-            <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
-              {product.company_name}
-            </Text>
-          </HStack>
-
-          {/* 상세옵션 로직 */}
-          <Box w="100%">
-            {option.length > 0 && (
-              <Box w="100%" position="relative" mt={5}>
-                <Box>
-                  <Select value={seletedOption} onChange={handleOptionChange}>
-                    <option value="">옵션을 선택하세요</option>
-                    {option.map((opt, index) => (
-                      <option key={index} value={opt.option_id}>
-                        {opt.option_name}
-                      </option>
-                    ))}
-                  </Select>
+        <Flex minW={"500px"} mt={-10}>
+          {/* 메인 이미지 */}
+          <Box p={2}>
+            {product &&
+              product.productImgs &&
+              product.productImgs.length > 0 && (
+                <Box p={2}>
+                  <Image
+                    src={product.productImgs[selectedImageIndex].main_img_uri}
+                    alt={`Product Image ${selectedImageIndex}`}
+                    boxSize="700px"
+                    objectFit="contain"
+                  />
                 </Box>
-              </Box>
-            )}
-            <Box>
-              {Object.keys(seletedOptionList).length > 0 &&
-                Object.entries(seletedOptionList).map(
-                  ([key, optionList], index) => (
-                    <Box
-                      mt={5}
-                      bg="#F9F9F9"
-                      border={"1px solid #F9F9F9"}
-                      key={key}
-                    >
-                      <Box
-                        border={"none"}
-                        key={index}
-                        p={4}
-                        borderWidth="1px"
-                        // mt={2}
-                        display={"flex"}
-                        alignItems={"center"}
-                        justifyContent={"space-between"}
-                      >
-                        <Text>
-                          {product.product.product_name}
-                          <br />
-                          {optionList.option_name}
-                        </Text>
+              )}
 
-                        {/* ------------------- 목록상품 삭제 버튼 ------------------- */}
-                        <Button
-                          size={"sm"}
-                          onClick={() => handleRemoveDetail(key)}
-                          bg={"none"}
-                          _hover={{ cursor: "background: none" }}
-                          _active={{ bg: "none" }}
-                        >
-                          X
-                        </Button>
-                      </Box>
-                      <HStack
-                        w={"74px"}
-                        border={"1px solid gray"}
-                        borderRadius={"10px"}
-                        bg={"white"}
-                        m={3}
-                      >
-                        {/* ------------------- 수량 증가 버튼 ------------------- */}
-                        <Button
-                          size={"xs"}
-                          bg={"none"}
-                          borderRight={"1px solid gray"}
-                          borderRadius={0}
-                          p={0}
-                          onClick={() => increaseQuantity(key)}
-                          _hover={{ bg: "none" }}
-                          _active={{ bg: "none" }}
-                        >
-                          <ChevronUpIcon />
-                        </Button>
-                        {/* ------------------- 수량 ------------------- */}
-                        <Box fontSize={"13px"}>{optionList.quantity}</Box>
-                        {/* ------------------- 수량 감소 버튼 ------------------- */}
-                        <Button
-                          size={"xs"}
-                          bg={"none"}
-                          borderLeft={"1px solid gray"}
-                          borderRadius={0}
-                          p={0}
-                          onClick={() => decreaseQuantity(key)}
-                          _hover={{ bg: "none" }}
-                          _active={{ bg: "none" }}
-                        >
-                          <ChevronDownIcon />
-                        </Button>
-                      </HStack>
-                    </Box>
-                  ),
-                )}
-              <Box mt={10} textAlign={"end"}>
-                <Box textAlign={"end"}>
-                  <Text color={"gray"}>총 합계 금액</Text>
-                  <Text
-                    style={{
-                      color: "red",
-                      fontSize: "25px",
-                      fontWeight: "bold",
-                    }}
+            {/* 썸네일 이미지 */}
+            <HStack justifyContent={"center"} mt={2}>
+              {product &&
+                product.productImgs &&
+                product.productImgs.map((img, index) => (
+                  <Box
+                    key={img.main_img_id}
+                    onClick={() => changeMainImage(index)}
+                    onMouseEnter={() => changeMainImage(index)} // 마우스 호버 시 메인 이미지 변경
                   >
-                    {calculateTotalPrice()}
-                    <span style={{ fontSize: "18px" }}>원</span>
-                  </Text>
-                </Box>
-              </Box>
-            </Box>
+                    <Image
+                      src={img.main_img_uri}
+                      boxSize="100px"
+                      objectFit="cover"
+                    />
+                  </Box>
+                ))}
+            </HStack>
           </Box>
 
-          <Flex w={"100%"} mt={10}>
-            {/* --------------- 찜하기 --------------- */}
-            <Button
-              h={"50px"}
-              w={"20%"}
-              bg={"none"}
-              borderRadius={0}
-              border={"1px solid #eeeeee"}
-              onClick={() => setIsFavorited(!isFavorited)} // 클릭 시 상태 토글
-            >
-              <FontAwesomeIcon icon={isFavorited ? fasHeart : farHeart} />
-            </Button>
+          {/* 상품 정보 컨테이너 */}
+          <VStack w="60%" ml={5} mt={24}>
+            <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
+              <Flex mb={3}>
+                <FormLabel w={"100px"} fontWeight="bold">
+                  판매가
+                </FormLabel>
+                <Box
+                  fontWeight={"bold"}
+                  fontSize={"1.5rem"}
+                  mt={-2}
+                  border={"none"}
+                  flex={1}
+                >
+                  {formatPrice(product.product.product_price)}원
+                </Box>
+              </Flex>
+            </HStack>
 
-            {/* --------------- 장바구니 --------------- */}
-            <Button
-              h={"50px"}
-              w={"30%"}
-              borderRadius={0}
-              bg={"none"}
-              border={"1px solid #eeeeee"}
-              onClick={handleBucketClick}
-            >
-              <FontAwesomeIcon icon={faCartShopping} />
-            </Button>
+            <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
+              <HStack mt={3} mb={3}>
+                <FormLabel w={"100px"} fontWeight="bold">
+                  총 재고
+                </FormLabel>
+                <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
+                  {product.product.total_stock}개
+                </Box>
+              </HStack>
+            </HStack>
 
-            {/* --------------- 구매하기 --------------- */}
-            <Button
-              h={"50px"}
-              w={"50%"}
-              borderRadius={0}
-              bg={"black"}
-              color={"white"}
-              border={"1px solid #eeeeee"}
-              _hover={{ color: "black", background: "gray.300" }}
-            >
-              구매하기
-            </Button>
-          </Flex>
-        </VStack>
-      </Flex>
+            <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
+              <HStack mt={3} mb={3}>
+                <FormLabel w={"100px"} fontWeight="bold">
+                  제조사
+                </FormLabel>
+                <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
+                  {product.company_name}
+                </Text>
+              </HStack>
+            </HStack>
+
+            <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
+              <HStack mt={3} mb={3}>
+                <FormLabel w={"100px"} fontWeight="bold">
+                  평점
+                </FormLabel>
+                <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
+                  {product.product.average_rate}
+                </Text>
+              </HStack>
+            </HStack>
+
+            <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
+              <Flex alignItems={"center"} mt={3} mb={3}>
+                <FormLabel w={"100px"} fontWeight="bold">
+                  배송비
+                </FormLabel>
+                <Box w={"60px"} mt={-2}>
+                  3,000원
+                </Box>
+              </Flex>
+              <Flex alignItems="center" mt={-2} border={"none"} flex={1}>
+                <Popover>
+                  <PopoverTrigger>
+                    <Button
+                      color={"gray"}
+                      fontSize={"10px"}
+                      bg={"none"}
+                      border={"1px solid #eeeeee"}
+                      h={"25px"}
+                      w={"80px"}
+                      p={0}
+                    >
+                      추가배송정보
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent w={"400px"}>
+                    <PopoverArrow />
+                    <PopoverCloseButton />
+                    <PopoverHeader fontWeight={"bold"}>
+                      배송비 안내
+                    </PopoverHeader>
+                    <PopoverBody color={"gray"}>
+                      도서산간 추가 배송비
+                    </PopoverBody>
+                    <PopoverBody color={"gray"}>
+                      제주지역 5,000원, 도서산간지역 5,000원
+                    </PopoverBody>
+                    <PopoverFooter fontWeight={"bold"}>
+                      도착예정일
+                    </PopoverFooter>
+                    <PopoverBody color={"gray"}>
+                      판매자가 설정한 발송 예정일과 택배사의 배송 소요일을
+                      기반으로 도착 예정일을 제공하고 있습니다.
+                    </PopoverBody>
+                  </PopoverContent>
+                </Popover>
+              </Flex>
+            </HStack>
+
+            {/* 상세옵션 로직 */}
+            <Box w="100%">
+              {option.length > 0 && (
+                <Box w="100%" position="relative" mt={5}>
+                  <Box>
+                    <Select value={seletedOption} onChange={handleOptionChange}>
+                      <option value="">옵션을 선택하세요</option>
+                      {option.map((opt, index) => (
+                        <option key={index} value={opt.option_id}>
+                          {opt.option_name}
+                        </option>
+                      ))}
+                    </Select>
+                  </Box>
+                </Box>
+              )}
+              <Box>
+                {Object.keys(seletedOptionList).length > 0 &&
+                  Object.entries(seletedOptionList).map(
+                    ([key, optionList], index) => (
+                      <Box
+                        mt={5}
+                        bg="#F9F9F9"
+                        border={"1px solid #F9F9F9"}
+                        key={key}
+                      >
+                        <Box
+                          border={"none"}
+                          key={index}
+                          p={4}
+                          borderWidth="1px"
+                          // mt={2}
+                          display={"flex"}
+                          alignItems={"center"}
+                          justifyContent={"space-between"}
+                        >
+                          <Text>
+                            {product.product.product_name}
+                            <br />
+                            {optionList.option_name}
+                          </Text>
+
+                          {/* ------------------- 목록상품 삭제 버튼 ------------------- */}
+                          <Button
+                            size={"sm"}
+                            onClick={() => handleRemoveDetail(key)}
+                            bg={"none"}
+                            _hover={{ cursor: "background: none" }}
+                            _active={{ bg: "none" }}
+                          >
+                            X
+                          </Button>
+                        </Box>
+                        <HStack
+                          style={{
+                            display: "flex",
+                            width: "80px",
+                            border: "1px solid gray",
+                            borderRadius: "10px",
+                            backgroundColor: "white",
+                            margin: "3px",
+                          }}
+                        >
+                          {/* ------------------- 수량 증가 버튼 ------------------- */}
+                          <Button
+                            size={"xs"}
+                            style={{
+                              width: "23px",
+                              background: "none",
+                              borderRight: "1px solid gray",
+                              borderRadius: 0,
+                              padding: 0,
+                            }}
+                            onClick={() => increaseQuantity(key)}
+                            _hover={{ bg: "none" }}
+                            _active={{ bg: "none" }}
+                          >
+                            <ChevronUpIcon />
+                          </Button>
+
+                          {/* ------------------- 수량 표시 ------------------- */}
+                          <Box
+                            style={{
+                              flex: 1,
+                              textAlign: "center",
+                              fontSize: "13px",
+                              width: "20px",
+                            }}
+                          >
+                            {optionList.quantity}
+                          </Box>
+
+                          {/* ------------------- 수량 감소 버튼 ------------------- */}
+                          <Button
+                            size={"xs"}
+                            style={{
+                              width: "23px",
+                              background: "none",
+                              borderLeft: "1px solid gray",
+                              borderRadius: 0,
+                              padding: 0,
+                            }}
+                            onClick={() => decreaseQuantity(key)}
+                            _hover={{ bg: "none" }}
+                            _active={{ bg: "none" }}
+                          >
+                            <ChevronDownIcon />
+                          </Button>
+                        </HStack>
+                      </Box>
+                    ),
+                  )}
+                <Box mt={10} textAlign={"end"}>
+                  <Box textAlign={"end"}>
+                    <Text color={"gray"}>총 합계 금액</Text>
+                    <Text
+                      style={{
+                        color: "red",
+                        fontSize: "25px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {calculateTotalPrice()}
+                      <span style={{ fontSize: "18px" }}>원</span>
+                    </Text>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+
+            <Flex w={"100%"} mt={10}>
+              {/* --------------- 찜하기 --------------- */}
+              <Button
+                h={"50px"}
+                w={"20%"}
+                bg={"none"}
+                borderRadius={0}
+                border={"1px solid #eeeeee"}
+                onClick={handleFavoriteClick}
+              >
+                <FontAwesomeIcon icon={isFavorited ? fasHeart : farHeart} />
+              </Button>
+
+              {/* --------------- 장바구니 --------------- */}
+              <Button
+                h={"50px"}
+                w={"30%"}
+                borderRadius={0}
+                bg={"none"}
+                border={"1px solid #eeeeee"}
+                onClick={handleBucketClick}
+              >
+                <FontAwesomeIcon icon={faCartShopping} />
+              </Button>
+
+              {/* --------------- 구매하기 --------------- */}
+              <Button
+                h={"50px"}
+                w={"50%"}
+                borderRadius={0}
+                bg={"black"}
+                color={"white"}
+                border={"1px solid #eeeeee"}
+                _hover={{ color: "black", background: "gray.300" }}
+              >
+                구매하기
+              </Button>
+            </Flex>
+          </VStack>
+        </Flex>
+      </Box>
+
       {/* 삭제 모달 */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -433,6 +639,18 @@ export function ProductView() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <Box>
+        <Flex wrap="wrap" justify="center" gap={4}>
+          {renderProductDetailsImages()}
+        </Flex>
+      </Box>
+
+      {/* --------------- 상품 상세 설명, 리뷰 , Q&A --------------- */}
+      <ReviewView
+        product_id={product_id}
+        product_content={product.product_content}
+      />
     </Box>
   );
 }

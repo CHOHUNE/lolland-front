@@ -28,7 +28,8 @@ export function ProductWrite() {
   const [manufacturer, setManufacturer] = useState(""); // 제조사
   const [stock, setStock] = useState("");
   const [mainImg, setMainImg] = useState(null); // 메인이미지
-  const [options, setOptions] = useState([""]); // 상세옵션
+  const [contentImg, setContentImg] = useState(null); // 설명 이미지
+  const [options, setOptions] = useState([{ option_name: "", stock: 0 }]); // 초기값 수정
 
   // ---------------------------------- 대분류,소분류 렌더링 로직 ----------------------------------
   useEffect(() => {
@@ -82,9 +83,7 @@ export function ProductWrite() {
 
   // ---------------------------------- 저장 버튼 클릭 로직 ----------------------------------
   function handleSubmit() {
-    const finalOptions =
-      // 상세옵션이 하나만 남았고, 값이 없을경우 null 처리
-      options.length === 1 && options[0] === "" ? null : options;
+    options.map((option) => console.log(option));
 
     axios
       .postForm("/api/product/add", {
@@ -94,9 +93,10 @@ export function ProductWrite() {
         company_name: manufacturer,
         total_stock: stock,
         mainImg,
+        contentImg,
         category_id: selectedCategory?.category_id,
         subcategory_id: seletedSubCategory,
-        option_name: finalOptions,
+        options: JSON.stringify(options),
       })
 
       .then((response) => {
@@ -115,23 +115,24 @@ export function ProductWrite() {
   }
 
   // ---------------------------------- 상세옵션선택 관련 로직 ----------------------------------
-  const handleInputChange = (e, index) => {
-    const newOptions = [...options];
-    newOptions[index] = e.target.value;
-    setOptions(newOptions);
+  const handleOptionChange = (index, field, value) => {
+    const updatedOptions = options.map((option, i) => {
+      if (i === index) {
+        return { ...option, [field]: value };
+      }
+      return option;
+    });
+    setOptions(updatedOptions);
   };
 
   // ---------------------------------- 상세옵션선택 추가 로직 ----------------------------------
-  const handleAddInput = () => {
-    setOptions([...options, ""]);
+  const handleAddOption = () => {
+    setOptions([...options, { option_name: "", stock: 1 }]);
   };
 
   // ---------------------------------- 상세옵션선택 감소 로직 ----------------------------------
-  const handleRemoveInput = (index) => {
-    if (options.length > 1) {
-      const newOptions = options.filter((_, i) => i !== index);
-      setOptions(newOptions);
-    }
+  const handleRemoveOption = (index) => {
+    setOptions(options.filter((_, i) => i !== index));
   };
 
   return (
@@ -190,11 +191,6 @@ export function ProductWrite() {
         </FormControl>
 
         <FormControl>
-          <FormLabel>재고</FormLabel>
-          <Input value={stock} onChange={(e) => setStock(e.target.value)} />
-        </FormControl>
-
-        <FormControl>
           <FormLabel>메인 이미지</FormLabel>
           <Input
             type="file"
@@ -204,28 +200,51 @@ export function ProductWrite() {
           />
         </FormControl>
 
+        <FormControl>
+          <FormLabel>설명 이미지</FormLabel>
+          <Input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => setContentImg(e.target.files)}
+          />
+        </FormControl>
+
         <Box>
           {options.map((option, index) => (
-            <FormControl key={index}>
-              <FormLabel>{index + 1}번째 상세옵션추가</FormLabel>
-              <Input
-                value={option}
-                placeholder="예) 화이트/청축"
-                onChange={(e) => handleInputChange(e, index)}
-              />
-            </FormControl>
+            <Flex key={index} align="center">
+              <FormControl mr={2}>
+                <FormLabel>{`옵션 ${index + 1}`}</FormLabel>
+                <Input
+                  value={option.option_name}
+                  placeholder="예) 화이트/청축"
+                  onChange={(e) =>
+                    handleOptionChange(index, "option_name", e.target.value)
+                  }
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>수량</FormLabel>
+                <Input
+                  type="number"
+                  value={option.stock}
+                  onChange={(e) =>
+                    handleOptionChange(index, "stock", e.target.value)
+                  }
+                />
+              </FormControl>
+              <Button
+                ml={2}
+                onClick={() => handleRemoveOption(index)}
+                colorScheme="pink"
+              >
+                삭제
+              </Button>
+            </Flex>
           ))}
           <Flex justifyContent="center" mt={4}>
-            <Button colorScheme="teal" onClick={handleAddInput}>
+            <Button colorScheme="teal" onClick={handleAddOption}>
               상세 옵션 추가
-            </Button>
-            <Button
-              colorScheme="pink"
-              onClick={() => handleRemoveInput(options.length - 1)}
-              isDisabled={options.length === 1} // 옵션이 하나만 있을 때는 비활성화
-              ml={2}
-            >
-              마지막 상세 옵션 삭제
             </Button>
           </Flex>
         </Box>

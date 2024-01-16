@@ -86,29 +86,39 @@ export function MemberManage() {
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>우편번호</FormLabel>
-              <Input readOnly />
+              <Input
+                readOnly
+                value={member.memberAddressDto.member_post_code}
+              />
             </Flex>
           </FormControl>
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>주소</FormLabel>
-              <Input readOnly />
+              <Input readOnly value={member.memberAddressDto.member_address} />
             </Flex>
           </FormControl>
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>상세주소</FormLabel>
-              <Input readOnly />
+              <Input
+                readOnly
+                value={member.memberAddressDto.member_detail_address}
+              />
             </Flex>
           </FormControl>
           <FormControl mt={4}>
-            <Button>내 주소록 조회 하기</Button>
+            <Button onClick={() => navigate("/memberPage/addressInfo")}>
+              내 주소록 조회 하기
+            </Button>
           </FormControl>
         </CardBody>
 
         <CardFooter>
           <Flex gap={4}>
-            <Button>수정하기</Button>
+            <Button onClick={() => navigate("/memberPage/memberEdit")}>
+              수정하기
+            </Button>
             <Button colorScheme={"red"} onClick={onOpen}>
               회원 탈퇴
             </Button>

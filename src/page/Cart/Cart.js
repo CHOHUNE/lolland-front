@@ -5,6 +5,7 @@ import {
   Flex,
   Heading,
   Image,
+  Spinner,
   Table,
   TableContainer,
   Tbody,
@@ -16,93 +17,53 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBagShopping } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBagShopping,
+  faCircleExclamation,
+  faHeart,
+  faHome,
+} from "@fortawesome/free-solid-svg-icons";
 
 export function Cart() {
   const toast = useToast();
-  const [memberLoginId, setMemberLoginId] = useState("");
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [selectedProducts, setSelectedProducts] = useState([]);
-  const [productList, setProductList] = useState([
-    {
-      cart_id: 1,
-      member_id: 1,
-      product_id: 1,
-      member_login_id: "user",
-      category_name: "TV",
-      subcategory_name: "4K",
-      product_name: "예시1",
-      company_name: "삼성",
-      product_price: 35000,
-      main_img_url: "https://placehold.co/400",
-      count: 2,
-    },
-    {
-      cart_id: 2,
-      member_id: 1,
-      product_id: 2,
-      member_login_id: "user",
-      category_name: "노트북",
-      subcategory_name: "게이밍 노트북",
-      product_name: "예시2",
-      company_name: "Intel",
-      product_price: 15000,
-      main_img_url: "https://placehold.co/700",
-      count: 10,
-    },
-    {
-      cart_id: 3,
-      member_id: 1,
-      product_id: 3,
-      member_login_id: "user",
-      category_name: "Apple",
-      subcategory_name: "iPhone",
-      product_name: "예시3",
-      company_name: "애플",
-      product_price: 45000,
-      main_img_url: "https://placehold.co/500",
-      count: 7,
-    },
-    {
-      cart_id: 4,
-      member_id: 1,
-      product_id: 4,
-      member_login_id: "user",
-      category_name: "TV",
-      subcategory_name: "4K",
-      product_name: "예시4",
-      company_name: "LG",
-      product_price: 20000,
-      main_img_url: "https://placehold.co/300",
-      count: 12,
-    },
-  ]);
-  const { member_id } = useParams();
+  const [productList, setProductList] = useState([]);
+  const [memberLoginId, setMemberLoginId] = useState(null);
 
   useEffect(() => {
-    // fetchCart();
+    fetchCart();
   }, []);
 
   function fetchCart() {
+    setLoading(true);
     axios
-      .get("/api/cart/fetch", { member_id })
+      .get("/api/cart/fetch")
       .then((response) => {
-        const { cartDtoList, member_login_id } = response.data;
-        setProductList(cartDtoList);
-        setMemberLoginId(member_login_id);
+        setProductList(response.data.cartDtoList);
+        setMemberLoginId(response.data.member_login_id);
       })
       .catch((error) => {
-        toast({
-          title: "카트 불러오기에 실패하였습니다",
-          description: "다시 한번 확인해주세요",
-          status: "error",
-        });
+        if (error.response && error.response.status === 400) {
+          toast({
+            title: "권한이 없습니다",
+            description: "로그인 후 이용해주세요",
+            status: "warning",
+          });
+          navigate("/login");
+        } else {
+          toast({
+            title: "카트 불러오기에 실패하였습니다",
+            description: "다시 한번 확인해주세요: " + error.response.status,
+            status: "error",
+          });
+        }
       })
-      .finally(() => {
-        console.log(productList);
-      });
+      .finally(() => setLoading(false));
   }
 
   // 전체 선택
@@ -164,9 +125,9 @@ export function Cart() {
     // axios.post() TODO: 결제로 옮기기
   }
 
-  function handleDeleteAll(member_id) {
+  function handleDeleteAll() {
     axios
-      .delete("/api/cart/delete" + member_id)
+      .delete("/api/cart/delete")
       .then(() => {
         toast({
           description: "장바구니 비우기에 성공하였습니다",
@@ -181,6 +142,18 @@ export function Cart() {
             description: "백엔드 코드를 확인해보세요",
             status: "error",
           });
+        } else if (error.response.status === 400) {
+          toast({
+            title: "Bad Request - 요청이 잘못되었습니다",
+            description: "백엔드와 프론트엔드 코드 연동을 확인해보세요",
+            status: "error",
+          });
+        } else if (error.response.status === 401) {
+          toast({
+            title: "접근 권한이 없습니다",
+            description: "로그인 해주세요",
+            status: "error",
+          });
         } else {
           toast({
             title: "장바구니 비우기에 실패하였습니다",
@@ -191,12 +164,56 @@ export function Cart() {
       });
   }
 
+  if (loading && productList === null) {
+    return <Spinner />;
+  }
+
+  if (!loading && productList.length === 0) {
+    return (
+      <Flex
+        h="80vh"
+        flexDir="column"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Text fontSize="8xl" opacity={0.3}>
+          <FontAwesomeIcon icon={faCircleExclamation} />
+        </Text>
+        <Heading mb={10} opacity={0.3}>
+          장바구니에 담긴 상품이 없습니다
+        </Heading>
+        <ButtonGroup>
+          <Button
+            leftIcon={<FontAwesomeIcon icon={faHeart} />}
+            borderRadius={0}
+            variant="outline"
+            color="black"
+            border="1px solid black"
+            isDisabled
+            onClick={() => navigate("/")}
+          >
+            찜한 목록 보기
+          </Button>
+          <Button
+            leftIcon={<FontAwesomeIcon icon={faHome} />}
+            borderRadius={0}
+            bgColor="black"
+            color="white"
+            onClick={() => navigate("/")}
+          >
+            홈으로 돌아가기
+          </Button>
+        </ButtonGroup>
+      </Flex>
+    );
+  }
+
   return (
     <>
       <Heading my={5} mx={10}>
         <FontAwesomeIcon icon={faBagShopping} />
         <Text as="span" color="orange" ml={3}>
-          {"{"} memberLoginId {"}"}
+          {memberLoginId}
         </Text>
         님의 장바구니
       </Heading>
@@ -227,7 +244,7 @@ export function Cart() {
             <Button
               isDisabled={true}
               {...buttonStyles}
-              onClick={() => handleDeleteAll(member_id)}
+              onClick={() => handleDeleteAll()}
             >
               전부 비우기
             </Button>
