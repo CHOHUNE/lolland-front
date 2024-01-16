@@ -62,7 +62,7 @@ export function ProductView() {
       .then((response) => setOption(response.data));
   }, [product_id]);
 
-  // ---------------------------- 찜하기 관련 로직 ----------------------------
+  // ---------------------------- 찜한 내역 가져오는 렌더링 ----------------------------
   useEffect(() => {
     axios
       .get("/api/productLike/" + product_id)
@@ -231,19 +231,25 @@ export function ProductView() {
   const handleFavoriteClick = () => {
     // 현재 하트 상태 토글
     const newFavoriteStatus = !isFavorited;
-
     // UI를 먼저 업데이트하고 서버 요청을 보냄
     setIsFavorited(newFavoriteStatus);
-
     // 서버에 좋아요 상태 전송
     axios
       .post("/api/productLike", {
         product_id: product_id,
         isFavorited: newFavoriteStatus,
       })
+      .then(() => {
+        toast({
+          description: "상품 찜목록에 저장되었습니다.",
+          status: "success",
+        });
+      })
       .catch((error) => {
-        // 에러가 발생한 경우, 상태를 다시 원래대로 돌림
-        console.error("에러 발생:", error);
+        toast({
+          description: "찜목록으로 이동되지 않았습니다.",
+          status: "error",
+        });
         setIsFavorited(!newFavoriteStatus);
       });
   };
