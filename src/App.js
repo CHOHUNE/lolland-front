@@ -17,13 +17,21 @@ import { ProductList } from "./page/product/ProductList";
 import { ProductView } from "./page/product/ProductView";
 import { ReviewView } from "./page/review/ReviewView";
 import { Cart } from "./page/Cart/Cart";
-import { ProductEdit } from "./ProductEdit";
+import { GearBoard } from "./page/gearBoard/GearBoard";
+import { GearList } from "./page/gearBoard/GearList";
+import { GearView } from "./page/gearBoard/GearView";
+import { GearEdit } from "./page/gearBoard/GearEdit";
+import { ProductEdit } from "./page/product/ProductEdit";
 import { MemberInfo } from "./page/member/MemberViewPage/MemberInfo";
 import { MemberManage } from "./page/member/MemberViewPage/MemberManage";
 import { MemberAddress } from "./page/member/MemberViewPage/MemberAddress";
+import { GearListlayout } from "./page/gearBoard/GearListlayout";
 import { MemberAddressWrite } from "./page/member/MemberViewPage/MemberAddressWrite";
 import { MemberEdit } from "./page/member/MemberViewPage/MemberEdit";
 import LoginProvider from "./component/LoginProvider";
+import { ProductLike } from "./page/productLike/ProductLike";
+import { MemberFindId } from "./page/member/MemberFindId";
+import { MemberFindPassword } from "./page/member/MemberFindPassword";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -41,8 +49,6 @@ const routes = createBrowserRouter(
       {/* 장바구니 */}
       <Route path="/cart" element={<Cart />} />
 
-      {/* 찜하기 */}
-
       {/* Q&A */}
 
       {/* 결제 */}
@@ -50,12 +56,16 @@ const routes = createBrowserRouter(
       {/* 회원관련 */}
       <Route path="signup" element={<MemberSignup />} />
       <Route path="login" element={<MemberLogin />} />
+      <Route path="findId" element={<MemberFindId />} />
+      <Route path="findPassword" element={<MemberFindPassword />} />
       <Route path="memberPage" element={<MemberView />}>
         <Route path="memberInfo" element={<MemberInfo />} />
         <Route path="memberInfo/memberManagePage" element={<MemberManage />} />
         <Route path="memberEdit" element={<MemberEdit />} />
         <Route path="addressInfo" element={<MemberAddress />} />
         <Route path="addressWrite" element={<MemberAddressWrite />} />
+        {/* 상품 찜하기 목록 - gns14585 - */}
+        <Route path="productLike" element={<ProductLike />} />
       </Route>
 
       {/* 게시판관련 */}
@@ -63,6 +73,13 @@ const routes = createBrowserRouter(
       <Route path="gameboard/id/:id" element={<GameBoardView />} />
       <Route path="gameboard/list/write" element={<GameBoardWrite />} />
       <Route path="gameboard/edit/:id" element={<GameBoardEdit />} />
+
+      {/* 게임 장비 커뮤니티 */}
+      <Route path="gearboard" element={<GearBoard />} />
+      <Route path="gearlist" element={<GearList />} />
+      <Route path="gearlistlayout" element={<GearListlayout />} />
+      <Route path="gearlist/gear_id/:gear_id" element={<GearView />} />
+      <Route path="gearlist/edit/:gear_id" element={<GearEdit />} />
     </Route>,
   ),
 );

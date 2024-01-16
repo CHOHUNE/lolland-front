@@ -24,6 +24,13 @@ export function MemberSignup() {
   const [member_login_id, setMember_login_id] = useState("");
   const [member_password, setMember_password] = useState("");
 
+  // 인증번호 발송 눌렀을때의 번호 생성 -------------------------------------------------------------------
+  const [randomNumber, setRandomNumber] = useState("");
+  // 인증번호 체크 ----------------------------------------------------------------------------------
+  const [randomNumberCheck, setRandomNumberCheck] = useState("");
+  // 인증 번호 확인 상태 값 ---------------------------------------------------------------------------
+  const [emailCodeCheckedState, setEmailCodeCheckedState] = useState(false);
+
   // 맴버 비밀번호 확인 ------------------------------------------------------------------------------
   const [member_password_checked, setMember_password_checked] = useState("");
 
@@ -93,28 +100,25 @@ export function MemberSignup() {
   // 가입 버튼 활성화 상태 저장 ------------------------------------------------------------------------
   const [signButtonState, setSignButtonState] = useState(false);
 
-  // 비밀번호와 비밀번호 확인이 다르면 가입 버튼 막기
+  // 가입하기 버튼 활성화 상태 변경
   useEffect(() => {
-    if (member_password === "") {
-      setSignButtonState(false);
-    } else {
-      if (member_password === member_password_checked) {
-        setSignButtonState(true);
-      } else {
-        setSignButtonState(false);
-      }
-    }
-  }, [member_password, member_password_checked]);
-
-  // 아이디 중복확인 버튼 활성화 되어있으면 가입버튼 막기
-  useEffect(() => {
-    if (checkIdButtonState) {
+    if (
+      checkIdButtonState === true ||
+      emailCodeCheckedState === false ||
+      member_password !== member_password_checked
+    ) {
       setSignButtonState(false);
     } else {
       setSignButtonState(true);
     }
-  }, [checkIdButtonState]);
+  }, [
+    checkIdButtonState,
+    emailCodeCheckedState,
+    member_password,
+    member_password_checked,
+  ]);
 
+  // 핸드폰과 이메일의 각 인풋 값이 변경 될때에 setMember_email 과 setMember_phone_number 의 값이 변경 되도록 인식--
   useEffect(() => {
     setMember_email(member_email1 + "@" + member_email2);
     setMember_phone_number(
@@ -132,10 +136,33 @@ export function MemberSignup() {
     member_phone_number3,
   ]);
 
+  // 인증번호 발송 클릭시 로직 ----------------------------------------------------------
   function handleEmailCodeClick() {
+    setRandomNumberCheck("");
     setSendNumber(true);
+    const newRandomNumber = Math.floor(Math.random() * 100000); // 새로운 난수 생성
+    setRandomNumber(newRandomNumber);
+
+    axios
+      .post("/api/memberEmail/sendCodeMail", {
+        member_email,
+        message: newRandomNumber,
+      })
+      .then(() => {
+        toast({
+          description: "인증번호를 입력해주세요.",
+          status: "success",
+        });
+      })
+      .catch(() => {
+        toast({
+          description: "인증번호 발송중 문제가 발생하였습니다.",
+          status: "error",
+        });
+      });
   }
 
+  // 회원 가입 버튼 클릭시 ------------------------------------------------------------
   function handleSingUpClick() {
     setMember_type("user");
     axios
@@ -200,11 +227,13 @@ export function MemberSignup() {
       phoneInput3Ref.current.focus();
     }
   };
+
+  // 주소검색 버튼 클릭시 다음 postcode 열리게 하기 -------------------------------------------------------------
   const handlePostCodeClick = () => {
     openPostcodePopup({ onComplete: handleComplete });
   };
 
-  // 아이디 중복 확인
+  // 아이디 중복 확인 --------------------------------------------------------------------------------------
   function handleIdCheckButton() {
     axios
       .get("/api/member/checkId", {
@@ -216,14 +245,23 @@ export function MemberSignup() {
         toast({ description: "사용 가능한 아이디 입니다", status: "success" });
       })
       .then(() => setCheckIdButtonState(false))
-      .catch(
-        () =>
-          toast({
-            description: "이미 사용중인 아이디 입니다.",
-            status: "error",
-          }),
-        setSignButtonState(false),
+      .catch(() =>
+        toast({
+          description: "이미 사용중인 아이디 입니다.",
+          status: "error",
+        }),
       );
+  }
+
+  // 인증 번호 확인 클릭 -----------------------------------------------------------------
+  function handleCodeCheckClick() {
+    if (randomNumberCheck === randomNumber.toString()) {
+      toast({ description: "인증번호가 맞았습니다.", status: "success" });
+      setEmailCodeCheckedState(true);
+    } else {
+      toast({ description: "인증번호가 틀렸습니다.", status: "error" });
+      setEmailCodeCheckedState(false);
+    }
   }
 
   return (
@@ -408,7 +446,11 @@ export function MemberSignup() {
                 w={"175px"}
                 h={"50px"}
                 borderRadius={"0"}
-                onChange={(e) => setMember_email1(e.target.value)}
+                onChange={(e) => {
+                  setMember_email1(e.target.value);
+                  setEmailCodeCheckedState(false);
+                  setSendNumber(true);
+                }}
               />
               <Box
                 fontSize={"1.1rem"}
@@ -424,7 +466,11 @@ export function MemberSignup() {
                 w={"175px"}
                 h={"50px"}
                 borderRadius={"0"}
-                onChange={(e) => setMember_email2(e.target.value)}
+                onChange={(e) => {
+                  setMember_email2(e.target.value);
+                  setEmailCodeCheckedState(false);
+                  setSendNumber(false);
+                }}
               />
               <Button
                 w={"90px"}
@@ -446,10 +492,24 @@ export function MemberSignup() {
                 </FormLabel>
                 <Input
                   placeholder={"메일로 전송된 인증번호를 입력해 주세요."}
-                  w={"500px"}
+                  w={"350px"}
                   h={"50px"}
                   borderRadius={"0"}
+                  type={"number"}
+                  value={randomNumberCheck}
+                  onChange={(e) => {
+                    setRandomNumberCheck(e.target.value);
+                  }}
                 />
+                <Button
+                  isDisabled={emailCodeCheckedState}
+                  ml={"10px"}
+                  w={"140px"}
+                  h={"50px"}
+                  onClick={handleCodeCheckClick}
+                >
+                  인증번호 확인
+                </Button>
               </Flex>
             </FormControl>
           )}

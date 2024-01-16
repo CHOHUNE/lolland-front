@@ -35,7 +35,7 @@ export function NavBar() {
   const [categories, setCategories] = useState([]);
   const [index, setIndex] = useState(null);
   const toast = useToast();
-  const { isAdmin, isAuthenticated, hasAccess } = useContext(LoginContext);
+  const { fetchLogin, isAdmin, isAuthenticated, hasAccess } = useContext(LoginContext);
 
   // 카테고리 불러오기
   useEffect(() => {
@@ -90,7 +90,8 @@ export function NavBar() {
           description: "로그 아웃 중 문제가 발생하였습니다.",
           status: "error",
         });
-      });
+      })
+      .finally(() => fetchLogin());
   }
 
   const [overlayVisible, setOverlayVisible] = useState(false);

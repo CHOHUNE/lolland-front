@@ -28,6 +28,7 @@ export function ProductWrite() {
   const [manufacturer, setManufacturer] = useState(""); // 제조사
   const [stock, setStock] = useState("");
   const [mainImg, setMainImg] = useState(null); // 메인이미지
+  const [contentImg, setContentImg] = useState(null); // 설명 이미지
   const [options, setOptions] = useState([{ option_name: "", stock: 0 }]); // 초기값 수정
 
   // ---------------------------------- 대분류,소분류 렌더링 로직 ----------------------------------
@@ -92,6 +93,7 @@ export function ProductWrite() {
         company_name: manufacturer,
         total_stock: stock,
         mainImg,
+        contentImg,
         category_id: selectedCategory?.category_id,
         subcategory_id: seletedSubCategory,
         options: JSON.stringify(options),
@@ -195,6 +197,16 @@ export function ProductWrite() {
             accept="image/*"
             multiple
             onChange={(e) => setMainImg(e.target.files)}
+          />
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>설명 이미지</FormLabel>
+          <Input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => setContentImg(e.target.files)}
           />
         </FormControl>
 
