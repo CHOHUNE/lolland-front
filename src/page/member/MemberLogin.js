@@ -135,6 +135,7 @@ export function MemberLogin() {
                 color={"black"}
                 bg={"whitesmoke"}
                 _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+                onClick={() => navigate("/signup")}
               >
                 회원 가입하기
               </Button>
