@@ -141,35 +141,35 @@ export const ReviewView = ({ product_id }) => {
   }
 
   function handleSubmit() {
-    axios
-      .post("/api/review/submit", {
-        product_id: product_id,
-        review_content: review,
-        rate: rate,
-      })
-      .then((response) => {
-        toast({
-          description: "리뷰를 성공적으로 등록했습니다",
-          status: "success",
-        });
-        fetchReview();
-      })
-      .catch((error) => {
-        if (error.response.status === 400) {
+    if (isAuthenticated()) {
+      axios
+        .post("/api/review/submit", {
+          product_id: product_id,
+          review_content: review,
+          rate: rate,
+        })
+        .then((response) => {
           toast({
-            title: "비회원은 리뷰 등록이 불가능합니다",
-            description: "로그인 후 등록해주세요",
-            status: "error",
+            description: "리뷰를 성공적으로 등록했습니다",
+            status: "success",
           });
-          navigate("/login");
-        } else {
+          fetchReview();
+        })
+        .catch((error) => {
           toast({
             title: "댓글 등록에 실패했습니다",
             description: error.response.data,
             status: "error",
           });
-        }
+        });
+    } else {
+      toast({
+        title: "비회원은 리뷰를 등록할 수 없습니다",
+        description: "로그인 후 다시 시도해주세요",
+        status: "error",
       });
+      navigate("/login");
+    }
   }
 
   // ------------------------- 리뷰 수정 ------------------------- //
@@ -433,6 +433,8 @@ export const ReviewView = ({ product_id }) => {
               formattedLogId={formattedLogId}
               formattedDate={formattedDate}
               isAuthenticated={isAuthenticated}
+              hasAccess={hasAccess}
+              isAdmin={isAdmin}
             />
           </TabPanel>
         </TabPanels>

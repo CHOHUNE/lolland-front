@@ -7,6 +7,7 @@ import {
   FormControl,
   FormLabel,
   Heading,
+  IconButton,
   Input,
   InputGroup,
   InputRightElement,
@@ -24,7 +25,11 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMagnifyingGlass,
+  faPenToSquare,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 import { Fragment, useEffect, useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -35,6 +40,8 @@ export function QnaView({
   formattedDate,
   formattedLogId,
   isAuthenticated,
+  hasAccess,
+  isAdmin,
 }) {
   const [qnaList, setQnaList] = useState([]);
   const toast = useToast();
@@ -84,6 +91,115 @@ export function QnaView({
     }
   };
 
+  function handleViewMember() {
+    axios
+      .get("/api/qna/fetchMine", {
+        params: {
+          product_id: product_id,
+        },
+      })
+      .then((response) => {
+        setQnaList(response.data);
+      })
+      .catch((error) => {
+        if (error.response.status === 400) {
+          toast({
+            title: "Bad Request",
+            description: "프론트와 백엔드 파라미터를 확인해보세요",
+            status: "error",
+          });
+        } else if (error.response.status === 500) {
+          toast({
+            title: "Internal Server Error",
+            description: "백엔드 코드를 점검해보세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "내 리뷰를 찾는데 실패하였습니다",
+            description: "다시 한번 시도해보시거나, 관리자에게 문의하세요",
+            status: "error",
+          });
+        }
+      });
+  }
+
+  function handleEditQna(qna) {
+    axios
+      .put("/api/qna/edit", {
+        params: {
+          question_id: qna.question_id,
+          // question_title : ?
+          // question_content: ?
+        },
+      })
+      .then(() => {
+        toast({
+          title: "문의 수정에 성공하였습니다",
+          description: "판매자가 새로운 답변을 달 때까지 기다려주세요",
+          status: "success",
+        });
+      })
+      .catch((error) => {
+        if (error.response.status === 400) {
+          toast({
+            title: "Bad Request",
+            description: "프론트와 백엔드 파라미터를 확인해보세요",
+            status: "error",
+          });
+        } else if (error.response.status === 500) {
+          toast({
+            title: "Internal Server Error",
+            description: "백엔드 코드를 점검해보세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "리뷰 수정에 실패하였습니다",
+            description: "다시 한번 시도해보시거나, 관리자에게 문의하세요",
+            status: "error",
+          });
+        }
+      });
+  }
+
+  function handleDeleteQna(qna) {
+    axios
+      .delete("/api/qna/delete", {
+        params: {
+          question_id: qna.question_id,
+        },
+      })
+      .then((response) => {
+        toast({
+          description: "문의 내용이 성공적으로 삭제되었습니다",
+          status: "success",
+        });
+        fetchQna();
+      })
+      .catch((error) => {
+        if (error.response.status === 400) {
+          toast({
+            title: "Bad Request",
+            description: "프론트와 백엔드 파라미터를 확인해보세요",
+            status: "error",
+          });
+        } else if (error.response.status === 500) {
+          toast({
+            title: "Internal Server Error",
+            description: "백엔드 코드를 점검해보세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "리뷰 삭제에 실패하였습니다",
+            description: "다시 한번 시도해보시거나, 관리자에게 문의하세요",
+            status: "error",
+          });
+        }
+      });
+  }
+
   return (
     <>
       {isWriting ? (
@@ -107,6 +223,18 @@ export function QnaView({
                 variant="undefined"
                 border="1px solid black"
                 bgColor="white"
+                onClick={() => {
+                  if (isAuthenticated()) {
+                    handleViewMember();
+                  } else {
+                    toast({
+                      title: "문의는 로그인 후 열람 가능합니다",
+                      description: "먼저 로그인 해주세요",
+                      status: "error",
+                    });
+                    navigate("/login");
+                  }
+                }}
               >
                 내 글 보기
               </Button>
@@ -167,20 +295,18 @@ export function QnaView({
                         <Td textAlign="center">
                           {formattedLogId(qna.member_login_id)}
                         </Td>
-                        {/*<Td textAlign="center">*/}
-                        {/*  <Tag*/}
-                        {/*    size="sm"*/}
-                        {/*    // variant="outline"*/}
-                        {/*    colorScheme={*/}
-                        {/*      qna.answer_status === "답변대기중"*/}
-                        {/*        ? "orange"*/}
-                        {/*        : "blackAlpha"*/}
-                        {/*    }*/}
-                        {/*    p={2}*/}
-                        {/*  >*/}
-                        {/*    {qna.answer_status}*/}
-                        {/*  </Tag>*/}
-                        {/*</Td> TODO: 답변 있없 유무로 프론트에서 처리하기*/}
+                        <Td textAlign="center">
+                          <Tag
+                            size="sm"
+                            variant="outline"
+                            colorScheme={
+                              !qna.answer_content ? "orange" : "blackAlpha"
+                            }
+                            p={2}
+                          >
+                            {!qna.answer_content ? "답변 대기중" : "답변 완료"}
+                          </Tag>
+                        </Td>
                         <Td textAlign="center">
                           {formattedDate(qna.question_reg_time)}
                         </Td>
@@ -188,7 +314,34 @@ export function QnaView({
                       {openId === qna.question_id && (
                         <>
                           <Tr>
-                            <Td colSpan={4} px={10}>
+                            <Td colSpan={4} border="1px solid black">
+                              {(hasAccess(qna.member_login_id) ||
+                                isAdmin()) && (
+                                <ButtonGroup
+                                  size="sm"
+                                  display="flex"
+                                  justifyContent="flex-end"
+                                >
+                                  <IconButton
+                                    icon={
+                                      <FontAwesomeIcon icon={faPenToSquare} />
+                                    }
+                                    variant="ghost"
+                                    colorScheme="purple"
+                                    onClick={() => handleEditQna(qna)}
+                                  />
+                                  <IconButton
+                                    icon={<FontAwesomeIcon icon={faTrashCan} />}
+                                    variant="ghost"
+                                    color="black"
+                                    _hover={{
+                                      color: "white",
+                                      bgColor: "black",
+                                    }}
+                                    onClick={() => handleDeleteQna(qna)}
+                                  />
+                                </ButtonGroup>
+                              )}
                               <Text whiteSpace="pre-wrap" lineHeight="30px">
                                 {qna.question_content}
                               </Text>
