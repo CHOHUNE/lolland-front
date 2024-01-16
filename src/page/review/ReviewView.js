@@ -28,7 +28,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { Qna } from "../qna/Qna";
+import { QnaView } from "../qna/QnaView";
 import { useNavigate } from "react-router-dom";
 import loginProvider, { LoginContext } from "../../component/LoginProvider";
 
@@ -107,7 +107,7 @@ const Star = ({ initialRate, onRateChange, isEditing }) => {
 export const ReviewView = ({ product_id }) => {
   const [rate, setRate] = useState(0);
   const [review, setReview] = useState("");
-  const { hasAccess, isAdmin } = useContext(LoginContext);
+  const { hasAccess, isAdmin, isAuthenticated } = useContext(LoginContext);
   const [reviewList, setReviewList] = useState([]);
   const [isEditing, setIsEditing] = useState(null);
   const [editingReview, setEditingReview] = useState(null);
@@ -283,12 +283,7 @@ export const ReviewView = ({ product_id }) => {
   return (
     <>
       <Tabs position="relative" variant="unstyled">
-        <TabList
-          p={5}
-          justifyContent="space-evenly"
-          align="center"
-          border="1px dashed blue"
-        >
+        <TabList p={5} justifyContent="space-evenly" align="center">
           <Tab {...tabStyles}>상품 설명</Tab>
           <Tab {...tabStyles}>리뷰 & 댓글 ({reviewList.length})</Tab>
           <Tab {...tabStyles}>Q&A</Tab>
@@ -433,9 +428,11 @@ export const ReviewView = ({ product_id }) => {
           </TabPanel>
           {/* -------------------------- Q&A -------------------------- */}
           <TabPanel>
-            <Qna
+            <QnaView
+              product_id={product_id}
               formattedLogId={formattedLogId}
               formattedDate={formattedDate}
+              isAuthenticated={isAuthenticated}
             />
           </TabPanel>
         </TabPanels>

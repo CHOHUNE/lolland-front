@@ -21,17 +21,60 @@ import {
   Th,
   Thead,
   Tr,
+  useToast,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { Fragment, useState } from "react";
-import { Form } from "react-router-dom";
+import { Fragment, useEffect, useState } from "react";
+import { Form, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { QnaWrite } from "../qna/QnaWrite";
 
-export function Qna({ formattedDate, formattedLogId }) {
+export function QnaView({
+  product_id,
+  formattedDate,
+  formattedLogId,
+  isAuthenticated,
+}) {
   const [qnaList, setQnaList] = useState([]);
+  const toast = useToast();
+  const navigate = useNavigate();
 
   const [openId, setOpenId] = useState(null);
   const [isWriting, setIsWriting] = useState(false);
+
+  useEffect(() => {
+    fetchQna();
+  }, []);
+
+  function fetchQna() {
+    axios
+      .get("/api/qna/list", { params: { product_id: product_id } })
+      .then((response) => {
+        setQnaList(response.data);
+      })
+      .catch((error) => {
+        if (error.response.status === 400) {
+          toast({
+            title: "Bad Request",
+            description: "프론트엔드 코드와 백엔드 파라미터를 확인해주세요",
+            status: "error",
+          });
+        } else if (error.response.status === 500) {
+          toast({
+            title: "Internal Server Error",
+            description: "백엔드 코드를 확인해주세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "QNA 리스트 불러오기에 실패하였습니다",
+            description: "계속되면 관리자에게 문의해주세요",
+            status: "error",
+          });
+        }
+      });
+  }
 
   const handleToggle = (questionId) => {
     if (openId && questionId === openId) {
@@ -44,48 +87,11 @@ export function Qna({ formattedDate, formattedLogId }) {
   return (
     <>
       {isWriting ? (
-        <Box mx="15%" my={10}>
-          <Heading mb={10}>문의 등록</Heading>
-          <Form>
-            <FormControl mb={5}>
-              <FormLabel fontWeight="bold" mb={5}>
-                <Tag size="lg" borderRadius={0} bgColor="black" color="white">
-                  제목
-                </Tag>
-              </FormLabel>
-              <Input placeholder="제목을 입력하세요" />
-            </FormControl>
-            <FormControl>
-              <FormLabel fontWeight="bold" mb={5}>
-                <Tag size="lg" borderRadius={0} bgColor="black" color="white">
-                  문의 내용
-                </Tag>
-              </FormLabel>
-              <Textarea h="xs" placeholder="문의 내용을 작성해주세요" />
-            </FormControl>
-          </Form>
-          <ButtonGroup w="full" justifyContent="center" my={10}>
-            <Button
-              w={"30%"}
-              borderRadius={0}
-              variant="undefined"
-              border="1px solid black"
-              bgColor="white"
-            >
-              등록하기
-            </Button>
-            <Button
-              w="30%"
-              borderRadius={0}
-              variant="undefined"
-              bgColor="black"
-              color="white"
-              onClick={() => setIsWriting(false)}
-            >
-              닫기
-            </Button>
-          </ButtonGroup>
-        </Box>
+        <QnaWrite
+          setIsWriting={setIsWriting}
+          product_id={product_id}
+          fetchQna={fetchQna}
+        />
       ) : (
         <>
           <Flex justifyContent="center" mx="25%" gap={2} my={10}>
@@ -109,7 +115,18 @@ export function Qna({ formattedDate, formattedLogId }) {
                 borderRadius={0}
                 color="white"
                 bgColor="black"
-                onClick={() => setIsWriting(true)}
+                onClick={() => {
+                  if (isAuthenticated()) {
+                    setIsWriting(true);
+                  } else {
+                    toast({
+                      title: "문의는 로그인 후 작성 가능합니다",
+                      description: "먼저 로그인 해주세요",
+                      status: "error",
+                    });
+                    navigate("/login");
+                  }
+                }}
               >
                 작성하기
               </Button>
@@ -135,53 +152,53 @@ export function Qna({ formattedDate, formattedLogId }) {
               </Thead>
               <Tbody>
                 {qnaList && qnaList.length > 0 ? (
-                  qnaList.map((question) => (
+                  qnaList.map((qna) => (
                     <>
-                      <Tr key={question.question_id}>
+                      <Tr key={qna.question_id}>
                         <Td
                           textAlign="left"
                           fontWeight="bold"
                           onClick={() => {
-                            handleToggle(question.question_id);
+                            handleToggle(qna.question_id);
                           }}
                         >
-                          {question.question_title}
+                          {qna.question_title}
                         </Td>
                         <Td textAlign="center">
-                          {formattedLogId(question.member_login_id)}
+                          {formattedLogId(qna.member_login_id)}
                         </Td>
+                        {/*<Td textAlign="center">*/}
+                        {/*  <Tag*/}
+                        {/*    size="sm"*/}
+                        {/*    // variant="outline"*/}
+                        {/*    colorScheme={*/}
+                        {/*      qna.answer_status === "답변대기중"*/}
+                        {/*        ? "orange"*/}
+                        {/*        : "blackAlpha"*/}
+                        {/*    }*/}
+                        {/*    p={2}*/}
+                        {/*  >*/}
+                        {/*    {qna.answer_status}*/}
+                        {/*  </Tag>*/}
+                        {/*</Td> TODO: 답변 있없 유무로 프론트에서 처리하기*/}
                         <Td textAlign="center">
-                          <Tag
-                            size="sm"
-                            // variant="outline"
-                            colorScheme={
-                              question.answer_status === "답변대기중"
-                                ? "orange"
-                                : "blackAlpha"
-                            }
-                            p={2}
-                          >
-                            {question.answer_status}
-                          </Tag>
-                        </Td>
-                        <Td textAlign="center">
-                          {formattedDate(question.question_reg_time)}
+                          {formattedDate(qna.question_reg_time)}
                         </Td>
                       </Tr>
-                      {openId === question.question_id && (
+                      {openId === qna.question_id && (
                         <>
                           <Tr>
                             <Td colSpan={4} px={10}>
                               <Text whiteSpace="pre-wrap" lineHeight="30px">
-                                {question.question_content}
+                                {qna.question_content}
                               </Text>
                             </Td>
                           </Tr>
-                          {question.answer_content && (
+                          {qna.answer_content && (
                             <Tr>
                               <Td colSpan={4} px={10} py={6} bgColor="#F4F4F4">
                                 <Text whiteSpace="pre-wrap" lineHeight="30px">
-                                  {question.answer_content}
+                                  {qna.answer_content}
                                 </Text>
                               </Td>
                             </Tr>

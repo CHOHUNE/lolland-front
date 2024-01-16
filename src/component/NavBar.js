@@ -167,7 +167,7 @@ export function NavBar() {
                   setOverlayVisible(false);
                 }}
               >
-                게임 커뮤니티
+                커뮤니티
               </Tab>
               {categories.map((category) => (
                 <Tab
@@ -219,7 +219,10 @@ export function NavBar() {
                 setOverlayVisible(false);
               }}
             >
-              <Text>게임 장비 커뮤니티</Text>
+              <VStack spacing={2} align="flex-start">
+                <Text>게임 커뮤니티</Text>
+                <Text>게임 장비 커뮤니티</Text>
+              </VStack>
             </TabPanel>
             {categories.map((category) => (
               <TabPanel
