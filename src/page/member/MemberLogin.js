@@ -111,6 +111,7 @@ export function MemberLogin() {
                 h={"20px"}
                 borderRadius={"0"}
                 style={{ backgroundColor: "white" }}
+                onClick={() => navigate("/findId")}
               >
                 아이디 찾기
               </Button>
