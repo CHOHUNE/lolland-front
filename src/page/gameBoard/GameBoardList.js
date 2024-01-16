@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -16,6 +16,7 @@ import {
   Th,
   Thead,
   Tr,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
@@ -26,6 +27,7 @@ import {
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { LoginContext } from "../../component/LoginProvider";
 
 function PageButton({ variant, pageNumber, children }) {
   const [params] = useSearchParams();
@@ -110,6 +112,8 @@ function GameBoardList() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const location = useLocation();
+  const { isAuthenticated } = useContext(LoginContext);
+  const toast = useToast();
 
   useEffect(() => {
     axios.get("/api/gameboard/list?" + params).then((response) => {
@@ -216,8 +220,13 @@ function GameBoardList() {
       <Center>
         <Button
           my="20px"
-          onClick={() => navigate("write")}
-          colorScheme={"purple"}
+          onClick={() => {
+            if (isAuthenticated()) {
+              navigate("write");
+            } else {
+              toast({ description: "로그인 후 글 작성" });
+            }
+          }}
         >
           글 작성
         </Button>

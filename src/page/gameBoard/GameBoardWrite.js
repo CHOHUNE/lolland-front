@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import {
   Box,
@@ -13,6 +13,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { LoginContext } from "../../component/LoginProvider";
 
 export function GameBoardWrite(props) {
   const [title, setTitle] = useState("");
@@ -20,6 +21,7 @@ export function GameBoardWrite(props) {
   const [category, setCategory] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadFiles, setUploadFiles] = useState(null);
+  const { isAuthenticated } = useContext(LoginContext);
 
   let toast = useToast();
   let navigate = useNavigate();
@@ -90,7 +92,6 @@ export function GameBoardWrite(props) {
               한 개 파일은 1MB 이내, 총 용량으 10MB 이내로 첨부 하세요.
             </FormHelperText>
           </FormControl>
-
           <Button
             onClick={handleSubmit}
             colorScheme="blue"

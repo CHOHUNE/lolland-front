@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useImmer } from "use-immer";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -19,12 +19,14 @@ import {
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import loginProvider, { LoginContext } from "../../component/LoginProvider";
 
 export function GameBoardEdit(props) {
   const [board, updateBoard] = useImmer(null);
   const { id } = useParams();
   const [removeFileIds, setRemoveFileIds] = useState([]);
   const [uploadFiles, setUploadFiles] = useState(null);
+  const { isAuthenticated, hasAccess } = useContext(LoginContext);
 
   let toast = useToast();
   let navigate = useNavigate();
