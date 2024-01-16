@@ -112,6 +112,17 @@ export function MemberNavBar() {
               </Box>
             </Flex>
           </FormControl>
+          <Box border={"1px solid whitesmoke"}></Box>
+          <FormControl>
+            <Flex justify={"space-between"}>
+              <FormLabel _hover={{ cursor: "pointer" }} fontWeight={"900"}>
+                좋아요한 글 목록 >
+              </FormLabel>
+              <Box>
+                <FontAwesomeIcon icon={faHeart} />
+              </Box>
+            </Flex>
+          </FormControl>
         </Flex>
       </CardBody>
     </Card>

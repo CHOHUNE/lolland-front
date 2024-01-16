@@ -30,6 +30,8 @@ import { MemberAddressWrite } from "./page/member/MemberViewPage/MemberAddressWr
 import { MemberEdit } from "./page/member/MemberViewPage/MemberEdit";
 import LoginProvider from "./component/LoginProvider";
 import { ProductLike } from "./page/productLike/ProductLike";
+import { MemberFindId } from "./page/member/MemberFindId";
+import { MemberFindPassword } from "./page/member/MemberFindPassword";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -55,6 +57,8 @@ const routes = createBrowserRouter(
       {/* 회원관련 */}
       <Route path="signup" element={<MemberSignup />} />
       <Route path="login" element={<MemberLogin />} />
+      <Route path="findId" element={<MemberFindId />} />
+      <Route path="findPassword" element={<MemberFindPassword />} />
       <Route path="memberPage" element={<MemberView />}>
         <Route path="memberInfo" element={<MemberInfo />} />
         <Route path="memberInfo/memberManagePage" element={<MemberManage />} />

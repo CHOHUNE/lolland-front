@@ -111,6 +111,7 @@ export function MemberLogin() {
                 h={"20px"}
                 borderRadius={"0"}
                 style={{ backgroundColor: "white" }}
+                onClick={() => navigate("/findId")}
               >
                 아이디 찾기
               </Button>
@@ -121,6 +122,7 @@ export function MemberLogin() {
                 borderRadius={"0"}
                 bg={"none"}
                 style={{ backgroundColor: "white" }}
+                onClick={() => navigate("/findPassword")}
               >
                 비밀번호 찾기
               </Button>
@@ -135,6 +137,7 @@ export function MemberLogin() {
                 color={"black"}
                 bg={"whitesmoke"}
                 _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+                onClick={() => navigate("/signup")}
               >
                 회원 가입하기
               </Button>

@@ -14,7 +14,7 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -26,8 +26,10 @@ import {
   faPowerOff,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { LoginContext } from "./LoginProvider";
 
 export function NavBar() {
+  const { fetchLogin, isAuthenticated } = useContext(LoginContext);
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [index, setIndex] = useState(null);
@@ -86,7 +88,8 @@ export function NavBar() {
           description: "로그 아웃 중 문제가 발생하였습니다.",
           status: "error",
         });
-      });
+      })
+      .finally(() => fetchLogin());
   }
 
   const [overlayVisible, setOverlayVisible] = useState(false);
@@ -129,22 +132,30 @@ export function NavBar() {
               icon={<FontAwesomeIcon icon={faBagShopping} />}
               onClick={() => navigate("/cart")}
             />
-            <IconButton
-              icon={<FontAwesomeIcon icon={faUser} />}
-              onClick={() => navigate("/memberPage")}
-            />
-            <IconButton
-              icon={<FontAwesomeIcon icon={faUserPlus} />}
-              onClick={() => navigate("/signup")}
-            />
-            <IconButton
-              icon={<FontAwesomeIcon icon={faPowerOff} />}
-              onClick={() => navigate("/login")}
-            />
-            <IconButton
-              icon={<FontAwesomeIcon icon={faArrowRightFromBracket} />}
-              onClick={handleLogoutClick}
-            />
+            {isAuthenticated() && (
+              <IconButton
+                icon={<FontAwesomeIcon icon={faUser} />}
+                onClick={() => navigate("/memberPage")}
+              />
+            )}
+            {isAuthenticated() || (
+              <IconButton
+                icon={<FontAwesomeIcon icon={faUserPlus} />}
+                onClick={() => navigate("/signup")}
+              />
+            )}
+            {isAuthenticated() || (
+              <IconButton
+                icon={<FontAwesomeIcon icon={faPowerOff} />}
+                onClick={() => navigate("/login")}
+              />
+            )}
+            {isAuthenticated() && (
+              <IconButton
+                icon={<FontAwesomeIcon icon={faArrowRightFromBracket} />}
+                onClick={handleLogoutClick}
+              />
+            )}
           </ButtonGroup>
         </Flex>
         {/* ------------------- 하단 네브바 ------------------- */}

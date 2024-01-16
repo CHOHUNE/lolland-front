@@ -9,8 +9,6 @@ function LoginProvider({ children }) {
     fetchLogin();
   }, []);
 
-  console.log(login);
-
   function fetchLogin() {
     axios
       .get("/api/member/homepageLogin")
