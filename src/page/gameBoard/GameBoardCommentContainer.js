@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Box,
   Button,
@@ -11,6 +11,7 @@ import {
   StackDivider,
   Text,
   Textarea,
+  Tooltip,
   useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
@@ -21,20 +22,39 @@ import {
   NotAllowedIcon,
 } from "@chakra-ui/icons";
 import { useParams } from "react-router-dom";
+import LoginProvider, { LoginContext } from "../../component/LoginProvider";
 
 function CommentForm({ isSubmitting, onSubmit }) {
   const [comment, setComment] = useState("");
+  const { isAuthenticated, hasAccess } = useContext(LoginContext);
 
   function handleSubmit() {
     onSubmit({ comment });
+    setComment("");
   }
+
+  // handle Enter key Sumbit
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSubmit();
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleSubmit]);
 
   return (
     <Box>
       <Textarea value={comment} onChange={(e) => setComment(e.target.value)} />
-      <Button isDisabled={isSubmitting} onClick={handleSubmit}>
-        쓰기
-      </Button>
+      <Tooltip isDisabled={isAuthenticated()} hasArrow label={"로그인 하세요"}>
+        <Button isDisabled={isSubmitting} onClick={handleSubmit}>
+          쓰기
+        </Button>
+      </Tooltip>
     </Box>
   );
 }
@@ -45,6 +65,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
   const [commentEdited, setCommentEdited] = useState(comment.comment_content);
   const [replyComment, setReplyComment] = useState("");
   const toast = useToast();
+  const { isAuthenticated, hasAccess } = useContext(LoginContext);
 
   function handleDuplicateSubmit() {
     setIsSubmitting(true);
@@ -54,6 +75,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
         parent_id: comment.id,
         comment_content: replyComment,
         game_board_id: comment.game_board_id,
+        member_id: comment.member_id,
       })
       .then(() => {
         toast({ description: "성공", status: "success" });
@@ -134,56 +156,60 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
           )}
         </Box>
 
-        {isWriting || (
-          <Box>
-            <Button
-              size="xs"
-              colorScheme="green"
-              onClick={() => setIsWriting(true)}
-            >
-              <AddIcon />
-            </Button>
-          </Box>
-        )}
-        {isWriting && (
-          <Box>
-            <Button
-              size="xs"
-              colorScheme="gray"
-              onClick={() => setIsWriting(false)}
-            >
-              <NotAllowedIcon />
-            </Button>
-          </Box>
-        )}
-
         <Box>
-          {isEditing || (
-            <Button
-              size="xs"
-              colorScheme="purple"
-              onClick={() => setIsEditing(true)}
-            >
-              <EditIcon />
-            </Button>
+          {isAuthenticated() && (
+            <>
+              {isWriting || (
+                <Button
+                  size="xs"
+                  colorScheme="green"
+                  onClick={() => setIsWriting(true)}
+                >
+                  <AddIcon />
+                </Button>
+              )}
+              {isWriting && (
+                <Button
+                  size="xs"
+                  colorScheme="gray"
+                  onClick={() => setIsWriting(false)}
+                >
+                  <NotAllowedIcon />
+                </Button>
+              )}
+            </>
           )}
-          {isEditing && (
-            <Button
-              size="xs"
-              colorScheme="gray"
-              onClick={() => setIsEditing(false)}
-            >
-              <NotAllowedIcon />
-            </Button>
-          )}
-          <Button
-            onClick={() => onDelete(comment.id)}
-            size="xs"
-            colorScheme="red"
-          >
-            <DeleteIcon />
-          </Button>
         </Box>
+
+        {hasAccess(comment.member_id) && (
+          <Box>
+            {isEditing || (
+              <Button
+                size="xs"
+                colorScheme="purple"
+                onClick={() => setIsEditing(true)}
+              >
+                <EditIcon />
+              </Button>
+            )}
+            {isEditing && (
+              <Button
+                size="xs"
+                colorScheme="gray"
+                onClick={() => setIsEditing(false)}
+              >
+                <NotAllowedIcon />
+              </Button>
+            )}
+            <Button
+              onClick={() => onDelete(comment.id)}
+              size="xs"
+              colorScheme="red"
+            >
+              <DeleteIcon />
+            </Button>
+          </Box>
+        )}
       </Flex>
     </Box>
   );
@@ -233,6 +259,7 @@ export function GameBoardCommentContainer() {
         game_board_id: id,
         comment_content: comment.comment,
         parent_id: null,
+        member_id: comment.member_id,
       })
       .then(() => {
         toast({
@@ -242,7 +269,7 @@ export function GameBoardCommentContainer() {
       })
       .catch(() => {
         toast({
-          description: "실패",
+          description: "로그인 후 이용 해주세요.",
           status: "error",
         });
       })
