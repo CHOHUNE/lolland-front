@@ -6,6 +6,7 @@ import {
   Center,
   Divider,
   Flex,
+  Heading,
   Input,
   Select,
   Spinner,
@@ -114,6 +115,8 @@ function GameBoardList() {
   const location = useLocation();
   const { isAuthenticated } = useContext(LoginContext);
   const toast = useToast();
+  const [notice, setNotice] = useState(null);
+  const [top, setTop] = useState(null);
 
   useEffect(() => {
     axios.get("/api/gameboard/list?" + params).then((response) => {
@@ -122,12 +125,78 @@ function GameBoardList() {
     });
   }, [location, isAuthenticated]);
 
+  useEffect(() => {
+    axios.get("/api/gameboard/list/notice").then((response) => {
+      setNotice(response.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get("/api/gameboard/list/top")
+      .then((response) => setTop(response.data));
+  }, []);
+
   if (gameBoardList === null) {
     return <Spinner />;
   }
 
+  const normalBoard = gameBoardList.filter(
+    (board) => board.category !== "공지",
+  );
+
   return (
     <Box py={"100px"}>
+      <Center>
+        <Heading>베스트 게시물</Heading>
+      </Center>
+      <Center>
+        <TableContainer>
+          <Table size="sm" border={"1px solid whitesmoke"}>
+            <Thead>
+              <Tr>
+                <Th>id</Th>
+                <Th>title</Th>
+                <Th>category</Th>
+                <Th>content</Th>
+                <Th>boardClickCount</Th>
+                <Th>boardLikeCount</Th>
+                <Th>boardCommentCount</Th>
+                <Th>boardCountFile</Th>
+                <Th>regTime</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {top
+                .filter((topTen) => topTen.category !== "공지")
+                .map((topTen) => (
+                  <Tr
+                    key={topTen.id}
+                    _hover={{ cursor: "pointer" }}
+                    onClick={() => navigate("/gameboard/id/" + topTen.id)}
+                    borderRadius="10px"
+                  >
+                    <Td>{topTen.id}</Td>
+                    <Td>{topTen.title}</Td>
+                    <Td>{topTen.category}</Td>
+                    <Td>{topTen.board_content}</Td>
+                    <Td>{topTen.board_count}</Td>
+                    <Td>{topTen.count_like}</Td>
+                    <Td>{topTen.count_comment}</Td>
+                    <Td>{topTen.countFile}</Td>
+                    <Td>
+                      {new Date(topTen.reg_time).toLocaleDateString("ko-KR", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </Td>
+                  </Tr>
+                ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+      </Center>
       <Center>
         <ButtonGroup
           variant={"ouline"}
@@ -171,6 +240,11 @@ function GameBoardList() {
         </ButtonGroup>
       </Center>
       <Center>
+        <Heading as="h2" size="lg" mb={4}>
+          공지사항
+        </Heading>
+      </Center>
+      <Center>
         <TableContainer>
           <Table size="sm" border={"1px solid whitesmoke"}>
             <Thead>
@@ -186,36 +260,84 @@ function GameBoardList() {
                 <Th>regTime</Th>
               </Tr>
             </Thead>
-
             <Tbody>
-              {gameBoardList &&
-                gameBoardList
-                  .filter((board) => board.category !== "공지")
-                  .map((board) => (
-                    <Tr
-                      key={board.id}
-                      _hover={{ cursor: "pointer" }}
-                      onClick={() => navigate("/gameboard/id/" + board.id)}
-                      borderRadius="10px"
-                    >
-                      <Td>{board.id}</Td>
-                      <Td>{board.title}</Td>
-                      <Td>{board.category}</Td>
-                      <Td>{board.board_content}</Td>
-                      <Td>{board.board_count}</Td>
-                      <Td>{board.count_like}</Td>
-                      <Td>{board.count_comment}</Td>
-                      <Td>{board.countFile}</Td>
-                      <Td>
-                        {new Date(board.reg_time).toLocaleDateString("ko-KR", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </Td>
-                      {/*<Td>{board.reg_time}</Td>*/}
-                    </Tr>
-                  ))}
+              {notice.map((noticies) => (
+                <Tr
+                  key={noticies.id}
+                  _hover={{ cursor: "pointer" }}
+                  onClick={() => navigate("/gameboard/id/" + noticies.id)}
+                  borderRadius="10px"
+                  bgColor={noticies.category === "공지" ? "grey" : undefined}
+                >
+                  <Td>{noticies.id}</Td>
+                  <Td>{noticies.title}</Td>
+                  <Td>{noticies.category}</Td>
+                  <Td>{noticies.board_content}</Td>
+                  <Td>{noticies.board_count}</Td>
+                  <Td>{noticies.count_like}</Td>
+                  <Td>{noticies.count_comment}</Td>
+                  <Td>{noticies.countFile}</Td>
+                  <Td>
+                    {new Date(noticies.reg_time).toLocaleDateString("ko-KR", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+      </Center>
+
+      {/* 그 외의 게시물 게시판 */}
+      <Center>
+        <Heading as="h2" size="lg" mb={4} mt={"20px"}>
+          일반 게시물
+        </Heading>
+      </Center>
+      <Center>
+        <TableContainer>
+          <Table size="sm" border={"1px solid whitesmoke"}>
+            <Thead>
+              <Tr>
+                <Th>id</Th>
+                <Th>title</Th>
+                <Th>category</Th>
+                <Th>content</Th>
+                <Th>boardClickCount</Th>
+                <Th>boardLikeCount</Th>
+                <Th>boardCommentCount</Th>
+                <Th>boardCountFile</Th>
+                <Th>regTime</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {normalBoard.map((board) => (
+                <Tr
+                  key={board.id}
+                  _hover={{ cursor: "pointer" }}
+                  onClick={() => navigate("/gameboard/id/" + board.id)}
+                  borderRadius="10px"
+                >
+                  <Td>{board.id}</Td>
+                  <Td>{board.title}</Td>
+                  <Td>{board.category}</Td>
+                  <Td>{board.board_content}</Td>
+                  <Td>{board.board_count}</Td>
+                  <Td>{board.count_like}</Td>
+                  <Td>{board.count_comment}</Td>
+                  <Td>{board.countFile}</Td>
+                  <Td>
+                    {new Date(board.reg_time).toLocaleDateString("ko-KR", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </Td>
+                </Tr>
+              ))}
             </Tbody>
           </Table>
         </TableContainer>
