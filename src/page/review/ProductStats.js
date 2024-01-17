@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, Heading, VStack } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import React from "react";
@@ -32,17 +32,16 @@ export const ProductStats = ({ product_id }) => {
       >
         동일 카테고리 내 평점 순위
       </Box>
-      <Box
+      <VStack
         w="30%"
-        h="250px"
-        display="flex"
-        alignItems="center"
+        spacing={10}
         justifyContent="center"
         textAlign="center"
         border="1px dashed gold"
       >
+        <Heading size="md">별점 분포도</Heading>
         <RatingChart ratingDistribution={ratingDistribution} />
-      </Box>
+      </VStack>
       <Box
         w="30%"
         h="250px"

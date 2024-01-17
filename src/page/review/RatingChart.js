@@ -30,9 +30,18 @@ const RatingChart = ({ ratingDistribution }) => {
         x: {
           type: "linear",
           position: "bottom",
+          grid: {
+            display: false,
+          },
         },
         y: {
           beginAtZero: true,
+          display: false,
+        },
+      },
+      plugins: {
+        legend: {
+          display: false,
         },
       },
     };
@@ -40,7 +49,7 @@ const RatingChart = ({ ratingDistribution }) => {
     chartRef.current = new Chart(document.getElementById("rating-chart"), {
       type: "bar",
       data: chartData,
-      // options: options,
+      options: options,
     });
 
     return () => {
@@ -48,7 +57,7 @@ const RatingChart = ({ ratingDistribution }) => {
     };
   }, [ratingDistribution]);
 
-  return <canvas id="rating-chart" />;
+  return <canvas id="rating-chart" height="300" />;
 };
 
 export default RatingChart;
