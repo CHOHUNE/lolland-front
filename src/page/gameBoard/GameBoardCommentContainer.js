@@ -113,9 +113,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
   return (
     <Box ml={`${comment.depth * 20}px`}>
       <Flex justifyContent="space-between">
-        <Heading size="xs">
-          ID:{comment.id} PID:{comment.parent_id} DEP: {comment.depth}
-        </Heading>
+        <Heading size="xs">{comment.member_id}</Heading>
         <Text fontSize="xs">{comment.ago}</Text>
       </Flex>
       <Flex justifyContent="space-between" alignItems="center">
@@ -299,7 +297,7 @@ export function GameBoardCommentContainer() {
   }
 
   return (
-    <Box>
+    <Box w={"100%"} my={"50px"}>
       <CommentForm isSubmitting={isSubmitting} onSubmit={handleSubmit} />
       <CommentList
         commentList={commentList}
