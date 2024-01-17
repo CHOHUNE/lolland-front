@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
+  Badge,
   Box,
   Button,
   ButtonGroup,
@@ -25,10 +26,12 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   faAngleLeft,
   faAngleRight,
+  faImage,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { LoginContext } from "../../component/LoginProvider";
+import { AddIcon, ChatIcon } from "@chakra-ui/icons";
 
 function PageButton({ variant, pageNumber, children }) {
   const [params] = useSearchParams();
@@ -137,66 +140,157 @@ function GameBoardList() {
       .then((response) => setTop(response.data));
   }, []);
 
-  if (gameBoardList === null) {
+  if (gameBoardList === null || pageInfo === null) {
     return <Spinner />;
   }
 
   return (
     <Box py={"100px"}>
       <Center>
-        <Heading>베스트 게시물</Heading>
+        <Heading mb={"10px"}>베스트 게시물</Heading>
       </Center>
       <Center>
-        <TableContainer>
+        <TableContainer w={"50%"}>
           <Table size="sm" border={"1px solid whitesmoke"}>
             <Thead>
               <Tr>
-                <Th>id</Th>
-                <Th>title</Th>
-                <Th>category</Th>
-                <Th>content</Th>
-                <Th>boardClickCount</Th>
-                <Th>boardLikeCount</Th>
-                <Th>boardCommentCount</Th>
-                <Th>boardCountFile</Th>
-                <Th>regTime</Th>
+                <Th w="5%" textAlign={"center"}>
+                  추천
+                </Th>
+                <Th w="5%" pl="0">
+                  분류
+                </Th>
+                <Th w="40%" colSpan={2} textAlign={"center"}>
+                  제목
+                </Th>
+                <Th w="10%">조회수</Th>
+                <Th w="10%">작성자</Th>
+                <Th w="10%">날짜</Th>
               </Tr>
             </Thead>
             <Tbody>
-              {top.map((topTen) => (
-                <Tr
-                  key={topTen.id}
-                  _hover={{ cursor: "pointer" }}
-                  onClick={() => navigate("/gameboard/id/" + topTen.id)}
-                  borderRadius="10px"
-                >
-                  <Td>{topTen.id}</Td>
-                  <Td>{topTen.title}</Td>
-                  <Td>{topTen.category}</Td>
-                  <Td>{topTen.board_content}</Td>
-                  <Td>{topTen.board_count}</Td>
-                  <Td>{topTen.count_like}</Td>
-                  <Td>{topTen.count_comment}</Td>
-                  <Td>{topTen.countFile}</Td>
-                  <Td>
-                    {new Date(topTen.reg_time).toLocaleDateString("ko-KR", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </Td>
-                </Tr>
-              ))}
+              {top &&
+                top.map((topTen) => (
+                  <Tr key={topTen.id} borderRadius="10px">
+                    <Td w="10%" textAlign={"center"}>
+                      <Badge
+                        colorScheme="green"
+                        variant="outline"
+                        mx={"2px"} // Adjusted spacing around Badge
+                        fontWeight={"bold"}
+                        bgColor={`rgba(0, 128, 0, ${topTen.count_like / 10})`}
+                      >
+                        {topTen.count_like}
+                      </Badge>
+                    </Td>
+
+                    <Td w="5%" pl="0">
+                      {topTen.category}
+                    </Td>
+                    <Td
+                      w="40%"
+                      colSpan={2}
+                      textAlign={"center"}
+                      onClick={() => navigate("/gameboard/id/" + topTen.id)}
+                      _hover={{ cursor: "pointer" }}
+                    >
+                      <span style={{ marginLeft: "+10%" }}>{topTen.title}</span>
+                      <Badge colorScheme={"green"} variant="outline" mx={"1%"}>
+                        {topTen.count_comment}
+                        <ChatIcon />
+                      </Badge>
+                      <Badge mx={"1%"}>
+                        {topTen.countFile}
+                        <FontAwesomeIcon icon={faImage} />
+                      </Badge>
+                    </Td>
+                    <Td w="10%">{topTen.board_count}</Td>
+                    <Td w="10%">{topTen.member_id}</Td>
+                    <Td w="10%">
+                      {new Date(topTen.reg_time).toLocaleDateString("ko-KR", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </Td>
+                  </Tr>
+                ))}
             </Tbody>
           </Table>
         </TableContainer>
       </Center>
       <Center>
+        <Heading as="h2" size="lg" mb={4} mt={"2%"}>
+          공지사항
+        </Heading>
+      </Center>
+      <Center>
+        <TableContainer w={"40%"}>
+          <Table size="sm" border={"1px solid whitesmoke"}>
+            <Thead>
+              <Tr>
+                <Th w="5%" textAlign={"center"}>
+                  분류
+                </Th>
+                <Th w="40%" colSpan={2} textAlign={"center"}>
+                  제목
+                </Th>
+                <Th w="10%">조회수</Th>
+                <Th w="10%">작성자</Th>
+                <Th w="10%">날짜</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {notice &&
+                notice.map((noticies) => (
+                  <Tr key={noticies.id} borderRadius="10px">
+                    <Td w="5%" textAlign={"center"}>
+                      {noticies.category}
+                    </Td>
+                    <Td
+                      w="40%"
+                      colSpan={2}
+                      textAlign={"center"}
+                      onClick={() => navigate("/gameboard/id/" + noticies.id)}
+                      _hover={{ cursor: "pointer" }}
+                    >
+                      <span style={{ marginLeft: "+10%" }}>
+                        {noticies.title}
+                      </span>
+                      <Badge colorScheme={"green"} variant="outline" mx={"1%"}>
+                        {noticies.count_comment}
+                      </Badge>
+                      <Badge mx={"1%"}>{noticies.countFile}</Badge>
+                    </Td>
+                    <Td w="10%">{noticies.board_count}</Td>
+                    <Td w="10%">{noticies.member_id}</Td>
+                    <Td w="10%">
+                      {new Date(noticies.reg_time).toLocaleDateString("ko-KR", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </Td>
+                  </Tr>
+                ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+      </Center>
+
+      {/* 그 외의 게시물 게시판 */}
+      <Center>
+        <Heading as="h2" size="lg" mt={"1%"}>
+          일반 게시물
+        </Heading>
+      </Center>
+
+      <Center>
         <ButtonGroup
           variant={"ouline"}
           spacing={"6"}
-          border={"1px solid grey"}
-          my={"50px"}
+          border={"1px solid whitesmoke"}
+          my={"1%"}
         >
           <Button
             onClick={() => navigate("")}
@@ -233,105 +327,73 @@ function GameBoardList() {
           </Button>
         </ButtonGroup>
       </Center>
-      <Center>
-        <Heading as="h2" size="lg" mb={4}>
-          공지사항
-        </Heading>
-      </Center>
-      <Center>
-        <TableContainer>
-          <Table size="sm" border={"1px solid whitesmoke"}>
-            <Thead>
-              <Tr>
-                <Th>id</Th>
-                <Th>title</Th>
-                <Th>category</Th>
-                <Th>content</Th>
-                <Th>boardClickCount</Th>
-                <Th>boardLikeCount</Th>
-                <Th>boardCommentCount</Th>
-                <Th>boardCountFile</Th>
-                <Th>regTime</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {notice.map((noticies) => (
-                <Tr
-                  key={noticies.id}
-                  _hover={{ cursor: "pointer" }}
-                  onClick={() => navigate("/gameboard/id/" + noticies.id)}
-                  borderRadius="10px"
-                  bgColor={noticies.category === "공지" ? "grey" : undefined}
-                >
-                  <Td>{noticies.id}</Td>
-                  <Td>{noticies.title}</Td>
-                  <Td>{noticies.category}</Td>
-                  <Td>{noticies.board_content}</Td>
-                  <Td>{noticies.board_count}</Td>
-                  <Td>{noticies.count_like}</Td>
-                  <Td>{noticies.count_comment}</Td>
-                  <Td>{noticies.countFile}</Td>
-                  <Td>
-                    {new Date(noticies.reg_time).toLocaleDateString("ko-KR", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
-      </Center>
 
-      {/* 그 외의 게시물 게시판 */}
       <Center>
-        <Heading as="h2" size="lg" mb={4} mt={"20px"}>
-          일반 게시물
-        </Heading>
-      </Center>
-      <Center>
-        <TableContainer>
+        <TableContainer w={"50%"}>
           <Table size="sm" border={"1px solid whitesmoke"}>
             <Thead>
               <Tr>
-                <Th>id</Th>
-                <Th>title</Th>
-                <Th>category</Th>
-                <Th>content</Th>
-                <Th>boardClickCount</Th>
-                <Th>boardLikeCount</Th>
-                <Th>boardCommentCount</Th>
-                <Th>boardCountFile</Th>
-                <Th>regTime</Th>
+                <Th w="5%" textAlign={"center"}>
+                  추천
+                </Th>
+                <Th w="5%" pl="0">
+                  분류
+                </Th>
+                <Th w="40%" colSpan={2} textAlign={"center"}>
+                  제목
+                </Th>
+                <Th w="10%">조회수</Th>
+                <Th w="10%">작성자</Th>
+                <Th w="10%">날짜</Th>
               </Tr>
             </Thead>
             <Tbody>
-              {gameBoardList.map((board) => (
-                <Tr
-                  key={board.id}
-                  _hover={{ cursor: "pointer" }}
-                  onClick={() => navigate("/gameboard/id/" + board.id)}
-                  borderRadius="10px"
-                >
-                  <Td>{board.id}</Td>
-                  <Td>{board.title}</Td>
-                  <Td>{board.category}</Td>
-                  <Td>{board.board_content}</Td>
-                  <Td>{board.board_count}</Td>
-                  <Td>{board.count_like}</Td>
-                  <Td>{board.count_comment}</Td>
-                  <Td>{board.countFile}</Td>
-                  <Td>
-                    {new Date(board.reg_time).toLocaleDateString("ko-KR", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </Td>
-                </Tr>
-              ))}
+              {gameBoardList &&
+                gameBoardList.map((board) => (
+                  <Tr key={board.id} borderRadius="10px">
+                    <Td w="10%" textAlign={"center"}>
+                      <Badge
+                        colorScheme="green"
+                        variant="outline"
+                        mx={"2px"} // Adjusted spacing around Badge
+                        fontWeight={"bold"}
+                        bgColor={`rgba(0, 128, 0, ${board.count_like / 10})`}
+                      >
+                        {board.count_like}
+                      </Badge>
+                    </Td>
+
+                    <Td w="5%" pl="0">
+                      {board.category}
+                    </Td>
+                    <Td
+                      w="40%"
+                      colSpan={2}
+                      textAlign={"center"}
+                      _hover={{ cursor: "pointer" }}
+                      onClick={() => navigate("/gameboard/id/" + board.id)}
+                    >
+                      <span style={{ marginLeft: "+10%" }}>{board.title}</span>
+                      <Badge colorScheme={"green"} variant="outline" mx={"1%"}>
+                        <ChatIcon />
+                        {board.count_comment}
+                      </Badge>
+                      <Badge mx={"1%"}>
+                        <FontAwesomeIcon icon={faImage} />
+                        {board.countFile}
+                      </Badge>
+                    </Td>
+                    <Td w="10%">{board.board_count}</Td>
+                    <Td w="10%">{board.member_id}</Td>
+                    <Td w="10%">
+                      {new Date(board.reg_time).toLocaleDateString("ko-KR", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </Td>
+                  </Tr>
+                ))}
             </Tbody>
           </Table>
         </TableContainer>
