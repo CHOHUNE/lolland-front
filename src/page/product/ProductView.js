@@ -39,7 +39,8 @@ import {
 import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { selectOptions } from "@testing-library/user-event/dist/select-options"; // 빈 하트
-import { ReviewView } from "../review/ReviewView"; // 빈 하트
+import { ReviewView } from "../review/ReviewView";
+import { ProductStats } from "../review/ProductStats"; // 빈 하트
 
 export function ProductView() {
   const [product, setProduct] = useState(null);

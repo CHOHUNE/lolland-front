@@ -27,11 +27,12 @@ import {
   faTrashCan,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { QnaView } from "../qna/QnaView";
 import { useNavigate } from "react-router-dom";
 import loginProvider, { LoginContext } from "../../component/LoginProvider";
+import { ProductStats } from "./ProductStats";
 
 // 리뷰 등록할 때 별점 부분
 const StarRating = ({ rate, setRate }) => {
@@ -128,6 +129,7 @@ export const ReviewView = ({ product_id }) => {
   }, [page]);
 
   function fetchReview() {
+    console.log("fetchReview Triggered");
     axios
       .get("/api/review/fetch", {
         params: { product_id: product_id, page: page },
@@ -171,6 +173,8 @@ export const ReviewView = ({ product_id }) => {
             description: "리뷰를 성공적으로 등록했습니다",
             status: "success",
           });
+          setReviewList([]);
+          setPage(0);
           fetchReview();
         })
         .catch((error) => {
@@ -225,6 +229,8 @@ export const ReviewView = ({ product_id }) => {
           description: "리뷰를 성공적으로 수정하였습니다",
           status: "success",
         });
+        setReviewList([]);
+        setPage(0);
         fetchReview();
       })
       .catch((error) => {
@@ -253,6 +259,8 @@ export const ReviewView = ({ product_id }) => {
           description: "리뷰가 성공적으로 삭제되었습니다",
           status: "success",
         });
+        setReviewList([]);
+        setPage(0);
         fetchReview();
       })
       .catch((error) => {
@@ -300,10 +308,11 @@ export const ReviewView = ({ product_id }) => {
 
   return (
     <>
+      <ProductStats product_id={product_id} />
       <Tabs position="relative" variant="unstyled">
         <TabList p={5} justifyContent="space-evenly" align="center">
           <Tab {...tabStyles}>상품 설명</Tab>
-          <Tab {...tabStyles}>리뷰 & 댓글 ({totalReviews})</Tab>
+          <Tab {...tabStyles}>리뷰 ({totalReviews})</Tab>
           <Tab {...tabStyles}>Q&A</Tab>
         </TabList>
         <TabIndicator mt="-1.5px" height="2px" bg="black" borderRadius="1px" />
@@ -356,7 +365,7 @@ export const ReviewView = ({ product_id }) => {
                       isEditing={isEditing}
                     />
                     {/* -------------------------- 시간 출력란 -------------------------- */}
-                    <Text opacity={0.6}>
+                    <Text opacity={0.6} fontSize="xs">
                       {formattedDate(review.review_reg_time)}
                     </Text>
                     {/* -------------------------- 수정(취소) / 삭제 버튼 출력란 --------------------------*/}
@@ -368,12 +377,14 @@ export const ReviewView = ({ product_id }) => {
                             <>
                               <IconButton
                                 icon={<FontAwesomeIcon icon={faPaperPlane} />}
+                                size="sm"
                                 variant="ghost"
                                 colorScheme="blue"
                                 onClick={handleUpdateReview}
                               />
                               <IconButton
                                 icon={<FontAwesomeIcon icon={faXmark} />}
+                                size="sm"
                                 variant="ghost"
                                 colorScheme="red"
                                 onClick={handleCancelEdit}
@@ -383,12 +394,14 @@ export const ReviewView = ({ product_id }) => {
                             <>
                               <IconButton
                                 icon={<FontAwesomeIcon icon={faPenToSquare} />}
+                                size="sm"
                                 variant="ghost"
                                 colorScheme="purple"
                                 onClick={() => handleEditReview(review)}
                               />
                               <IconButton
                                 icon={<FontAwesomeIcon icon={faTrashCan} />}
+                                size="sm"
                                 variant="ghost"
                                 color="black"
                                 _hover={{ color: "white", bgColor: "black" }}
@@ -424,7 +437,7 @@ export const ReviewView = ({ product_id }) => {
                         <Button
                           bgColor="black"
                           color="white"
-                          borderRadius={0}
+                          borderRadius={25}
                           px="10%"
                           onClick={handleSeeMore}
                           mt={4}
@@ -443,20 +456,7 @@ export const ReviewView = ({ product_id }) => {
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
-              >
-                <VStack spacing={5}>
-                  <Text fontSize="2xl">
-                    <FontAwesomeIcon
-                      icon={faCommentSlash}
-                      size="lg"
-                      opacity={0.3}
-                    />
-                  </Text>
-                  <Text opacity={0.3} fontSize="2xl">
-                    아직 리뷰가 없는 상품입니다.
-                  </Text>
-                </VStack>
-              </Box>
+              ></Box>
             )}
           </TabPanel>
           {/* -------------------------- Q&A -------------------------- */}
