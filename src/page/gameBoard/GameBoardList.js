@@ -195,14 +195,24 @@ function GameBoardList() {
                       _hover={{ cursor: "pointer" }}
                     >
                       <span style={{ marginLeft: "+10%" }}>{topTen.title}</span>
-                      <Badge colorScheme={"green"} variant="outline" mx={"1%"}>
-                        {topTen.count_comment}
-                        <ChatIcon />
-                      </Badge>
-                      <Badge mx={"1%"}>
-                        {topTen.countFile}
-                        <FontAwesomeIcon icon={faImage} />
-                      </Badge>
+
+                      {topTen.count_comment !== 0 && (
+                        <Badge
+                          colorScheme={"green"}
+                          variant="outline"
+                          mx={"1%"}
+                        >
+                          {topTen.count_comment}
+                          <ChatIcon />
+                        </Badge>
+                      )}
+
+                      {topTen.countFile !== 0 && (
+                        <Badge mx={"1%"}>
+                          {topTen.countFile}
+                          <FontAwesomeIcon icon={faImage} />
+                        </Badge>
+                      )}
                     </Td>
                     <Td w="10%">{topTen.board_count}</Td>
                     <Td w="10%">{topTen.member_id}</Td>
@@ -257,10 +267,22 @@ function GameBoardList() {
                       <span style={{ marginLeft: "+10%" }}>
                         {noticies.title}
                       </span>
-                      <Badge colorScheme={"green"} variant="outline" mx={"1%"}>
-                        {noticies.count_comment}
-                      </Badge>
-                      <Badge mx={"1%"}>{noticies.countFile}</Badge>
+                      {noticies.count_comment !== 0 && (
+                        <Badge
+                          colorScheme={"green"}
+                          variant="outline"
+                          mx={"1%"}
+                        >
+                          <ChatIcon />
+                          {noticies.count_comment}
+                        </Badge>
+                      )}
+                      {noticies.countFile !== 0 && (
+                        <Badge mx={"1%"}>
+                          {noticies.countFile}
+                          <FontAwesomeIcon icon={faImage} />
+                        </Badge>
+                      )}{" "}
                     </Td>
                     <Td w="10%">{noticies.board_count}</Td>
                     <Td w="10%">{noticies.member_id}</Td>
@@ -374,14 +396,22 @@ function GameBoardList() {
                       onClick={() => navigate("/gameboard/id/" + board.id)}
                     >
                       <span style={{ marginLeft: "+10%" }}>{board.title}</span>
-                      <Badge colorScheme={"green"} variant="outline" mx={"1%"}>
-                        <ChatIcon />
-                        {board.count_comment}
-                      </Badge>
-                      <Badge mx={"1%"}>
-                        <FontAwesomeIcon icon={faImage} />
-                        {board.countFile}
-                      </Badge>
+                      {board.count_comment !== 0 && (
+                        <Badge
+                          colorScheme={"green"}
+                          variant="outline"
+                          mx={"1%"}
+                        >
+                          <ChatIcon />
+                          {board.count_comment}
+                        </Badge>
+                      )}{" "}
+                      {board.countFile !== 0 && (
+                        <Badge mx={"1%"}>
+                          <FontAwesomeIcon icon={faImage} />
+                          {board.countFile}
+                        </Badge>
+                      )}
                     </Td>
                     <Td w="10%">{board.board_count}</Td>
                     <Td w="10%">{board.member_id}</Td>
