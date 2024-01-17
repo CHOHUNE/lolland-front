@@ -132,7 +132,15 @@ export const ReviewView = ({ product_id }) => {
       })
       .then((response) => {
         console.log(response.data);
-        setReviewList(response.data);
+        setReviewList((prevReviews) => {
+          const uniqueReviews = response.data.filter(
+            (newReview) =>
+              !prevReviews.some(
+                (prevReview) => prevReview.review_id === newReview.review_id,
+              ),
+          );
+          return [...prevReviews, ...uniqueReviews];
+        });
       })
       .catch((error) => {
         toast({
@@ -144,8 +152,7 @@ export const ReviewView = ({ product_id }) => {
   }
 
   function handleSeeMore() {
-    setPage(page + 1);
-    fetchReview();
+    setPage((prevPage) => prevPage + 1);
   }
 
   function handleSubmit() {
