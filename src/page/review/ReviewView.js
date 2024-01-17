@@ -105,10 +105,11 @@ const Star = ({ initialRate, onRateChange, isEditing }) => {
 };
 
 export const ReviewView = ({ product_id }) => {
-  const [rate, setRate] = useState(0);
+  const [rate, setRate] = useState(1);
   const [review, setReview] = useState("");
   const { hasAccess, isAdmin, isAuthenticated } = useContext(LoginContext);
   const [reviewList, setReviewList] = useState([]);
+  const [page, setPage] = useState(0);
   const [isEditing, setIsEditing] = useState(null);
   const [editingReview, setEditingReview] = useState(null);
   const toast = useToast();
@@ -122,11 +123,13 @@ export const ReviewView = ({ product_id }) => {
   // 첫 로딩 시 리뷰 리스트 가져오기
   useEffect(() => {
     fetchReview();
-  }, []);
+  }, [page]);
 
   function fetchReview() {
     axios
-      .get("/api/review/fetch", { params: { product_id: product_id } })
+      .get("/api/review/fetch", {
+        params: { product_id: product_id, page: page },
+      })
       .then((response) => {
         console.log(response.data);
         setReviewList(response.data);
@@ -138,6 +141,11 @@ export const ReviewView = ({ product_id }) => {
           status: "error",
         });
       });
+  }
+
+  function handleSeeMore() {
+    setPage(page + 1);
+    fetchReview();
   }
 
   function handleSubmit() {
@@ -280,6 +288,8 @@ export const ReviewView = ({ product_id }) => {
     return "";
   }
 
+  console.log("reviewList length: " + reviewList.length);
+
   return (
     <>
       <Tabs position="relative" variant="unstyled">
@@ -318,7 +328,7 @@ export const ReviewView = ({ product_id }) => {
               />
             </Flex>
             {/* -------------------------- 리뷰 출력란 -------------------------- */}
-            {reviewList && reviewList.length > 0 ? (
+            {reviewList.length > 0 ? (
               reviewList.map((review, index) => (
                 <Box key={review.review_id} mx="20%" my={5}>
                   <HStack spacing={5} mb={5}>
@@ -400,6 +410,11 @@ export const ReviewView = ({ product_id }) => {
                     </Text>
                   )}
                   {index < reviewList.length - 1 && <Divider />}
+                  {index === reviewList.length - 1 && (
+                    <Button onClick={handleSeeMore} mt={4}>
+                      See More
+                    </Button>
+                  )}
                 </Box>
               ))
             ) : (
