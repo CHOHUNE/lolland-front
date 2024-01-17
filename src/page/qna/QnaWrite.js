@@ -48,7 +48,7 @@ export function QnaWrite({ setIsWriting, product_id, fetchQna }) {
         } else if (error.response.status === 400) {
           toast({
             title: "Bad Request",
-            description: "프론트와 백엔드 파라미터를 확인해주세요",
+            description: "3프론트와 백엔드 파라미터를 확인해주세요",
             status: "error",
           });
         } else {

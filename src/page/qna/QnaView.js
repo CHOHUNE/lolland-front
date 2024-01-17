@@ -3,20 +3,13 @@ import {
   Button,
   ButtonGroup,
   Center,
-  Collapse,
   Flex,
-  FormControl,
-  FormLabel,
-  Heading,
   IconButton,
   Input,
   InputGroup,
-  InputLeftAddon,
   InputLeftElement,
-  InputRightAddon,
   InputRightElement,
   Select,
-  Skeleton,
   Spinner,
   Table,
   TableContainer,
@@ -41,12 +34,7 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { Fragment, useEffect, useState } from "react";
-import {
-  Form,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { QnaWrite } from "../qna/QnaWrite";
 
@@ -57,7 +45,8 @@ function PageButton({ variant, pageNumber, children, product_id }) {
   function handleClick() {
     params.set("product_id", product_id);
     params.set("p", pageNumber);
-    navigate("/?" + params);
+    console.log(params.get("p"));
+    navigate("?" + params);
   }
 
   return (
@@ -77,7 +66,7 @@ function Pagination({ pageInfo, product_id }) {
   return (
     <Center mt={5} mb={40}>
       <Box>
-        <Flex justifyContent="center">
+        <ButtonGroup justifyContent="center">
           {pageInfo.prevPageNumber && (
             <PageButton
               variant="ghost"
@@ -110,7 +99,7 @@ function Pagination({ pageInfo, product_id }) {
               <FontAwesomeIcon icon={faAngleRight} />
             </PageButton>
           )}
-        </Flex>
+        </ButtonGroup>
       </Box>
     </Center>
   );
@@ -125,7 +114,7 @@ export function QnaView({
   isAdmin,
 }) {
   const [qnaList, setQnaList] = useState([]);
-  const [pageInfo, setPageInfo] = useState();
+  const [pageInfo, setPageInfo] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -145,46 +134,20 @@ export function QnaView({
     paramsSearch.set("product_id", product_id);
     paramsSearch.set("k", keyword);
     paramsSearch.set("c", category);
-    axios
-      .get("/api/qna/list?" + paramsSearch)
-      .then((response) => {
-        console.log(response);
-        setQnaList(response.data.qnaList);
-        setPageInfo(response.data.pageInfo);
-      })
-      .catch((error) => {
-        if (error.response.status === 400) {
-          toast({
-            title: "Bad Request",
-            description: "프론트엔드 코드와 백엔드 파라미터를 확인해주세요",
-            status: "error",
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Internal Server Error",
-            description: "백엔드 코드를 확인해주세요",
-            status: "error",
-          });
-        } else {
-          toast({
-            title: "QNA 리스트 불러오기에 실패하였습니다",
-            description: "계속되면 관리자에게 문의해주세요",
-            status: "error",
-          });
-        }
-      });
+    navigate("?" + paramsSearch);
   }
 
   useEffect(() => {
     fetchQna();
-  }, []);
+  }, [location]);
 
   function fetchQna() {
-    const params = new URLSearchParams({
-      product_id: product_id,
-      k: keyword,
-      c: category,
-    });
+    console.log("location" + location);
+    const params = new URLSearchParams(location.search);
+    params.set("product_id", product_id);
+    params.set("k", keyword);
+    params.set("c", category);
+    console.log(params);
 
     axios
       .get("/api/qna/list?" + params)
@@ -197,7 +160,8 @@ export function QnaView({
         if (error.response.status === 400) {
           toast({
             title: "Bad Request",
-            description: "프론트엔드 코드와 백엔드 파라미터를 확인해주세요",
+            description:
+              "리스트 로딩 중 에러. 프론트엔드 코드와 백엔드 파라미터를 확인해주세요",
             status: "error",
           });
         } else if (error.response.status === 500) {
@@ -214,6 +178,8 @@ export function QnaView({
           });
         }
       });
+    console.log(qnaList);
+    console.log(pageInfo);
   }
 
   const handleToggle = (questionId) => {
@@ -243,7 +209,7 @@ export function QnaView({
         if (error.response.status === 400) {
           toast({
             title: "Bad Request",
-            description: "프론트와 백엔드 파라미터를 확인해보세요",
+            description: "2프론트와 백엔드 파라미터를 확인해보세요",
             status: "error",
           });
         } else if (error.response.status === 500) {
@@ -283,7 +249,7 @@ export function QnaView({
         if (error.response.status === 400) {
           toast({
             title: "Bad Request",
-            description: "프론트와 백엔드 파라미터를 확인해보세요",
+            description: "5프론트와 백엔드 파라미터를 확인해보세요",
             status: "error",
           });
         } else if (error.response.status === 500) {
@@ -320,7 +286,7 @@ export function QnaView({
         if (error.response.status === 400) {
           toast({
             title: "Bad Request",
-            description: "프론트와 백엔드 파라미터를 확인해보세요",
+            description: "6프론트와 백엔드 파라미터를 확인해보세요",
             status: "error",
           });
         } else if (error.response.status === 500) {
@@ -355,11 +321,10 @@ export function QnaView({
                 <Select
                   border="1px solid black"
                   borderRadius={0}
+                  defaultValue="all"
                   onChange={(e) => setCategory(e.target.value)}
                 >
-                  <option selected value="all">
-                    전체
-                  </option>
+                  <option value="all">전체</option>
                   <option value="title">제목</option>
                   <option value="content">내용</option>
                   <option value="id">아이디</option>
@@ -459,7 +424,14 @@ export function QnaView({
                 {qnaList && qnaList.length > 0 ? (
                   qnaList.map((qna) => (
                     <>
-                      <Tr key={qna.question_id}>
+                      <Tr
+                        key={qna.question_id}
+                        borderBottom={
+                          openId !== qna.question_id &&
+                          !qna.answer_content &&
+                          "1px solid #F4F4F4"
+                        }
+                      >
                         <Td
                           textAlign="left"
                           fontWeight="bold"
@@ -485,13 +457,15 @@ export function QnaView({
                           </Tag>
                         </Td>
                         <Td textAlign="center">
-                          {formattedDate(qna.question_reg_time)}
+                          <Text fontSize="xs" opacity="0.5">
+                            {formattedDate(qna.question_reg_time)}
+                          </Text>
                         </Td>
                       </Tr>
                       {openId === qna.question_id && (
                         <>
                           <Tr>
-                            <Td colSpan={4} border="1px solid black">
+                            <Td colSpan={4} borderBottom="1px solid #F4F4F4">
                               {(hasAccess(qna.member_login_id) ||
                                 isAdmin()) && (
                                 <ButtonGroup
@@ -583,7 +557,7 @@ export function QnaView({
                             </Td>
                           </Tr>
                           {qna.answer_content && (
-                            <Tr>
+                            <Tr borderBottom="1px solid #F4F4F4">
                               <Td colSpan={4} px={10} py={6} bgColor="#F4F4F4">
                                 <Text whiteSpace="pre-wrap" lineHeight="30px">
                                   {qna.answer_content}
