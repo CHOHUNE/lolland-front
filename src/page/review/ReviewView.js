@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Center,
   Divider,
   Flex,
   HStack,
@@ -115,6 +116,7 @@ export const ReviewView = ({ product_id }) => {
   const toast = useToast();
   const navigate = useNavigate();
   const [editableRating, setEditableRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
 
   const handleRatingChange = (newRating) => {
     setEditableRating(newRating);
@@ -131,9 +133,9 @@ export const ReviewView = ({ product_id }) => {
         params: { product_id: product_id, page: page },
       })
       .then((response) => {
-        console.log(response.data);
+        const { reviewList, totalReviews } = response.data;
         setReviewList((prevReviews) => {
-          const uniqueReviews = response.data.filter(
+          const uniqueReviews = reviewList.filter(
             (newReview) =>
               !prevReviews.some(
                 (prevReview) => prevReview.review_id === newReview.review_id,
@@ -141,6 +143,7 @@ export const ReviewView = ({ product_id }) => {
           );
           return [...prevReviews, ...uniqueReviews];
         });
+        setTotalReviews(totalReviews);
       })
       .catch((error) => {
         toast({
@@ -295,14 +298,12 @@ export const ReviewView = ({ product_id }) => {
     return "";
   }
 
-  console.log("reviewList length: " + reviewList.length);
-
   return (
     <>
       <Tabs position="relative" variant="unstyled">
         <TabList p={5} justifyContent="space-evenly" align="center">
           <Tab {...tabStyles}>상품 설명</Tab>
-          <Tab {...tabStyles}>리뷰 & 댓글 ({reviewList.length})</Tab>
+          <Tab {...tabStyles}>리뷰 & 댓글 ({totalReviews})</Tab>
           <Tab {...tabStyles}>Q&A</Tab>
         </TabList>
         <TabIndicator mt="-1.5px" height="2px" bg="black" borderRadius="1px" />
@@ -417,11 +418,21 @@ export const ReviewView = ({ product_id }) => {
                     </Text>
                   )}
                   {index < reviewList.length - 1 && <Divider />}
-                  {index === reviewList.length - 1 && (
-                    <Button onClick={handleSeeMore} mt={4}>
-                      See More
-                    </Button>
-                  )}
+                  {index === reviewList.length - 1 &&
+                    reviewList.length !== totalReviews && (
+                      <Center>
+                        <Button
+                          bgColor="black"
+                          color="white"
+                          borderRadius={0}
+                          px="10%"
+                          onClick={handleSeeMore}
+                          mt={4}
+                        >
+                          더보기
+                        </Button>
+                      </Center>
+                    )}
                 </Box>
               ))
             ) : (
