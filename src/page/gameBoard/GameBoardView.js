@@ -51,6 +51,7 @@ async function fetchBoardData(
   setLike,
   setWritten,
   setWriterInfo,
+  setWrittenComment,
 ) {
   try {
     const boardResponse = await axios.get(`/api/gameboard/id/${id}`);
@@ -69,6 +70,11 @@ async function fetchBoardData(
         `/api/gameboard/list/info/${boardResponse.data.member_id}`,
       );
       setWriterInfo(writerInfoResponse.data);
+
+      const writtenCommentResponse = await axios.get(
+        `/api/comment/list/written/comment/${boardResponse.data.member_id}`,
+      );
+      setWrittenComment(writtenCommentResponse.data);
     }
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -108,6 +114,7 @@ export function GameBoardView() {
   const [like, setLike] = useState(null);
   const [written, setWritten] = useState(null);
   const [writerInfo, setWriterInfo] = useState(null);
+  const [writtenComment, setWrittenComment] = useState(null);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -116,7 +123,14 @@ export function GameBoardView() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchBoardData(id, setBoard, setLike, setWritten, setWriterInfo);
+      await fetchBoardData(
+        id,
+        setBoard,
+        setLike,
+        setWritten,
+        setWriterInfo,
+        setWrittenComment,
+      );
     };
     fetchData();
   }, [id]);
@@ -286,8 +300,33 @@ export function GameBoardView() {
                       </TableContainer>
                     )}
                   </TabPanel>
-                  <TabPanel></TabPanel>
-                  <TabPanel></TabPanel>
+                  <TabPanel>
+                    {writtenComment && (
+                      <TableContainer>
+                        <Table variant="simple">
+                          <TableCaption></TableCaption>
+
+                          <Tbody>
+                            {writtenComment.map((commen) => (
+                              <Tr
+                                key={commen.id}
+                                onClick={() => {
+                                  navigate(`/gameboard/id/${commen.id}`);
+                                  window.scrollTo(0, 0);
+                                }}
+                                _hover={{ cursor: "pointer" }}
+                              >
+                                <TableCaption>
+                                  {commen.comment_content}
+                                </TableCaption>
+                                <Divider />
+                              </Tr>
+                            ))}
+                          </Tbody>
+                        </Table>
+                      </TableContainer>
+                    )}
+                  </TabPanel>
                 </TabPanels>
               </Tabs>
             </AccordionPanel>
