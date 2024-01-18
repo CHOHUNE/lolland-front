@@ -507,26 +507,6 @@ export function ProductView() {
               </Flex>
             </HStack>
 
-            {/* 상세옵션 로직 */}
-            {/*<Box w="100%">*/}
-            {/*  {option.length > 0 && (*/}
-            {/*    <Box w="100%" position="relative" mt={5}>*/}
-            {/*      <Box>*/}
-            {/*        <Select*/}
-            {/*          h={"50px"}*/}
-            {/*          value={seletedOption}*/}
-            {/*          onChange={handleOptionChange}*/}
-            {/*        >*/}
-            {/*          <option value="">옵션을 선택하세요</option>*/}
-            {/*          {option.map((opt, index) => (*/}
-            {/*            <option key={index} value={opt.option_id}>*/}
-            {/*              {opt.option_name} (수량: {opt.stock})*/}
-            {/*            </option>*/}
-            {/*          ))}*/}
-            {/*        </Select>*/}
-            {/*      </Box>*/}
-            {/*    </Box>*/}
-            {/*  )}*/}
             <Box w="100%" mt={5}>
               {option.length > 0 && (
                 <Menu matchWidth>
@@ -553,25 +533,6 @@ export function ProductView() {
                 </Menu>
               )}
 
-              {/*<Menu>*/}
-              {/*  <MenuButton as={Button} w="100%">*/}
-              {/*    옵션을 선택하세요*/}
-              {/*  </MenuButton>*/}
-              {/*  <MenuList w={"100%"}>*/}
-              {/*    {option.map((opt, index) => (*/}
-              {/*      <MenuItem*/}
-              {/*        key={index}*/}
-              {/*        value={opt.option_id}*/}
-              {/*        onClick={() => handleOptionChange(opt.option_id)}*/}
-              {/*      >*/}
-              {/*        <Flex justifyContent="space-between" w="100%">*/}
-              {/*          <Text>{opt.option_name}</Text>*/}
-              {/*          <Text>수량: {opt.stock}</Text>*/}
-              {/*        </Flex>*/}
-              {/*      </MenuItem>*/}
-              {/*    ))}*/}
-              {/*  </MenuList>*/}
-              {/*</Menu>*/}
               <Box>
                 {Object.keys(seletedOptionList).length > 0 &&
                   Object.entries(seletedOptionList).map(
