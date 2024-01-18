@@ -2,16 +2,15 @@ import {
   Box,
   Button,
   ButtonGroup,
-  Collapse,
+  Center,
   Flex,
-  FormControl,
-  FormLabel,
-  Heading,
   IconButton,
   Input,
   InputGroup,
+  InputLeftElement,
   InputRightElement,
-  Skeleton,
+  Select,
+  Spinner,
   Table,
   TableContainer,
   Tag,
@@ -26,6 +25,8 @@ import {
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faAngleLeft,
+  faAngleRight,
   faMagnifyingGlass,
   faPaperPlane,
   faPenToSquare,
@@ -33,9 +34,76 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { Fragment, useEffect, useState } from "react";
-import { Form, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { QnaWrite } from "../qna/QnaWrite";
+
+function PageButton({ variant, pageNumber, children, product_id }) {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+
+  function handleClick() {
+    params.set("product_id", product_id);
+    params.set("p", pageNumber);
+    console.log(params.get("p"));
+    navigate("?" + params);
+  }
+
+  return (
+    <Button variant={variant} onClick={handleClick}>
+      {children}
+    </Button>
+  );
+}
+
+function Pagination({ pageInfo, product_id }) {
+  const pageNumbers = [];
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <Center mt={5} mb={40}>
+      <Box>
+        <ButtonGroup justifyContent="center">
+          {pageInfo.prevPageNumber && (
+            <PageButton
+              variant="ghost"
+              product_id={product_id}
+              pageNumber={pageInfo.prevPageNumber}
+            >
+              <FontAwesomeIcon icon={faAngleLeft} />
+            </PageButton>
+          )}
+
+          {pageNumbers.map((pageNumber) => (
+            <PageButton
+              key={pageNumber}
+              variant={
+                pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
+              }
+              product_id={product_id}
+              pageNumber={pageNumber}
+            >
+              {pageNumber}
+            </PageButton>
+          ))}
+
+          {pageInfo.nextPageNumber && (
+            <PageButton
+              variant="ghost"
+              product_id={product_id}
+              pageNumber={pageInfo.nextPageNumber}
+            >
+              <FontAwesomeIcon icon={faAngleRight} />
+            </PageButton>
+          )}
+        </ButtonGroup>
+      </Box>
+    </Center>
+  );
+}
 
 export function QnaView({
   product_id,
@@ -46,6 +114,7 @@ export function QnaView({
   isAdmin,
 }) {
   const [qnaList, setQnaList] = useState([]);
+  const [pageInfo, setPageInfo] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -55,21 +124,44 @@ export function QnaView({
   const [editedQuestion, setEditedQuestion] = useState([]);
   const [viewMode, setViewMode] = useState(false);
 
+  const location = useLocation();
+
+  const [keyword, setKeyword] = useState("");
+  const [category, setCategory] = useState("all");
+
+  function handleSearch() {
+    const paramsSearch = new URLSearchParams();
+    paramsSearch.set("product_id", product_id);
+    paramsSearch.set("k", keyword);
+    paramsSearch.set("c", category);
+    navigate("?" + paramsSearch);
+  }
+
   useEffect(() => {
     fetchQna();
-  }, []);
+  }, [location]);
 
   function fetchQna() {
+    console.log("location" + location);
+    const params = new URLSearchParams(location.search);
+    params.set("product_id", product_id);
+    params.set("k", keyword);
+    params.set("c", category);
+    console.log(params);
+
     axios
-      .get("/api/qna/list", { params: { product_id: product_id } })
+      .get("/api/qna/list?" + params)
       .then((response) => {
-        setQnaList(response.data);
+        console.log(response);
+        setQnaList(response.data.qnaList);
+        setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
         if (error.response.status === 400) {
           toast({
             title: "Bad Request",
-            description: "프론트엔드 코드와 백엔드 파라미터를 확인해주세요",
+            description:
+              "리스트 로딩 중 에러. 프론트엔드 코드와 백엔드 파라미터를 확인해주세요",
             status: "error",
           });
         } else if (error.response.status === 500) {
@@ -86,6 +178,8 @@ export function QnaView({
           });
         }
       });
+    console.log(qnaList);
+    console.log(pageInfo);
   }
 
   const handleToggle = (questionId) => {
@@ -95,6 +189,10 @@ export function QnaView({
       setOpenId(questionId);
     }
   };
+
+  if (pageInfo === null) {
+    return <Spinner />;
+  }
 
   function handleViewMember() {
     axios
@@ -111,7 +209,7 @@ export function QnaView({
         if (error.response.status === 400) {
           toast({
             title: "Bad Request",
-            description: "프론트와 백엔드 파라미터를 확인해보세요",
+            description: "2프론트와 백엔드 파라미터를 확인해보세요",
             status: "error",
           });
         } else if (error.response.status === 500) {
@@ -151,7 +249,7 @@ export function QnaView({
         if (error.response.status === 400) {
           toast({
             title: "Bad Request",
-            description: "프론트와 백엔드 파라미터를 확인해보세요",
+            description: "5프론트와 백엔드 파라미터를 확인해보세요",
             status: "error",
           });
         } else if (error.response.status === 500) {
@@ -188,7 +286,7 @@ export function QnaView({
         if (error.response.status === 400) {
           toast({
             title: "Bad Request",
-            description: "프론트와 백엔드 파라미터를 확인해보세요",
+            description: "6프론트와 백엔드 파라미터를 확인해보세요",
             status: "error",
           });
         } else if (error.response.status === 500) {
@@ -217,10 +315,29 @@ export function QnaView({
         />
       ) : (
         <>
-          <Flex justifyContent="center" mx="25%" gap={2} my={10}>
+          <Flex justifyContent="center" mx="15%" gap={2} my={10}>
             <InputGroup>
-              <Input borderRadius={0} placeholder="검색어를 입력해주세요" />
-              <InputRightElement bgColor="black">
+              <InputLeftElement w="20%">
+                <Select
+                  border="1px solid black"
+                  borderRadius={0}
+                  defaultValue="all"
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  <option value="all">전체</option>
+                  <option value="title">제목</option>
+                  <option value="content">내용</option>
+                  <option value="id">아이디</option>
+                </Select>
+              </InputLeftElement>
+              <Input
+                borderRadius={0}
+                textIndent="20%"
+                placeholder="검색어를 입력해주세요"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+              />
+              <InputRightElement bgColor="black" onClick={handleSearch}>
                 <FontAwesomeIcon icon={faMagnifyingGlass} color="white" />
               </InputRightElement>
             </InputGroup>
@@ -307,7 +424,14 @@ export function QnaView({
                 {qnaList && qnaList.length > 0 ? (
                   qnaList.map((qna) => (
                     <>
-                      <Tr key={qna.question_id}>
+                      <Tr
+                        key={qna.question_id}
+                        borderBottom={
+                          openId !== qna.question_id &&
+                          !qna.answer_content &&
+                          "1px solid #F4F4F4"
+                        }
+                      >
                         <Td
                           textAlign="left"
                           fontWeight="bold"
@@ -333,13 +457,15 @@ export function QnaView({
                           </Tag>
                         </Td>
                         <Td textAlign="center">
-                          {formattedDate(qna.question_reg_time)}
+                          <Text fontSize="xs" opacity="0.5">
+                            {formattedDate(qna.question_reg_time)}
+                          </Text>
                         </Td>
                       </Tr>
                       {openId === qna.question_id && (
                         <>
                           <Tr>
-                            <Td colSpan={4} border="1px solid black">
+                            <Td colSpan={4} borderBottom="1px solid #F4F4F4">
                               {(hasAccess(qna.member_login_id) ||
                                 isAdmin()) && (
                                 <ButtonGroup
@@ -431,7 +557,7 @@ export function QnaView({
                             </Td>
                           </Tr>
                           {qna.answer_content && (
-                            <Tr>
+                            <Tr borderBottom="1px solid #F4F4F4">
                               <Td colSpan={4} px={10} py={6} bgColor="#F4F4F4">
                                 <Text whiteSpace="pre-wrap" lineHeight="30px">
                                   {qna.answer_content}
@@ -453,6 +579,7 @@ export function QnaView({
               </Tbody>
             </Table>
           </TableContainer>
+          <Pagination product_id={product_id} pageInfo={pageInfo} />
         </>
       )}
     </>

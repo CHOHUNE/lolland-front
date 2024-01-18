@@ -40,13 +40,14 @@ import {
 import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { selectOptions } from "@testing-library/user-event/dist/select-options"; // 빈 하트
-import { ReviewView } from "../review/ReviewView"; // 빈 하트
+import { ReviewView } from "../review/ReviewView";
+import { ProductStats } from "../review/ProductStats"; // 빈 하트
 
 export function ProductView() {
   const [product, setProduct] = useState(null);
   const [option, setOption] = useState([]);
-  const [seletedOption, setSeletedOption] = useState("");
-  const [seletedOptionList, setSeletedOptionList] = useState({});
+  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOptionList, setSelectedOptionList] = useState({});
 
   const { product_id } = useParams();
   const [isFavorited, setIsFavorited] = useState(false); // 찜하기
@@ -102,7 +103,7 @@ export function ProductView() {
   // ------------------------------ 상세 옵션 관련 로직 ------------------------------
   const handleOptionChange = (e) => {
     const selectedValue = e.target.value;
-    setSeletedOption(selectedValue);
+    setSelectedOption(selectedValue);
 
     // 선택된 옵션을 찾아 해당 옵션 정보를 추가
     const selectedOptionInfo = option.find(
@@ -110,7 +111,7 @@ export function ProductView() {
     );
 
     if (selectedOptionInfo) {
-      setSeletedOptionList((prev) => ({
+      setSelectedOptionList((prev) => ({
         ...prev,
         [selectedOptionInfo.option_id]: {
           ...prev[selectedOptionInfo.option_id],
@@ -123,7 +124,7 @@ export function ProductView() {
 
   // ------------------------------ 목록에있는 상품 삭제 로직 ------------------------------
   const handleRemoveDetail = (key) => {
-    setSeletedOptionList((prevDetails) => {
+    setSelectedOptionList((prevDetails) => {
       const { [key]: _, ...rest } = prevDetails;
       return rest;
     });
@@ -131,7 +132,7 @@ export function ProductView() {
 
   // ------------------------------ 수량 증가 로직 ------------------------------
   const increaseQuantity = (key) => {
-    setSeletedOptionList((prevDetails) => {
+    setSelectedOptionList((prevDetails) => {
       const currentQuantity = prevDetails[key].quantity;
       const maxQuantity = prevDetails[key].stock; // 'stock'이 재고 수량을 나타냄
 
@@ -160,7 +161,7 @@ export function ProductView() {
 
   // ------------------------------ 수량 감소 로직 ------------------------------
   const decreaseQuantity = (key) => {
-    setSeletedOptionList((prevDetails) => {
+    setSelectedOptionList((prevDetails) => {
       // 현재 항목의 수량 확인
       const currentQuantity = prevDetails[key].quantity;
 
@@ -184,9 +185,9 @@ export function ProductView() {
   // ------------------------------ 수량에 따라 총 가격 계산 로직 ------------------------------
   const calculateTotalPrice = () => {
     // 상세선택이 있고 선택된 상세선택이 있는 경우
-    if (option.length > 0 && Object.keys(seletedOptionList).length > 0) {
+    if (option.length > 0 && Object.keys(selectedOptionList).length > 0) {
       return formatPrice(
-        Object.values(seletedOptionList).reduce((sum, optionItem) => {
+        Object.values(selectedOptionList).reduce((sum, optionItem) => {
           // 옵션 가격이 있으면 사용, 없으면 기본 상품 가격 사용
           const pricePerItem =
             optionItem.price || product.product.product_price;
@@ -224,7 +225,7 @@ export function ProductView() {
     axios
       .post("/api/cart/add", {
         product_id: product_id,
-        seletedOptionList: seletedOptionList,
+        selectedOptionList: selectedOptionList,
       })
       .then(() => {
         toast({
@@ -234,7 +235,7 @@ export function ProductView() {
       })
       .catch(() => {
         toast({
-          description: "이동중 오류가 발생하였습니다.",
+          description: "장바구니로 이동 중 오류가 발생하였습니다.",
           status: "error",
         });
       });
@@ -485,7 +486,10 @@ export function ProductView() {
               {option.length > 0 && (
                 <Box w="100%" position="relative" mt={5}>
                   <Box>
-                    <Select value={seletedOption} onChange={handleOptionChange}>
+                    <Select
+                      value={selectedOption}
+                      onChange={handleOptionChange}
+                    >
                       <option value="">옵션을 선택하세요</option>
                       {option.map((opt, index) => (
                         <option key={index} value={opt.option_id}>
@@ -497,8 +501,8 @@ export function ProductView() {
                 </Box>
               )}
               <Box>
-                {Object.keys(seletedOptionList).length > 0 &&
-                  Object.entries(seletedOptionList).map(
+                {Object.keys(selectedOptionList).length > 0 &&
+                  Object.entries(selectedOptionList).map(
                     ([key, optionList], index) => (
                       <Box
                         mt={5}

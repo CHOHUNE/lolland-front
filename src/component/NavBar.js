@@ -5,6 +5,7 @@ import {
   Flex,
   HStack,
   IconButton,
+  Image,
   Tab,
   TabList,
   TabPanel,
@@ -35,7 +36,8 @@ export function NavBar() {
   const [categories, setCategories] = useState([]);
   const [index, setIndex] = useState(null);
   const toast = useToast();
-  const { fetchLogin, isAdmin, isAuthenticated, hasAccess } = useContext(LoginContext);
+  const { fetchLogin, isAdmin, isAuthenticated, hasAccess } =
+    useContext(LoginContext);
 
   // 카테고리 불러오기
   useEffect(() => {
@@ -105,6 +107,7 @@ export function NavBar() {
           justifyContent="space-between"
           p={5}
           w="full"
+          px="3%"
           shadow="sm"
           position="fixed"
           zIndex={100}
@@ -112,14 +115,14 @@ export function NavBar() {
         >
           <Flex>
             <Box
-              w="200px"
-              border="1px dashed black"
+              w="100px"
+              // border="1px dashed black"
               display="flex"
               alignItems="center"
               justifyContent="center"
               textAlign="center"
             >
-              로고
+              <Image src="/logo.png" boxSize="100%" objectFit="fit" />
             </Box>
             <ButtonGroup variant="undefined" size="lg">
               <Button onClick={() => navigate("/")}>HOME</Button>
@@ -162,6 +165,7 @@ export function NavBar() {
                   fontSize="xs"
                   bgColor="orange"
                   color="black"
+                  fontWeight="bold"
                   borderRadius={10}
                   gutter={0}
                   isOpen={true}
@@ -234,7 +238,7 @@ export function NavBar() {
             px={10}
             left={0}
             right={0}
-            top="54px"
+            top="53px"
             zIndex={100}
             backgroundColor="white"
             position="absolute"
