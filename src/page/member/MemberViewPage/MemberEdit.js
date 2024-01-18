@@ -9,6 +9,7 @@ import {
   Flex,
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   Input,
   Spinner,
@@ -55,20 +56,9 @@ export function MemberEdit() {
   // 맴버 타입 --------------------------------------------------------------------------------------
   const [member_type, setMember_type] = useState("");
 
-  // 아이디 변경 인식 --------------------------------------------------------------------------------------
-  const [nameChangeCheck, setNameChangeCheck] = useState(true);
-
   // 회원 정보 변경 인식 --------------------------------------------------------------------------------------
   // true 면 수정하기 버튼 비활셩화 false 일때 수정하기 버튼 활성화 되게 함
   const [editChangeCheck, setEditChangeCheck] = useState(true);
-
-  useEffect(() => {
-    if (nameChangeCheck) {
-      setEditChangeCheck(false);
-    } else {
-      setEditChangeCheck(true);
-    }
-  }, [nameChangeCheck]);
 
   const navigate = useNavigate();
 
@@ -97,6 +87,7 @@ export function MemberEdit() {
 
     setMember_address(fullAddress); // 선택된 주소를 상태에 저장
     setMember_post_code(data.zonecode);
+    setEditChangeCheck(false);
   };
 
   useEffect(() => {
@@ -150,6 +141,7 @@ export function MemberEdit() {
 
   // 핸드폰 인풋 1 ---------------------------------------------------------------------------------------
   const handlePhoneInput1Change = (e) => {
+    setEditChangeCheck(false);
     setMember_phone_number1(e.target.value);
     if (e.target.value.length === 3) {
       phoneInput2Ref.current.focus();
@@ -158,6 +150,7 @@ export function MemberEdit() {
 
   // 핸드폰 인풋 2 ---------------------------------------------------------------------------------------
   const handlePhoneInput2Change = (e) => {
+    setEditChangeCheck(false);
     setMember_phone_number2(e.target.value);
     if (e.target.value.length === 4) {
       phoneInput3Ref.current.focus();
@@ -207,6 +200,11 @@ export function MemberEdit() {
       .finally();
   }
 
+  // 비밀번호 수정 버튼 클릭시 ---------------------------------------------
+  function handleEditPasswordClick() {
+    navigate("/memberPage/passwordEdit");
+  }
+
   return (
     <Center>
       <Card w={"700px"}>
@@ -223,8 +221,8 @@ export function MemberEdit() {
                 w={"500px"}
                 h={"50px"}
                 borderRadius={"0"}
+                readOnly
                 value={member_name}
-                onChange={(e) => setMember_name(e.target.value)}
               />
             </Flex>
           </FormControl>
@@ -236,24 +234,18 @@ export function MemberEdit() {
                 아이디
               </FormLabel>
               <Input
-                w={"350px"}
+                w={"500px"}
                 h={"50px"}
                 borderRadius={"0"}
+                readOnly
                 value={member_login_id}
-                onChange={(e) => {
-                  setMember_login_id(e.target.value);
-                  setNameChangeCheck(false);
-                }}
               />
-              <Button
-                isDisabled={nameChangeCheck}
-                w={"140px"}
-                h={"50px"}
-                ml={"10px"}
-              >
-                중복확인
-              </Button>
             </Flex>
+            <Center mb={4}>
+              <FormHelperText fontSize={"1.1rem"}>
+                이름과 아이디는 수정 불가능 합니다.
+              </FormHelperText>
+            </Center>
           </FormControl>
 
           {/* 비밀번호 */}
@@ -272,6 +264,7 @@ export function MemberEdit() {
                   color: "whitesmoke",
                   fontWeight: "700",
                 }}
+                onClick={handleEditPasswordClick}
               >
                 비밀번호 수정
               </Button>
@@ -330,7 +323,10 @@ export function MemberEdit() {
                 h={"50px"}
                 borderRadius={"0"}
                 value={member_phone_number3}
-                onChange={(e) => setMember_phone_number3(e.target.value)}
+                onChange={(e) => {
+                  setMember_phone_number3(e.target.value);
+                  setEditChangeCheck(false);
+                }}
               />
             </Flex>
           </FormControl>
@@ -347,7 +343,10 @@ export function MemberEdit() {
                 h={"50px"}
                 borderRadius={"0"}
                 value={member_email1}
-                onChange={(e) => setMember_email1(e.target.value)}
+                onChange={(e) => {
+                  setMember_email1(e.target.value);
+                  setEditChangeCheck(false);
+                }}
               />
               <Box
                 fontSize={"1.1rem"}
@@ -363,7 +362,10 @@ export function MemberEdit() {
                 h={"50px"}
                 borderRadius={"0"}
                 value={member_email2}
-                onChange={(e) => setMember_email2(e.target.value)}
+                onChange={(e) => {
+                  setMember_email2(e.target.value);
+                  setEditChangeCheck(false);
+                }}
               />
             </Flex>
           </FormControl>
@@ -375,7 +377,6 @@ export function MemberEdit() {
                 우편번호
               </FormLabel>
               <Input
-                // value={member_post_code}
                 w={"350px"}
                 h={"50px"}
                 borderRadius={"0"}
@@ -419,7 +420,10 @@ export function MemberEdit() {
                 h={"50px"}
                 borderRadius={"0"}
                 value={member_detail_address}
-                onChange={(e) => setMember_detail_address(e.target.value)}
+                onChange={(e) => {
+                  setMember_detail_address(e.target.value);
+                  setEditChangeCheck(false);
+                }}
               />
             </Flex>
           </FormControl>

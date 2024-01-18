@@ -16,8 +16,12 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export function MemberFindPassword() {
   // 아이디
@@ -27,9 +31,72 @@ export function MemberFindPassword() {
   const [email1, setEmail1] = useState("");
   const [email2, setEmail2] = useState("");
 
+  // 임시 비밀번호
+  const [randomPassword, setRandomPassword] = useState("");
+
+  const toast = useToast();
+
+  const navigate = useNavigate();
+
+  const { isOpen, onClose, onOpen } = useDisclosure();
+
   useEffect(() => {
     setMember_email(email1 + "@" + email2);
   }, [email1, email2]);
+
+  // 비밀번호 찾기 버튼 클릭 --------------------------------------
+  function handleFindPasswordClick() {
+    // 찾기 버튼을 누르면 난수 생성 하기 ( 문자열과 숫자를 섞어서 생성 )----------------------------
+    const randomNumber = Math.random().toString(36).substr(2, 9);
+
+    // 해당 맴버가 DB에 존재 하는지 확인 ----------------------------
+    axios
+      .get("/api/member/findPassword", {
+        params: {
+          member_login_id,
+          member_email,
+        },
+      })
+      .then(() => setRandomPassword(randomNumber))
+      .then(() => {
+        // 임시 비밀 번호 발급 모달 띄우기
+        onOpen();
+      })
+      .catch(() => {
+        toast({ description: "회원 정보가 없습니다.", status: "error" });
+      });
+  }
+
+  // 모달 창 내의 발송 버튼 클릭시 로직 --------------------------------------------------
+  function handleModalSendClick() {
+    // 메일로 임시 비밀 번호 발송 하기 --------------------------------------------------
+    axios
+      .post("/api/memberEmail/findPassword", {
+        member_email,
+        message: randomPassword,
+      })
+      .then(() => {
+        // 임시 비밀번호가 발송 되면 회원의 비밀번호 변경 하기 -------------------------------
+        axios.put("/api/member/setRandomPassword", {
+          member_login_id,
+          member_password: randomPassword,
+        });
+      })
+      .then(() =>
+        toast({
+          description: "등록된 메일로 임시 비밀번호가 발급 되었습니다.",
+          status: "success",
+        }),
+      )
+      .then(() => navigate("/login"))
+      .catch(() => {
+        toast({
+          description: "메일 발송중 문제가 발생 하였습니다.",
+          status: "error",
+        });
+      })
+      .finally(onClose);
+  }
 
   return (
     <Center mt={8} mb={20}>
@@ -103,7 +170,7 @@ export function MemberFindPassword() {
                 fontSize: "1.1rem",
                 fontWeight: "900",
               }}
-              // onClick={handleFindIdClick}
+              onClick={handleFindPasswordClick}
             >
               비밀번호 찾기
             </Button>
@@ -113,39 +180,42 @@ export function MemberFindPassword() {
 
       {/* 아이디 찾기 성공시 오픈할 모달 */}
       <>
-        <Modal
-        // isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false}
-        >
+        <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
-          <ModalContent>
-            <ModalHeader textAlign={"center"}>
-              가입하신 이메일로 ID 를 발송 하였습니다.
+          <ModalContent textAlign={"center"}>
+            <ModalHeader fontSize={"1.5rem"} fontWeight={"900"}>
+              비밀 번호를 재발급 받으시겠습니까?
             </ModalHeader>
             <ModalBody>
-              {/*<Box fontSize={"10rem"} textAlign={"center"}>*/}
-              {/*  {showSpinner && (*/}
-              {/*    <FontAwesomeIcon icon={faSpinner} spinPulse color={"black"} />*/}
-              {/*  )}*/}
-              {/*  {showCheckCircle && (*/}
-              {/*    <FontAwesomeIcon*/}
-              {/*      icon={faCheckCircle}*/}
-              {/*      bounce={1}*/}
-              {/*      color={"green"}*/}
-              {/*    />*/}
-              {/*  )}*/}
-              {/*</Box>*/}
+              <Box mt={4}>등록된 이메일 : {member_email}</Box>
+              <Box mt={2} fontWeight={"bold"}>
+                임시 비밀번호가 발송 됩니다.
+              </Box>
             </ModalBody>
 
-            <ModalFooter>
-              <Button
-                bg={"black"}
-                color={"whitesmoke"}
-                _hover={{ backgroundColor: "whitesmoke", color: "black" }}
-                mr={3}
-                // onClick={handleModalCloseClick}
-              >
-                Close
-              </Button>
+            <ModalFooter mt={4}>
+              <Flex gap={2}>
+                <Button
+                  w={"80px"}
+                  bg={"whitesmoke"}
+                  color={"black"}
+                  _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+                  mr={3}
+                  onClick={onClose}
+                >
+                  취소
+                </Button>
+                <Button
+                  w={"80px"}
+                  bg={"black"}
+                  color={"whitesmoke"}
+                  _hover={{ backgroundColor: "whitesmoke", color: "black" }}
+                  mr={3}
+                  onClick={handleModalSendClick}
+                >
+                  발송
+                </Button>
+              </Flex>
             </ModalFooter>
           </ModalContent>
         </Modal>
