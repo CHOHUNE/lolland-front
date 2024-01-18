@@ -1,11 +1,14 @@
 import {
   Box,
   Button,
+  Center,
   Flex,
   FormControl,
   FormLabel,
   Input,
   Select,
+  Text,
+  Textarea,
   useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
@@ -91,7 +94,6 @@ export function ProductWrite() {
         product_content: content,
         product_price: price,
         company_name: manufacturer,
-        total_stock: stock,
         mainImg,
         contentImg,
         category_id: selectedCategory?.category_id,
@@ -137,122 +139,139 @@ export function ProductWrite() {
 
   return (
     <Box>
-      <h1>상품 작성</h1>
-      {/* ---------------------------------- 대분류 , 소분류 나누는 로직 ---------------------------------- */}
-      <Box>
-        <>
-          {/* categories가 없을 때 (초기값, 에러) 대비해 null return으로 처리 */}
-          {categories.length === 0 ? null : (
-            <Select onChange={handleCategoryChange}>
-              <option value="">---대분류 선택---</option>
-              {categories.map((category) => (
-                <option key={category.category_id} value={category.category_id}>
-                  {category.category_name}
-                </option>
-              ))}
-            </Select>
-          )}
-          {selectedCategory && (
-            <Select onChange={handleSubCategoryChange}>
-              <option value="">---소분류 선택---</option>
-              {selectedCategory.subCategory.map((subCategory) => (
-                <option
-                  key={subCategory.subcategory_id}
-                  value={subCategory.subcategory_id}
-                >
-                  {subCategory.subcategory_name}
-                </option>
-              ))}
-            </Select>
-          )}
-        </>
-
-        <FormControl mt={10}>
-          <FormLabel>상품명</FormLabel>
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>상품설명</FormLabel>
-          <Input value={content} onChange={(e) => setContent(e.target.value)} />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>제조사</FormLabel>
-          <Input
-            value={manufacturer}
-            onChange={(e) => setManufacturer(e.target.value)}
-          />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>판매가</FormLabel>
-          <Input value={price} onChange={(e) => setPrice(e.target.value)} />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>메인 이미지</FormLabel>
-          <Input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => setMainImg(e.target.files)}
-          />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>설명 이미지</FormLabel>
-          <Input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => setContentImg(e.target.files)}
-          />
-        </FormControl>
-
+      <Text
+        fontSize={"1.5rem"}
+        fontWeight={"bold"}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
+      >
+        상품등록
+      </Text>
+      <Center>
+        {/* ---------------------------------- 대분류 , 소분류 나누는 로직 ---------------------------------- */}
         <Box>
-          {options.map((option, index) => (
-            <Flex key={index} align="center">
-              <FormControl mr={2}>
-                <FormLabel>{`옵션 ${index + 1}`}</FormLabel>
-                <Input
-                  value={option.option_name}
-                  placeholder="예) 화이트/청축"
-                  onChange={(e) =>
-                    handleOptionChange(index, "option_name", e.target.value)
-                  }
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>수량</FormLabel>
-                <Input
-                  type="number"
-                  value={option.stock}
-                  onChange={(e) =>
-                    handleOptionChange(index, "stock", e.target.value)
-                  }
-                />
-              </FormControl>
-              <Button
-                ml={2}
-                onClick={() => handleRemoveOption(index)}
-                colorScheme="pink"
-              >
-                삭제
+          <>
+            {/* categories가 없을 때 (초기값, 에러) 대비해 null return으로 처리 */}
+            {categories.length === 0 ? null : (
+              <Select onChange={handleCategoryChange}>
+                <option value="">---대분류 선택---</option>
+                {categories.map((category) => (
+                  <option
+                    key={category.category_id}
+                    value={category.category_id}
+                  >
+                    {category.category_name}
+                  </option>
+                ))}
+              </Select>
+            )}
+            {selectedCategory && (
+              <Select onChange={handleSubCategoryChange}>
+                <option value="">---소분류 선택---</option>
+                {selectedCategory.subCategory.map((subCategory) => (
+                  <option
+                    key={subCategory.subcategory_id}
+                    value={subCategory.subcategory_id}
+                  >
+                    {subCategory.subcategory_name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </>
+
+          <FormControl mt={10}>
+            <FormLabel>상품명</FormLabel>
+            <Input value={name} onChange={(e) => setName(e.target.value)} />
+          </FormControl>
+
+          <FormControl mt={3}>
+            <FormLabel>상품설명</FormLabel>
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
+          </FormControl>
+
+          <FormControl mt={3}>
+            <FormLabel>제조사</FormLabel>
+            <Input
+              value={manufacturer}
+              onChange={(e) => setManufacturer(e.target.value)}
+            />
+          </FormControl>
+
+          <FormControl mt={3}>
+            <FormLabel>판매가</FormLabel>
+            <Input value={price} onChange={(e) => setPrice(e.target.value)} />
+          </FormControl>
+
+          <FormControl mt={3}>
+            <FormLabel>메인 이미지</FormLabel>
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => setMainImg(e.target.files)}
+            />
+          </FormControl>
+
+          <FormControl mt={3}>
+            <FormLabel>설명 이미지</FormLabel>
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => setContentImg(e.target.files)}
+            />
+          </FormControl>
+
+          <Box mt={3}>
+            {options.map((option, index) => (
+              <Flex key={index} align="center">
+                <FormControl mr={2}>
+                  <FormLabel>{`옵션 ${index + 1}`}</FormLabel>
+                  <Input
+                    value={option.option_name}
+                    placeholder="예) 화이트/청축"
+                    onChange={(e) =>
+                      handleOptionChange(index, "option_name", e.target.value)
+                    }
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>수량</FormLabel>
+                  <Input
+                    type="number"
+                    value={option.stock}
+                    onChange={(e) =>
+                      handleOptionChange(index, "stock", e.target.value)
+                    }
+                  />
+                </FormControl>
+                <Button
+                  ml={2}
+                  mt={8}
+                  onClick={() => handleRemoveOption(index)}
+                  colorScheme="pink"
+                >
+                  삭제
+                </Button>
+              </Flex>
+            ))}
+            <Flex justifyContent="center" mt={4}>
+              <Button colorScheme="teal" onClick={handleAddOption}>
+                상세 옵션 추가
               </Button>
             </Flex>
-          ))}
-          <Flex justifyContent="center" mt={4}>
-            <Button colorScheme="teal" onClick={handleAddOption}>
-              상세 옵션 추가
-            </Button>
-          </Flex>
-        </Box>
+          </Box>
 
-        <Button mt={10} colorScheme="blue" onClick={handleSubmit}>
-          저장
-        </Button>
-      </Box>
+          <Button mt={10} colorScheme="blue" onClick={handleSubmit}>
+            저장
+          </Button>
+        </Box>
+      </Center>
     </Box>
   );
 }

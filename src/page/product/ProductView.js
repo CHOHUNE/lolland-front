@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Button,
+  Card,
   Center,
   Flex,
   FormLabel,
   HStack,
   Image,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -32,20 +37,26 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar as farStar } from "@fortawesome/free-regular-svg-icons"; // 꽉 찬 아이콘
 import {
   faCartShopping,
   faHeart as fasHeart,
-} from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 하트
-import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
+  faSpinner,
+  faStar,
+  faStarHalfAlt,
+} from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 아이콘
+import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons"; // 빈 아이콘
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
-import { selectOptions } from "@testing-library/user-event/dist/select-options"; // 빈 하트
-import { ReviewView } from "../review/ReviewView"; // 빈 하트
+import { ReviewView } from "../review/ReviewView";
+import { LoginContext } from "../../component/LoginProvider";
 
 export function ProductView() {
   const [product, setProduct] = useState(null);
   const [option, setOption] = useState([]);
   const [seletedOption, setSeletedOption] = useState("");
   const [seletedOptionList, setSeletedOptionList] = useState({});
+
+  const { isAuthenticated } = useContext(LoginContext);
 
   const { product_id } = useParams();
   const [isFavorited, setIsFavorited] = useState(false); // 찜하기
@@ -72,20 +83,34 @@ export function ProductView() {
 
   // ---------------------------- 찜한 내역 가져오는 렌더링 ----------------------------
   useEffect(() => {
-    axios
-      .get("/api/productLike/" + product_id)
-      .then((response) => {
+    if (isAuthenticated()) {
+      axios.get("/api/productLike/" + product_id).then((response) => {
         setIsFavorited(response.data.productLike);
-      })
-      .catch((error) => {
-        console.error("Error fetching product like status:", error);
       });
+    }
   }, [product_id]);
 
   // ---------------------------- 로딩로직 ----------------------------
+  const FullPageSpinner = () => {
+    return (
+      <Flex
+        position="fixed"
+        top="0"
+        left="0"
+        right="0"
+        bottom="0"
+        justifyContent="center"
+        alignItems="center"
+        backgroundColor="rgba(0,0,0,0.3)"
+        zIndex="9999"
+      >
+        <Spinner size="xl" color="white" />
+      </Flex>
+    );
+  };
 
   if (product === null) {
-    return <Spinner />;
+    return <FullPageSpinner />;
   }
 
   // ------------------------------ 가격 ex) 1,000 ,로 구분지어 보여지게 처리 ------------------------------
@@ -99,24 +124,21 @@ export function ProductView() {
   };
 
   // ------------------------------ 상세 옵션 관련 로직 ------------------------------
-  const handleOptionChange = (e) => {
-    const selectedValue = e.target.value;
-    setSeletedOption(selectedValue);
-
-    // 선택된 옵션을 찾아 해당 옵션 정보를 추가
-    const selectedOptionInfo = option.find(
-      (opt) => opt.option_id.toString() === selectedValue,
-    );
+  const handleOptionChange = (optionId) => {
+    // 선택된 옵션의 정보를 가져옵니다.
+    const selectedOptionInfo = option.find((opt) => opt.option_id === optionId);
 
     if (selectedOptionInfo) {
+      // 선택된 옵션을 상태에 추가합니다.
       setSeletedOptionList((prev) => ({
         ...prev,
         [selectedOptionInfo.option_id]: {
-          ...prev[selectedOptionInfo.option_id],
           ...selectedOptionInfo,
           quantity: prev[selectedOptionInfo.option_id]?.quantity || 1,
         },
       }));
+      // 선택된 옵션 ID를 상태에 설정합니다.
+      setSeletedOption(selectedOptionInfo.option_id.toString());
     }
   };
 
@@ -182,20 +204,29 @@ export function ProductView() {
 
   // ------------------------------ 수량에 따라 총 가격 계산 로직 ------------------------------
   const calculateTotalPrice = () => {
-    // 상세선택이 있고 선택된 상세선택이 있는 경우
+    // 옵션이 있지만, 모든 옵션이 빈 문자열("")인 경우 기본 상품 가격 반환
+    if (option.every((opt) => opt.option_name === "")) {
+      return formatPrice(product.product.product_price);
+    }
+
+    // 옵션이 있고, 아직 선택되지 않았다면 0원 반환
+    if (option.length > 0 && Object.keys(seletedOptionList).length === 0) {
+      return formatPrice(0);
+    }
+
+    // 옵션이 있고 선택된 옵션이 있다면, 옵션 가격을 계산
     if (option.length > 0 && Object.keys(seletedOptionList).length > 0) {
       return formatPrice(
         Object.values(seletedOptionList).reduce((sum, optionItem) => {
-          // 옵션 가격이 있으면 사용, 없으면 기본 상품 가격 사용
-          const pricePerItem =
-            optionItem.price || product.product.product_price;
-          // 해당 옵션의 총 가격 = 가격 * 수량
-          return sum + pricePerItem * optionItem.quantity;
+          // 옵션 가격이 정의되어 있고, option_name이 빈 문자열이 아닐 때만 가격을 더함
+          if (optionItem.price && optionItem.option_name !== "") {
+            return sum + optionItem.price * optionItem.quantity;
+          }
+          // 옵션 가격이 정의되어 있지 않은 경우 기본 상품 가격을 사용
+          return sum + product.product.product_price * optionItem.quantity;
         }, 0),
       );
     }
-    // 상세선택이 없는 경우 기본 상품 가격 반환
-    return formatPrice(option.length > 0 ? 0 : product.product.product_price);
   };
 
   // ------------------------------ 게시물 삭제 로직 ------------------------------
@@ -220,10 +251,12 @@ export function ProductView() {
 
   // ------------------------------ 장바구니로 정보 전달 로직 ------------------------------
   function handleBucketClick() {
+    const optionsArray = Object.values(seletedOptionList);
+
     axios
       .post("/api/cart/add", {
         product_id: product_id,
-        seletedOptionList: seletedOptionList,
+        selectedOptionList: optionsArray,
       })
       .then(() => {
         toast({
@@ -261,24 +294,71 @@ export function ProductView() {
     // UI를 먼저 업데이트하고 서버 요청을 보냄
     setIsFavorited(newFavoriteStatus);
     // 서버에 좋아요 상태 전송
-    axios
-      .post("/api/productLike", {
-        product_id: product_id,
-        isFavorited: newFavoriteStatus,
-      })
-      .then(() => {
-        toast({
-          description: "상품 찜목록에 저장되었습니다.",
-          status: "success",
+    if (isFavorited !== true) {
+      axios
+        .post("/api/productLike", {
+          product_id: product_id,
+          isFavorited: newFavoriteStatus,
+        })
+        .then(() => {
+          toast({
+            description: "상품 찜목록에 저장되었습니다.",
+            status: "success",
+          });
+        })
+        .catch((error) => {
+          toast({
+            description: "로그인 해주시기 바랍니다.",
+            status: "error",
+          });
+          setIsFavorited(!newFavoriteStatus);
         });
-      })
-      .catch((error) => {
-        toast({
-          description: "찜목록으로 이동되지 않았습니다.",
-          status: "error",
+    } else {
+      axios
+        .post("/api/productLike", {
+          product_id: product_id,
+          isFavorited: newFavoriteStatus,
+        })
+        .then(() => {
+          toast({
+            description: "상품 찜목록에서 삭제되었습니다.",
+            status: "error",
+          });
+        })
+        .catch((error) => {
+          toast({
+            description: "로그인 해주시기 바랍니다.",
+            status: "error",
+          });
+          setIsFavorited(!newFavoriteStatus);
         });
-        setIsFavorited(!newFavoriteStatus);
-      });
+    }
+  };
+
+  // ----------------------------------- 평점 별 표시 로직 -----------------------------------
+  const renderStars = (rate) => {
+    // 평점이 없거나 0인 경우 빈 별 5개로 출력
+    if (rate == null || rate === 0) {
+      return Array.from({ length: 5 }, (_, i) => (
+        <FontAwesomeIcon icon={farStar} color="#EAEAE7" key={i} />
+      ));
+    }
+    let stars = [];
+    for (let i = 0; i < 5; i++) {
+      if (i < Math.floor(rate)) {
+        // 꽉찬 별
+        stars.push(<FontAwesomeIcon icon={faStar} color="#FFE000" key={i} />);
+      } else if (i === Math.floor(rate) && !Number.isInteger(rate)) {
+        // 반쪽 별
+        stars.push(
+          <FontAwesomeIcon icon={faStarHalfAlt} color="#FFE000" key={i} />,
+        );
+      } else {
+        // 빈 별
+        stars.push(<FontAwesomeIcon icon={farStar} color="#EAEAE7" key={i} />);
+      }
+    }
+    return stars;
   };
 
   return (
@@ -306,7 +386,7 @@ export function ProductView() {
         <Box justify="center" align="start" maxW="100%" m="auto">
           {/* ---------------------- 상품명 ---------------------- */}
           <Text ml={4} fontWeight={"bold"} fontSize={"1.7rem"}>
-            [{product.company_name}]{product.product.product_name}
+            [{product.company_name}] {product.product.product_name}
           </Text>
 
           {/* ---------------------- 상품설명 ---------------------- */}
@@ -315,7 +395,7 @@ export function ProductView() {
           </Text>
         </Box>
 
-        <Flex minW={"500px"} mt={-10}>
+        <Flex minW="1000px" maxW="1500px" mt={-5}>
           {/* 메인 이미지 */}
           <Box p={2}>
             {product &&
@@ -332,7 +412,7 @@ export function ProductView() {
               )}
 
             {/* 썸네일 이미지 */}
-            <HStack justifyContent={"center"} mt={2}>
+            <HStack justifyContent={"center"} mt={-10}>
               {product &&
                 product.productImgs &&
                 product.productImgs.map((img, index) => (
@@ -373,17 +453,6 @@ export function ProductView() {
             <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
               <HStack mt={3} mb={3}>
                 <FormLabel w={"100px"} fontWeight="bold">
-                  총 재고
-                </FormLabel>
-                <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
-                  {product.product.total_stock}개
-                </Box>
-              </HStack>
-            </HStack>
-
-            <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
-              <HStack mt={3} mb={3}>
-                <FormLabel w={"100px"} fontWeight="bold">
                   제조사
                 </FormLabel>
                 <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
@@ -398,7 +467,10 @@ export function ProductView() {
                   평점
                 </FormLabel>
                 <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
-                  {product.product.average_rate}
+                  {renderStars(product.product.average_rate)}{" "}
+                  {product.product.average_rate !== null
+                    ? product.product.average_rate
+                    : "0"}
                 </Text>
               </HStack>
             </HStack>
@@ -451,22 +523,55 @@ export function ProductView() {
               </Flex>
             </HStack>
 
-            {/* 상세옵션 로직 */}
-            <Box w="100%">
-              {option.length > 0 && (
-                <Box w="100%" position="relative" mt={5}>
-                  <Box>
-                    <Select value={seletedOption} onChange={handleOptionChange}>
-                      <option value="">옵션을 선택하세요</option>
-                      {option.map((opt, index) => (
-                        <option key={index} value={opt.option_id}>
-                          {opt.option_name}
-                        </option>
-                      ))}
-                    </Select>
+            <Box w="100%" mt={5}>
+              {
+                // 상품 옵션 목록이 있고, 모든 옵션의 이름이 비어있지 않으면 메뉴를 표시합니다.
+                // 그렇지 않은 경우(옵션이 없거나 이름이 비어있는 옵션이 있는 경우), 기본 상품명을 표시하는 목록을 렌더링합니다.
+                option.length === 0 ||
+                option.some((opt) => opt.option_name === "") ? (
+                  // 옵션이 없거나 옵션 이름이 비어있는 경우
+                  <Box mt={5} bg="#F9F9F9" border="1px solid #F9F9F9">
+                    <Flex justify="space-between" p={4}>
+                      <Text>{product.product.product_name}</Text>
+                      {/* 수량 조절 버튼 및 수량 표시 */}
+                      <HStack
+                        spacing={0}
+                        border="1px solid gray"
+                        borderRadius="10px"
+                        bg="white"
+                        m={3}
+                      >
+                        {/* 이 부분은 상품 수량 조절 로직에 따라 조건부 렌더링되어야 합니다. */}
+                      </HStack>
+                    </Flex>
                   </Box>
-                </Box>
-              )}
+                ) : (
+                  // 옵션이 있고 모든 옵션의 이름이 비어있지 않은 경우
+                  <Menu matchWidth>
+                    <MenuButton as={Button} w="100%" h="50px">
+                      {seletedOption
+                        ? option.find(
+                            (opt) => opt.option_id.toString() === seletedOption,
+                          )?.option_name || "옵션을 선택하세요"
+                        : "옵션을 선택하세요"}
+                    </MenuButton>
+                    <MenuList>
+                      {option.map((opt, index) => (
+                        <MenuItem
+                          key={index}
+                          onClick={() => handleOptionChange(opt.option_id)}
+                        >
+                          <Flex justifyContent="space-between" w="100%">
+                            <Text>{opt.option_name}</Text>
+                            <Text>수량: {opt.stock}</Text>
+                          </Flex>
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                )
+              }
+
               <Box>
                 {Object.keys(seletedOptionList).length > 0 &&
                   Object.entries(seletedOptionList).map(
@@ -569,7 +674,7 @@ export function ProductView() {
                     <Text
                       style={{
                         color: "red",
-                        fontSize: "25px",
+                        fontSize: "2rem",
                         fontWeight: "bold",
                       }}
                     >
