@@ -35,7 +35,8 @@ export function NavBar() {
   const [categories, setCategories] = useState([]);
   const [index, setIndex] = useState(null);
   const toast = useToast();
-  const { fetchLogin, isAdmin, isAuthenticated, hasAccess } = useContext(LoginContext);
+  const { fetchLogin, isAdmin, isAuthenticated, hasAccess } =
+    useContext(LoginContext);
 
   // 카테고리 불러오기
   useEffect(() => {
@@ -253,7 +254,9 @@ export function NavBar() {
             >
               <VStack spacing={2} align="flex-start">
                 <Text>게임 커뮤니티</Text>
-                <Text>게임 장비 커뮤니티</Text>
+                <Text onClick={() => navigate("/gearlistlayout")}>
+                  게임 장비 커뮤니티
+                </Text>
               </VStack>
             </TabPanel>
             {categories.map((category) => (
