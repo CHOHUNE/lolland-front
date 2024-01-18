@@ -163,6 +163,7 @@ export function NavBar() {
                   fontSize="xs"
                   bgColor="orange"
                   color="black"
+                  fontWeight="bold"
                   borderRadius={10}
                   gutter={0}
                   isOpen={true}

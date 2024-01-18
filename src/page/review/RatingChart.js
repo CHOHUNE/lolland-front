@@ -1,8 +1,8 @@
 import React, { useRef, useEffect } from "react";
-import Chart from "chart.js/auto";
+import { Chart, Tooltip, TooltipItem } from "chart.js/auto";
 import { Bar } from "react-chartjs-2";
 
-const RatingChart = ({ ratingDistribution }) => {
+const RatingChart = ({ ratingDistribution, boxDimensions }) => {
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -10,17 +10,21 @@ const RatingChart = ({ ratingDistribution }) => {
       chartRef.current.destroy();
     }
 
-    const labels = Object.keys(ratingDistribution);
-    const data = Object.values(ratingDistribution);
+    const labels = [0, 1, 2, 3, 4, 5];
+    const data = labels.map((label) =>
+      ratingDistribution[label] !== undefined ? ratingDistribution[label] : 0,
+    );
+
+    const chartContainer = document.getElementById("rating-chart");
+    chartContainer.width = boxDimensions.width;
+    chartContainer.height = boxDimensions.height;
 
     const chartData = {
       labels: labels.map(Number),
       datasets: [
         {
           data: data,
-          backgroundColor: "red",
-          // borderColor: "rgba(75,192,192,1)",
-          // borderWidth: 1,
+          backgroundColor: "orange",
         },
       ],
     };
@@ -33,6 +37,10 @@ const RatingChart = ({ ratingDistribution }) => {
           grid: {
             display: false,
           },
+          ticks: {
+            minTicksLimit: 6,
+            maxTicksLimit: 6,
+          },
         },
         y: {
           beginAtZero: true,
@@ -40,8 +48,36 @@ const RatingChart = ({ ratingDistribution }) => {
         },
       },
       plugins: {
+        title: {
+          display: true,
+          text: "평점 비율",
+          font: { size: 20 },
+          padding: {
+            top: 10,
+            bottom: 30,
+          },
+        },
         legend: {
           display: false,
+        },
+        tooltip: {
+          enabled: true,
+          backgroundColor: "orange",
+          callbacks: {
+            title: function (tooltipItem, data) {
+              return "";
+            },
+            label: function (context) {
+              const value = context.parsed.y;
+              const displayValue =
+                typeof value !== "undefined" ? value + "명" : "0명";
+              return displayValue;
+            },
+          },
+          displayColors: false,
+          titleColor: "#000",
+          bodyColor: "white",
+          yAlign: "bottom",
         },
       },
     };
@@ -55,9 +91,9 @@ const RatingChart = ({ ratingDistribution }) => {
     return () => {
       chartRef.current.destroy();
     };
-  }, [ratingDistribution]);
+  }, [ratingDistribution, boxDimensions]);
 
-  return <canvas id="rating-chart" height="300" />;
+  return <canvas id="rating-chart" />;
 };
 
 export default RatingChart;

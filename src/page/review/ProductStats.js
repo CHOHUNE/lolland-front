@@ -20,7 +20,12 @@ export const ProductStats = ({ product_id }) => {
   }, [product_id]);
 
   return (
-    <Flex border="1px dashed black" justifyContent="space-between" my={10}>
+    <Flex
+      border="1px dashed black"
+      justifyContent="space-between"
+      my={10}
+      minW="1200px"
+    >
       <Box
         w="30%"
         h="250px"
@@ -30,18 +35,22 @@ export const ProductStats = ({ product_id }) => {
         textAlign="center"
         border="1px dashed red"
       >
-        동일 카테고리 내 평점 순위
+        전체 만족도 평점
       </Box>
-      <VStack
+      <Box
         w="30%"
-        spacing={10}
+        h="250px"
+        display="flex"
+        alignItems="center"
         justifyContent="center"
         textAlign="center"
         border="1px dashed gold"
       >
-        <Heading size="md">별점 분포도</Heading>
-        <RatingChart ratingDistribution={ratingDistribution} />
-      </VStack>
+        <RatingChart
+          ratingDistribution={ratingDistribution}
+          boxDimensions={{ width: "100%", height: "100%" }}
+        />
+      </Box>
       <Box
         w="30%"
         h="250px"
