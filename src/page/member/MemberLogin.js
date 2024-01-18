@@ -36,7 +36,7 @@ export function MemberLogin() {
       })
       .then(() => {
         toast({ description: "로그인에 성공 하였습니다.", status: "success" });
-        navigate("/");
+        navigate(-1);
       })
       .catch(() => {
         toast({ description: "로그인에 실패 하셨습니다.", status: "error" });
