@@ -21,12 +21,21 @@ export function GameBoardWrite(props) {
   const [category, setCategory] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadFiles, setUploadFiles] = useState(null);
-  const { isAuthenticated } = useContext(LoginContext);
+  const { isAuthenticated, isAdmin } = useContext(LoginContext);
 
   let toast = useToast();
   let navigate = useNavigate();
 
   function handleSubmit() {
+    // if (category === "공지" || isAdmin()) {
+    //   // '공지' 카테고리에서는 isAdmin이어야만 작성 가능
+    //   toast({
+    //     description: "공지는 관리자만 작성할 수 있습니다.",
+    //     status: "error",
+    //   });
+    //   return;
+    // }
+
     setIsSubmitting(true);
     axios
       .postForm("/api/gameboard/write", {
@@ -48,9 +57,7 @@ export function GameBoardWrite(props) {
           status: "error",
         });
       })
-      .finally
-      // () => setIsSubmitting(true)
-      ();
+      .finally(() => setIsSubmitting(false));
   }
 
   return (
@@ -64,7 +71,7 @@ export function GameBoardWrite(props) {
               setCategory(e.target.value);
             }}
           >
-            <option value="공지">공지</option>
+            {isAdmin() && <option value="공지">공지</option>}
             <option value="잡담">잡담</option>
             <option value="질문">질문</option>
             <option value="정보">정보</option>

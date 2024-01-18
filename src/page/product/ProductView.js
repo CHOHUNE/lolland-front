@@ -32,9 +32,10 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar as farStar } from "@fortawesome/free-regular-svg-icons";
 import {
   faCartShopping,
-  faHeart as fasHeart,
+  faHeart as fasHeart, faStar, faStarHalfAlt,
 } from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 하트
 import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
@@ -282,6 +283,32 @@ export function ProductView() {
       });
   };
 
+  // ----------------------------------- 평점 별 표시 로직 -----------------------------------
+  const renderStars = (rate) => {
+    // 평점이 없거나 0인 경우 빈 별 5개로 출력
+    if (rate == null || rate === 0) {
+      return Array.from({ length: 5 }, (_, i) => (
+        <FontAwesomeIcon icon={farStar} color="#EAEAE7" key={i} />
+      ));
+    }
+    let stars = [];
+    for (let i = 0; i < 5; i++) {
+      if (i < Math.floor(rate)) {
+        // 꽉찬 별
+        stars.push(<FontAwesomeIcon icon={faStar} color="#FFE000" key={i} />);
+      } else if (i === Math.floor(rate) && !Number.isInteger(rate)) {
+        // 반쪽 별
+        stars.push(<FontAwesomeIcon icon={faStarHalfAlt} color="#FFE000" key={i} />);
+      } else {
+        // 빈 별
+        stars.push(<FontAwesomeIcon icon={farStar} color="#EAEAE7" key={i} />);
+      }
+    }
+    return stars;
+  };
+
+
+
   return (
     <Box mx={"15%"} p={5}>
       <Box>
@@ -307,7 +334,7 @@ export function ProductView() {
         <Box justify="center" align="start" maxW="100%" m="auto">
           {/* ---------------------- 상품명 ---------------------- */}
           <Text ml={4} fontWeight={"bold"} fontSize={"1.7rem"}>
-            [{product.company_name}]{product.product.product_name}
+            [{product.company_name}] {product.product.product_name}
           </Text>
 
           {/* ---------------------- 상품설명 ---------------------- */}
@@ -316,7 +343,7 @@ export function ProductView() {
           </Text>
         </Box>
 
-        <Flex minW={"500px"} mt={-10}>
+        <Flex minW="1000px" maxW="1500px" mt={-5}>
           {/* 메인 이미지 */}
           <Box p={2}>
             {product &&
@@ -399,8 +426,10 @@ export function ProductView() {
                   평점
                 </FormLabel>
                 <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
-                  {product.product.average_rate}
+                  {renderStars(product.product.average_rate)}{" "}
+                  {product.product.average_rate !== null ? product.product.average_rate : "0"}
                 </Text>
+
               </HStack>
             </HStack>
 
@@ -573,7 +602,7 @@ export function ProductView() {
                     <Text
                       style={{
                         color: "red",
-                        fontSize: "25px",
+                        fontSize: "2rem",
                         fontWeight: "bold",
                       }}
                     >

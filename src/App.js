@@ -15,7 +15,6 @@ import GameBoardView from "./page/gameBoard/GameBoardView";
 import { ProductWrite } from "./page/product/ProductWrite";
 import { ProductList } from "./page/product/ProductList";
 import { ProductView } from "./page/product/ProductView";
-import { ReviewView } from "./page/review/ReviewView";
 import { Cart } from "./page/Cart/Cart";
 import { GearBoard } from "./page/gearBoard/GearBoard";
 import { GearList } from "./page/gearBoard/GearList";
@@ -32,6 +31,7 @@ import LoginProvider from "./component/LoginProvider";
 import { ProductLike } from "./page/productLike/ProductLike";
 import { MemberFindId } from "./page/member/MemberFindId";
 import { MemberFindPassword } from "./page/member/MemberFindPassword";
+import { PasswordEdit } from "./page/member/MemberViewPage/PasswordEdit";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -64,6 +64,7 @@ const routes = createBrowserRouter(
         <Route path="memberEdit" element={<MemberEdit />} />
         <Route path="addressInfo" element={<MemberAddress />} />
         <Route path="addressWrite" element={<MemberAddressWrite />} />
+        <Route path="passwordEdit" element={<PasswordEdit />} />
         {/* 상품 찜하기 목록 - gns14585 - */}
         <Route path="productLike" element={<ProductLike />} />
       </Route>
