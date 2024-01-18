@@ -107,7 +107,7 @@ const Star = ({ initialRate, onRateChange, isEditing }) => {
 };
 
 export const ReviewView = ({ product_id }) => {
-  const [rate, setRate] = useState(1);
+  const [rate, setRate] = useState(0);
   const [review, setReview] = useState("");
   const { hasAccess, isAdmin, isAuthenticated } = useContext(LoginContext);
   const [reviewList, setReviewList] = useState([]);

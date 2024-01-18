@@ -5,6 +5,7 @@ import {
   Flex,
   HStack,
   IconButton,
+  Image,
   Tab,
   TabList,
   TabPanel,
@@ -106,6 +107,7 @@ export function NavBar() {
           justifyContent="space-between"
           p={5}
           w="full"
+          px="3%"
           shadow="sm"
           position="fixed"
           zIndex={100}
@@ -113,14 +115,14 @@ export function NavBar() {
         >
           <Flex>
             <Box
-              w="200px"
-              border="1px dashed black"
+              w="100px"
+              // border="1px dashed black"
               display="flex"
               alignItems="center"
               justifyContent="center"
               textAlign="center"
             >
-              로고
+              <Image src="/logo.png" boxSize="100%" objectFit="fit" />
             </Box>
             <ButtonGroup variant="undefined" size="lg">
               <Button onClick={() => navigate("/")}>HOME</Button>
