@@ -127,7 +127,7 @@ export function ProductView() {
 
     if (selectedOptionInfo) {
       // 선택된 옵션을 상태에 추가합니다.
-      setSeletedOptionList((prev) => ({
+      setSelectedOptionList((prev) => ({
         ...prev,
         [selectedOptionInfo.option_id]: {
           ...selectedOptionInfo,
@@ -458,7 +458,6 @@ export function ProductView() {
                     ? product.product.average_rate
                     : "0"}
                 </Text>
-
               </HStack>
             </HStack>
 
@@ -515,9 +514,9 @@ export function ProductView() {
               {option.length > 0 && (
                 <Menu matchWidth>
                   <MenuButton as={Button} w="100%" h="50px">
-                    {seletedOption
+                    {selectedOption
                       ? option.find(
-                          (opt) => opt.option_id.toString() === seletedOption,
+                          (opt) => opt.option_id.toString() === selectedOption,
                         )?.option_name || "옵션을 선택하세요"
                       : "옵션을 선택하세요"}
                   </MenuButton>
