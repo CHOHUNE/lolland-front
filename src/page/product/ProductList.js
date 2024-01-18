@@ -14,8 +14,27 @@ export function ProductList() {
       .then((response) => setProductList(response.data));
   }, []);
 
+  // ---------------------------- 로딩로직 ----------------------------
+  const FullPageSpinner = () => {
+    return (
+      <Flex
+        position="fixed"
+        top="0"
+        left="0"
+        right="0"
+        bottom="0"
+        justifyContent="center"
+        alignItems="center"
+        backgroundColor="rgba(0,0,0,0.3)"
+        zIndex="9999"
+      >
+        <Spinner size="xl" color="white" />
+      </Flex>
+    );
+  };
+
   if (productList === null) {
-    return <Spinner />;
+    return <FullPageSpinner />;
   }
 
   return (

@@ -4,11 +4,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Button,
+  Card,
   Center,
   Flex,
   FormLabel,
   HStack,
   Image,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -32,15 +37,18 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar as farStar } from "@fortawesome/free-regular-svg-icons";
+import { faStar as farStar } from "@fortawesome/free-regular-svg-icons"; // 꽉 찬 아이콘
 import {
   faCartShopping,
-  faHeart as fasHeart, faStar, faStarHalfAlt,
-} from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 하트
-import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
+  faHeart as fasHeart,
+  faSpinner,
+  faStar,
+  faStarHalfAlt,
+} from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 아이콘
+import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons"; // 빈 아이콘
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
-import { selectOptions } from "@testing-library/user-event/dist/select-options"; // 빈 하트
 import { ReviewView } from "../review/ReviewView";
+import { selectOptions } from "@testing-library/user-event/dist/select-options"; // 빈 하트
 import { ProductStats } from "../review/ProductStats"; // 빈 하트
 
 export function ProductView() {
@@ -87,7 +95,19 @@ export function ProductView() {
   // ---------------------------- 로딩로직 ----------------------------
 
   if (product === null) {
-    return <Spinner />;
+    return (
+      <Center textAlign={"center"}>
+        <Card
+          size={"500px"}
+          w="500px"
+          h="500px"
+          alignItems={"center"}
+          display={"flex"}
+        >
+          <FontAwesomeIcon fontSize={"3.5rem"} icon={faSpinner} spinPulse />
+        </Card>
+      </Center>
+    );
   }
 
   // ------------------------------ 가격 ex) 1,000 ,로 구분지어 보여지게 처리 ------------------------------
@@ -101,24 +121,21 @@ export function ProductView() {
   };
 
   // ------------------------------ 상세 옵션 관련 로직 ------------------------------
-  const handleOptionChange = (e) => {
-    const selectedValue = e.target.value;
-    setSelectedOption(selectedValue);
-
-    // 선택된 옵션을 찾아 해당 옵션 정보를 추가
-    const selectedOptionInfo = option.find(
-      (opt) => opt.option_id.toString() === selectedValue,
-    );
+  const handleOptionChange = (optionId) => {
+    // 선택된 옵션의 정보를 가져옵니다.
+    const selectedOptionInfo = option.find((opt) => opt.option_id === optionId);
 
     if (selectedOptionInfo) {
+      // 선택된 옵션을 상태에 추가합니다.
       setSelectedOptionList((prev) => ({
         ...prev,
         [selectedOptionInfo.option_id]: {
-          ...prev[selectedOptionInfo.option_id],
           ...selectedOptionInfo,
           quantity: prev[selectedOptionInfo.option_id]?.quantity || 1,
         },
       }));
+      // 선택된 옵션 ID를 상태에 설정합니다.
+      setSelectedOption(selectedOptionInfo.option_id.toString());
     }
   };
 
@@ -263,24 +280,45 @@ export function ProductView() {
     // UI를 먼저 업데이트하고 서버 요청을 보냄
     setIsFavorited(newFavoriteStatus);
     // 서버에 좋아요 상태 전송
-    axios
-      .post("/api/productLike", {
-        product_id: product_id,
-        isFavorited: newFavoriteStatus,
-      })
-      .then(() => {
-        toast({
-          description: "상품 찜목록에 저장되었습니다.",
-          status: "success",
+    if (isFavorited !== true) {
+      axios
+        .post("/api/productLike", {
+          product_id: product_id,
+          isFavorited: newFavoriteStatus,
+        })
+        .then(() => {
+          toast({
+            description: "상품 찜목록에 저장되었습니다.",
+            status: "success",
+          });
+        })
+        .catch((error) => {
+          toast({
+            description: "로그인 해주시기 바랍니다.",
+            status: "error",
+          });
+          setIsFavorited(!newFavoriteStatus);
         });
-      })
-      .catch((error) => {
-        toast({
-          description: "찜목록으로 이동되지 않았습니다.",
-          status: "error",
+    } else {
+      axios
+        .post("/api/productLike", {
+          product_id: product_id,
+          isFavorited: newFavoriteStatus,
+        })
+        .then(() => {
+          toast({
+            description: "상품 찜목록에서 삭제되었습니다.",
+            status: "error",
+          });
+        })
+        .catch((error) => {
+          toast({
+            description: "로그인 해주시기 바랍니다.",
+            status: "error",
+          });
+          setIsFavorited(!newFavoriteStatus);
         });
-        setIsFavorited(!newFavoriteStatus);
-      });
+    }
   };
 
   // ----------------------------------- 평점 별 표시 로직 -----------------------------------
@@ -298,7 +336,9 @@ export function ProductView() {
         stars.push(<FontAwesomeIcon icon={faStar} color="#FFE000" key={i} />);
       } else if (i === Math.floor(rate) && !Number.isInteger(rate)) {
         // 반쪽 별
-        stars.push(<FontAwesomeIcon icon={faStarHalfAlt} color="#FFE000" key={i} />);
+        stars.push(
+          <FontAwesomeIcon icon={faStarHalfAlt} color="#FFE000" key={i} />,
+        );
       } else {
         // 빈 별
         stars.push(<FontAwesomeIcon icon={farStar} color="#EAEAE7" key={i} />);
@@ -306,8 +346,6 @@ export function ProductView() {
     }
     return stars;
   };
-
-
 
   return (
     <Box mx={"15%"} p={5}>
@@ -360,7 +398,7 @@ export function ProductView() {
               )}
 
             {/* 썸네일 이미지 */}
-            <HStack justifyContent={"center"} mt={2}>
+            <HStack justifyContent={"center"} mt={-10}>
               {product &&
                 product.productImgs &&
                 product.productImgs.map((img, index) => (
@@ -401,17 +439,6 @@ export function ProductView() {
             <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
               <HStack mt={3} mb={3}>
                 <FormLabel w={"100px"} fontWeight="bold">
-                  총 재고
-                </FormLabel>
-                <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
-                  {product.product.total_stock}개
-                </Box>
-              </HStack>
-            </HStack>
-
-            <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
-              <HStack mt={3} mb={3}>
-                <FormLabel w={"100px"} fontWeight="bold">
                   제조사
                 </FormLabel>
                 <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
@@ -427,9 +454,10 @@ export function ProductView() {
                 </FormLabel>
                 <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
                   {renderStars(product.product.average_rate)}{" "}
-                  {product.product.average_rate !== null ? product.product.average_rate : "0"}
+                  {product.product.average_rate !== null
+                    ? product.product.average_rate
+                    : "0"}
                 </Text>
-
               </HStack>
             </HStack>
 
@@ -482,24 +510,32 @@ export function ProductView() {
             </HStack>
 
             {/* 상세옵션 로직 */}
-            <Box w="100%">
+            <Box w="100%" mt={5}>
               {option.length > 0 && (
-                <Box w="100%" position="relative" mt={5}>
-                  <Box>
-                    <Select
-                      value={selectedOption}
-                      onChange={handleOptionChange}
-                    >
-                      <option value="">옵션을 선택하세요</option>
-                      {option.map((opt, index) => (
-                        <option key={index} value={opt.option_id}>
-                          {opt.option_name}
-                        </option>
-                      ))}
-                    </Select>
-                  </Box>
-                </Box>
+                <Menu matchWidth>
+                  <MenuButton as={Button} w="100%" h="50px">
+                    {selectedOption
+                      ? option.find(
+                          (opt) => opt.option_id.toString() === selectedOption,
+                        )?.option_name || "옵션을 선택하세요"
+                      : "옵션을 선택하세요"}
+                  </MenuButton>
+                  <MenuList>
+                    {option.map((opt, index) => (
+                      <MenuItem
+                        key={index}
+                        onClick={() => handleOptionChange(opt.option_id)} // 여기서 handleOptionChange 호출
+                      >
+                        <Flex justifyContent="space-between" w="100%">
+                          <Text>{opt.option_name}</Text>
+                          <Text>수량: {opt.stock}</Text>
+                        </Flex>
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
               )}
+
               <Box>
                 {Object.keys(selectedOptionList).length > 0 &&
                   Object.entries(selectedOptionList).map(
