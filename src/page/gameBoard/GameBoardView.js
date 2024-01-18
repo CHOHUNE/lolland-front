@@ -28,7 +28,7 @@ import {
 import { LoginContext } from "../../component/LoginProvider";
 
 function LikeContainer({ like, onClick }) {
-  const { isAuthenticated } = useContext(LoginContext);
+  const { isAuthenticated, isAdmin, hasAccess } = useContext(LoginContext);
 
   if (like === null) {
     return <Spinner />;
@@ -62,7 +62,7 @@ export function GameBoardView(props) {
   const { id } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
-  const { isAuthenticated, hasAccess } = useContext(LoginContext);
+  const { isAuthenticated, hasAccess, isAdmin } = useContext(LoginContext);
 
   useEffect(() => {
     axios.get("/api/gameboard/id/" + id).then((response) => {
@@ -116,9 +116,10 @@ export function GameBoardView(props) {
       <VStack spacing={6} align="start" w="50%" px={4}>
         <HStack spacing={2} w="100%" justify="space-between">
           <Button onClick={() => navigate(-1)}>이전</Button>
-          {hasAccess(board.member_id) && (
+          <Spacer />
+
+          {(hasAccess(board.member_id) || isAdmin()) && (
             <>
-              <Spacer />
               <Button
                 colorScheme="purple"
                 onClick={() => navigate("/gameboard/edit/" + id)}

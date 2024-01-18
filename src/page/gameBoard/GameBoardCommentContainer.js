@@ -26,31 +26,24 @@ import LoginProvider, { LoginContext } from "../../component/LoginProvider";
 
 function CommentForm({ isSubmitting, onSubmit }) {
   const [comment, setComment] = useState("");
-  const { isAuthenticated, hasAccess } = useContext(LoginContext);
+  const { isAuthenticated } = useContext(LoginContext);
 
   function handleSubmit() {
+    if (!comment.trim()) {
+      // If the comment is empty or contains only whitespace, don't submit
+      return;
+    }
     onSubmit({ comment });
-    setComment("");
+    setComment(""); // Clear the input field after submission
   }
 
-  // handle Enter key Sumbit
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        handleSubmit();
-      }
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleSubmit]);
+  // handle Enter key Submit
+  useEffect(() => {}, [handleSubmit]);
 
   return (
     <Box>
       <Textarea value={comment} onChange={(e) => setComment(e.target.value)} />
-      <Tooltip isDisabled={isAuthenticated()} hasArrow label={"로그인 하세요"}>
+      <Tooltip isDisabled={!isAuthenticated()} hasArrow label={"로그인 하세요"}>
         <Button isDisabled={isSubmitting} onClick={handleSubmit}>
           쓰기
         </Button>
@@ -65,7 +58,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
   const [commentEdited, setCommentEdited] = useState(comment.comment_content);
   const [replyComment, setReplyComment] = useState("");
   const toast = useToast();
-  const { isAuthenticated, hasAccess } = useContext(LoginContext);
+  const { isAuthenticated, hasAccess, isAdmin } = useContext(LoginContext);
 
   function handleDuplicateSubmit() {
     setIsSubmitting(true);
@@ -179,7 +172,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
           )}
         </Box>
 
-        {hasAccess(comment.member_id) && (
+        {(hasAccess(comment.member_id) || isAdmin()) && (
           <Box>
             {isEditing || (
               <Button
