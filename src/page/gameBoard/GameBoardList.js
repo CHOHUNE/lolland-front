@@ -157,7 +157,9 @@ function GameBoardList() {
         <Center w={"100%"}>
           <VStack w={"100%"} ml={"10%"}>
             <Center>
-              <Heading mb={"10px"}>베스트 게시물</Heading>
+              <Heading as="h2" size="lg" my={"15px"}>
+                오늘의 BEST
+              </Heading>
             </Center>
             <Center w={"75%"}>
               <TableContainer w={"100%"}>
@@ -248,81 +250,6 @@ function GameBoardList() {
                 </Table>
               </TableContainer>
             </Center>
-            <Center>
-              <Heading as="h2" size="lg" my={"15px"} mt={"20px"}>
-                공지사항
-              </Heading>
-            </Center>
-            <Center w={"80%"}>
-              <TableContainer w={"70%"}>
-                <Table size="sm" border={"1px solid whitesmoke"}>
-                  <Thead>
-                    <Tr>
-                      <Th w="5%" textAlign={"center"}>
-                        분류
-                      </Th>
-                      <Th w="40%" colSpan={2} textAlign={"center"}>
-                        제목
-                      </Th>
-                      <Th w="10%">조회수</Th>
-                      <Th w="10%">작성자</Th>
-                      <Th w="10%">날짜</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {notice &&
-                      notice.map((noticies) => (
-                        <Tr key={noticies.id} borderRadius="10px">
-                          <Td w="5%" textAlign={"center"}>
-                            {noticies.category}
-                          </Td>
-                          <Td
-                            w="40%"
-                            colSpan={2}
-                            textAlign={"center"}
-                            onClick={() =>
-                              navigate("/gameboard/id/" + noticies.id)
-                            }
-                            _hover={{ cursor: "pointer" }}
-                          >
-                            <span style={{ marginLeft: "+10%" }}>
-                              {noticies.title}
-                            </span>
-                            {noticies.count_comment !== 0 && (
-                              <Badge
-                                colorScheme={"green"}
-                                variant="outline"
-                                mx={"1%"}
-                              >
-                                <ChatIcon />
-                                {noticies.count_comment}
-                              </Badge>
-                            )}
-                            {noticies.countFile !== 0 && (
-                              <Badge mx={"1%"}>
-                                {noticies.countFile}
-                                <FontAwesomeIcon icon={faImage} />
-                              </Badge>
-                            )}{" "}
-                          </Td>
-                          <Td w="10%">{noticies.board_count}</Td>
-                          <Td w="10%">{noticies.member_id}</Td>
-                          <Td w="10%">
-                            {new Date(noticies.reg_time).toLocaleDateString(
-                              "ko-KR",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              },
-                            )}
-                          </Td>
-                        </Tr>
-                      ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-            </Center>
 
             {/* 그 외의 게시물 게시판 */}
             <Center>
@@ -395,6 +322,73 @@ function GameBoardList() {
                     </Tr>
                   </Thead>
                   <Tbody>
+                    {notice &&
+                      notice.map((noticies) => (
+                        <Tr
+                          key={noticies.id}
+                          borderRadius="10px"
+                          bgColor={"whitesmoke"}
+                        >
+                          <Td w="10%" textAlign={"center"}>
+                            <Badge
+                              colorScheme="green"
+                              variant="outline"
+                              mx={"2px"}
+                              fontWeight={"bold"}
+                              bgColor={`rgba(0, 128, 0, ${
+                                noticies.count_like / 10
+                              })`}
+                            >
+                              {noticies.count_like}
+                            </Badge>
+                          </Td>
+                          <Td w="5%" pl={"0"}>
+                            {noticies.category}
+                          </Td>
+                          <Td
+                            w="40%"
+                            colSpan={2}
+                            textAlign={"center"}
+                            onClick={() =>
+                              navigate("/gameboard/id/" + noticies.id)
+                            }
+                            _hover={{ cursor: "pointer" }}
+                          >
+                            <span style={{ marginLeft: "+10%" }}>
+                              {noticies.title}
+                            </span>
+                            {noticies.count_comment !== 0 && (
+                              <Badge
+                                colorScheme={"green"}
+                                variant="outline"
+                                mx={"1%"}
+                              >
+                                <ChatIcon />
+                                {noticies.count_comment}
+                              </Badge>
+                            )}
+                            {noticies.countFile !== 0 && (
+                              <Badge mx={"1%"}>
+                                {noticies.countFile}
+                                <FontAwesomeIcon icon={faImage} />
+                              </Badge>
+                            )}{" "}
+                          </Td>
+                          <Td w="10%">{noticies.board_count}</Td>
+                          <Td w="10%">{noticies.member_id}</Td>
+                          <Td w="10%">
+                            {new Date(noticies.reg_time).toLocaleDateString(
+                              "ko-KR",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              },
+                            )}
+                          </Td>
+                        </Tr>
+                      ))}
+
                     {gameBoardList &&
                       gameBoardList.map((board) => (
                         <Tr key={board.id} borderRadius="10px">
