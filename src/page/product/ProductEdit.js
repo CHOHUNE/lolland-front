@@ -219,7 +219,7 @@ export function ProductEdit() {
         <Box>
           {/* ------------------- 대분류 로직 ------------------- */}
           <FormControl mt={3}>
-            <FormLabel>대분류</FormLabel>
+            <FormLabel fontWeight={"bold"}>대분류</FormLabel>
             <Select value={selectedCategory} onChange={handleCategoryChange}>
               <option value="">---Select Category---</option>
               {categories.map((category) => (
@@ -232,7 +232,7 @@ export function ProductEdit() {
 
           {/* ------------------- 소분류 로직 ------------------- */}
           <FormControl mt={3}>
-            <FormLabel>소분류</FormLabel>
+            <FormLabel fontWeight={"bold"}>소분류</FormLabel>
             <Select
               value={selectedSubCategory}
               onChange={handleSubCategoryChange}
@@ -253,7 +253,7 @@ export function ProductEdit() {
           </FormControl>
 
           <FormControl mt={3}>
-            <FormLabel>상품명</FormLabel>
+            <FormLabel fontWeight={"bold"}>상품명</FormLabel>
             <Input
               value={product.product.product_name}
               onChange={(e) =>
@@ -269,7 +269,7 @@ export function ProductEdit() {
           </FormControl>
 
           <FormControl mt={3}>
-            <FormLabel>금액</FormLabel>
+            <FormLabel fontWeight={"bold"}>금액</FormLabel>
             <Input
               value={product.product.product_price}
               onChange={(e) =>
@@ -285,7 +285,7 @@ export function ProductEdit() {
           </FormControl>
 
           <FormControl mt={3}>
-            <FormLabel>상품설명</FormLabel>
+            <FormLabel fontWeight={"bold"}>상품설명</FormLabel>
             <Textarea
               value={product.product.product_content}
               onChange={(e) =>
@@ -301,23 +301,7 @@ export function ProductEdit() {
           </FormControl>
 
           <FormControl mt={3}>
-            <FormLabel>재고</FormLabel>
-            <Input
-              value={product.product.total_stock}
-              onChange={(e) =>
-                setProduct((prevProduct) => ({
-                  ...prevProduct,
-                  product: {
-                    ...prevProduct.product,
-                    total_stock: e.target.value,
-                  },
-                }))
-              }
-            />
-          </FormControl>
-
-          <FormControl mt={3}>
-            <FormLabel>제조사</FormLabel>
+            <FormLabel fontWeight={"bold"}>제조사</FormLabel>
             <Input
               value={product.company_name}
               onChange={(e) =>
@@ -353,7 +337,7 @@ export function ProductEdit() {
           </Flex>
 
           <FormControl mt={3}>
-            <FormLabel>메인 이미지</FormLabel>
+            <FormLabel fontWeight={"bold"}>메인 이미지</FormLabel>
             <Input
               type="file"
               accept="image/*"
@@ -399,7 +383,7 @@ export function ProductEdit() {
           </Flex>
 
           <FormControl mt={3}>
-            <FormLabel>설명 이미지</FormLabel>
+            <FormLabel fontWeight={"bold"}>설명 이미지</FormLabel>
             <Input
               type="file"
               accept="image/*"
@@ -413,7 +397,9 @@ export function ProductEdit() {
             {options.map((option, index) => (
               <Flex mt={3} gap={3}>
                 <FormControl key={index}>
-                  <FormLabel>{index + 1}번째 상세옵션추가</FormLabel>
+                  <FormLabel fontWeight={"bold"}>
+                    {index + 1}번째 상세옵션추가
+                  </FormLabel>
                   <Input
                     value={option.option_name}
                     placeholder="예) 화이트/청축"
@@ -421,7 +407,7 @@ export function ProductEdit() {
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel>수량</FormLabel>
+                  <FormLabel fontWeight={"bold"}>수량</FormLabel>
                   <Input
                     type="number"
                     value={option.stock || ""} // 수량이 없으면 빈 문자열

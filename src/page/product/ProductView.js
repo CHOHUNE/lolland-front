@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -48,15 +48,12 @@ import {
 import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons"; // 빈 아이콘
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { ReviewView } from "../review/ReviewView";
-import { LoginContext } from "../../component/LoginProvider";
 
 export function ProductView() {
   const [product, setProduct] = useState(null);
   const [option, setOption] = useState([]);
   const [seletedOption, setSeletedOption] = useState("");
   const [seletedOptionList, setSeletedOptionList] = useState({});
-
-  const { isAuthenticated } = useContext(LoginContext);
 
   const { product_id } = useParams();
   const [isFavorited, setIsFavorited] = useState(false); // 찜하기
@@ -83,34 +80,32 @@ export function ProductView() {
 
   // ---------------------------- 찜한 내역 가져오는 렌더링 ----------------------------
   useEffect(() => {
-    if (isAuthenticated()) {
-      axios.get("/api/productLike/" + product_id).then((response) => {
+    axios
+      .get("/api/productLike/" + product_id)
+      .then((response) => {
         setIsFavorited(response.data.productLike);
+      })
+      .catch((error) => {
+        console.error("Error fetching product like status:", error);
       });
-    }
   }, [product_id]);
 
   // ---------------------------- 로딩로직 ----------------------------
-  const FullPageSpinner = () => {
-    return (
-      <Flex
-        position="fixed"
-        top="0"
-        left="0"
-        right="0"
-        bottom="0"
-        justifyContent="center"
-        alignItems="center"
-        backgroundColor="rgba(0,0,0,0.3)"
-        zIndex="9999"
-      >
-        <Spinner size="xl" color="white" />
-      </Flex>
-    );
-  };
 
   if (product === null) {
-    return <FullPageSpinner />;
+    return (
+      <Center textAlign={"center"}>
+        <Card
+          size={"500px"}
+          w="500px"
+          h="500px"
+          alignItems={"center"}
+          display={"flex"}
+        >
+          <FontAwesomeIcon fontSize={"3.5rem"} icon={faSpinner} spinPulse />
+        </Card>
+      </Center>
+    );
   }
 
   // ------------------------------ 가격 ex) 1,000 ,로 구분지어 보여지게 처리 ------------------------------
@@ -204,29 +199,20 @@ export function ProductView() {
 
   // ------------------------------ 수량에 따라 총 가격 계산 로직 ------------------------------
   const calculateTotalPrice = () => {
-    // 옵션이 있지만, 모든 옵션이 빈 문자열("")인 경우 기본 상품 가격 반환
-    if (option.every((opt) => opt.option_name === "")) {
-      return formatPrice(product.product.product_price);
-    }
-
-    // 옵션이 있고, 아직 선택되지 않았다면 0원 반환
-    if (option.length > 0 && Object.keys(seletedOptionList).length === 0) {
-      return formatPrice(0);
-    }
-
-    // 옵션이 있고 선택된 옵션이 있다면, 옵션 가격을 계산
+    // 상세선택이 있고 선택된 상세선택이 있는 경우
     if (option.length > 0 && Object.keys(seletedOptionList).length > 0) {
       return formatPrice(
         Object.values(seletedOptionList).reduce((sum, optionItem) => {
-          // 옵션 가격이 정의되어 있고, option_name이 빈 문자열이 아닐 때만 가격을 더함
-          if (optionItem.price && optionItem.option_name !== "") {
-            return sum + optionItem.price * optionItem.quantity;
-          }
-          // 옵션 가격이 정의되어 있지 않은 경우 기본 상품 가격을 사용
-          return sum + product.product.product_price * optionItem.quantity;
+          // 옵션 가격이 있으면 사용, 없으면 기본 상품 가격 사용
+          const pricePerItem =
+            optionItem.price || product.product.product_price;
+          // 해당 옵션의 총 가격 = 가격 * 수량
+          return sum + pricePerItem * optionItem.quantity;
         }, 0),
       );
     }
+    // 상세선택이 없는 경우 기본 상품 가격 반환
+    return formatPrice(option.length > 0 ? 0 : product.product.product_price);
   };
 
   // ------------------------------ 게시물 삭제 로직 ------------------------------
@@ -251,12 +237,10 @@ export function ProductView() {
 
   // ------------------------------ 장바구니로 정보 전달 로직 ------------------------------
   function handleBucketClick() {
-    const optionsArray = Object.values(seletedOptionList);
-
     axios
       .post("/api/cart/add", {
         product_id: product_id,
-        selectedOptionList: optionsArray,
+        seletedOptionList: seletedOptionList,
       })
       .then(() => {
         toast({
@@ -523,55 +507,71 @@ export function ProductView() {
               </Flex>
             </HStack>
 
+            {/* 상세옵션 로직 */}
+            {/*<Box w="100%">*/}
+            {/*  {option.length > 0 && (*/}
+            {/*    <Box w="100%" position="relative" mt={5}>*/}
+            {/*      <Box>*/}
+            {/*        <Select*/}
+            {/*          h={"50px"}*/}
+            {/*          value={seletedOption}*/}
+            {/*          onChange={handleOptionChange}*/}
+            {/*        >*/}
+            {/*          <option value="">옵션을 선택하세요</option>*/}
+            {/*          {option.map((opt, index) => (*/}
+            {/*            <option key={index} value={opt.option_id}>*/}
+            {/*              {opt.option_name} (수량: {opt.stock})*/}
+            {/*            </option>*/}
+            {/*          ))}*/}
+            {/*        </Select>*/}
+            {/*      </Box>*/}
+            {/*    </Box>*/}
+            {/*  )}*/}
             <Box w="100%" mt={5}>
-              {
-                // 상품 옵션 목록이 있고, 모든 옵션의 이름이 비어있지 않으면 메뉴를 표시합니다.
-                // 그렇지 않은 경우(옵션이 없거나 이름이 비어있는 옵션이 있는 경우), 기본 상품명을 표시하는 목록을 렌더링합니다.
-                option.length === 0 ||
-                option.some((opt) => opt.option_name === "") ? (
-                  // 옵션이 없거나 옵션 이름이 비어있는 경우
-                  <Box mt={5} bg="#F9F9F9" border="1px solid #F9F9F9">
-                    <Flex justify="space-between" p={4}>
-                      <Text>{product.product.product_name}</Text>
-                      {/* 수량 조절 버튼 및 수량 표시 */}
-                      <HStack
-                        spacing={0}
-                        border="1px solid gray"
-                        borderRadius="10px"
-                        bg="white"
-                        m={3}
+              {option.length > 0 && (
+                <Menu matchWidth>
+                  <MenuButton as={Button} w="100%" h="50px">
+                    {seletedOption
+                      ? option.find(
+                          (opt) => opt.option_id.toString() === seletedOption,
+                        )?.option_name || "옵션을 선택하세요"
+                      : "옵션을 선택하세요"}
+                  </MenuButton>
+                  <MenuList>
+                    {option.map((opt, index) => (
+                      <MenuItem
+                        key={index}
+                        onClick={() => handleOptionChange(opt.option_id)} // 여기서 handleOptionChange 호출
                       >
-                        {/* 이 부분은 상품 수량 조절 로직에 따라 조건부 렌더링되어야 합니다. */}
-                      </HStack>
-                    </Flex>
-                  </Box>
-                ) : (
-                  // 옵션이 있고 모든 옵션의 이름이 비어있지 않은 경우
-                  <Menu matchWidth>
-                    <MenuButton as={Button} w="100%" h="50px">
-                      {seletedOption
-                        ? option.find(
-                            (opt) => opt.option_id.toString() === seletedOption,
-                          )?.option_name || "옵션을 선택하세요"
-                        : "옵션을 선택하세요"}
-                    </MenuButton>
-                    <MenuList>
-                      {option.map((opt, index) => (
-                        <MenuItem
-                          key={index}
-                          onClick={() => handleOptionChange(opt.option_id)}
-                        >
-                          <Flex justifyContent="space-between" w="100%">
-                            <Text>{opt.option_name}</Text>
-                            <Text>수량: {opt.stock}</Text>
-                          </Flex>
-                        </MenuItem>
-                      ))}
-                    </MenuList>
-                  </Menu>
-                )
-              }
+                        <Flex justifyContent="space-between" w="100%">
+                          <Text>{opt.option_name}</Text>
+                          <Text>수량: {opt.stock}</Text>
+                        </Flex>
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
+              )}
 
+              {/*<Menu>*/}
+              {/*  <MenuButton as={Button} w="100%">*/}
+              {/*    옵션을 선택하세요*/}
+              {/*  </MenuButton>*/}
+              {/*  <MenuList w={"100%"}>*/}
+              {/*    {option.map((opt, index) => (*/}
+              {/*      <MenuItem*/}
+              {/*        key={index}*/}
+              {/*        value={opt.option_id}*/}
+              {/*        onClick={() => handleOptionChange(opt.option_id)}*/}
+              {/*      >*/}
+              {/*        <Flex justifyContent="space-between" w="100%">*/}
+              {/*          <Text>{opt.option_name}</Text>*/}
+              {/*          <Text>수량: {opt.stock}</Text>*/}
+              {/*        </Flex>*/}
+              {/*      </MenuItem>*/}
+              {/*    ))}*/}
+              {/*  </MenuList>*/}
+              {/*</Menu>*/}
               <Box>
                 {Object.keys(seletedOptionList).length > 0 &&
                   Object.entries(seletedOptionList).map(
