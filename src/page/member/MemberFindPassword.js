@@ -21,6 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export function MemberFindPassword() {
   // 아이디
@@ -31,6 +32,8 @@ export function MemberFindPassword() {
   const [email2, setEmail2] = useState("");
 
   const toast = useToast();
+
+  const navigate = useNavigate();
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
@@ -54,6 +57,29 @@ export function MemberFindPassword() {
       .catch(() => {
         toast({ description: "회원 정보가 없습니다.", status: "error" });
       });
+  }
+
+  // 모달 창 내의 발송 버튼 클릭시 로직 --------------------------------------------------
+  function handleModalSendClick() {
+    axios
+      .post("/api/memberEmail/findPassword", {
+        member_email,
+        message: member_email,
+      })
+      .then(() =>
+        toast({
+          description: "등록된 메일로 임시 비밀번호가 발급 되었습니다.",
+          status: "success",
+        }),
+      )
+      .then(() => navigate("/login"))
+      .catch(() => {
+        toast({
+          description: "메일 발송중 문제가 발생 하였습니다.",
+          status: "error",
+        });
+      })
+      .finally(onClose);
   }
 
   return (
@@ -169,7 +195,7 @@ export function MemberFindPassword() {
                   color={"whitesmoke"}
                   _hover={{ backgroundColor: "whitesmoke", color: "black" }}
                   mr={3}
-                  // onClick={handleModalCloseClick}
+                  onClick={handleModalSendClick}
                 >
                   발송
                 </Button>
