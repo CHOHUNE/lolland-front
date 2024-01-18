@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Button,
@@ -16,6 +15,24 @@ import {
   Spacer,
   Flex,
   Badge,
+  AccordionPanel,
+  AccordionIcon,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  TabPanel,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  Card,
+  Table,
+  Th,
+  Tr,
+  TableCaption,
+  Tbody,
+  Td,
+  TableContainer,
 } from "@chakra-ui/react";
 import GameBoardCommentContainer from "./GameBoardCommentContainer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,9 +43,40 @@ import {
   faHeart as fullHeart,
 } from "@fortawesome/free-solid-svg-icons";
 import { LoginContext } from "../../component/LoginProvider";
+import { useNavigate, useParams } from "react-router-dom";
+
+async function fetchBoardData(
+  id,
+  setBoard,
+  setLike,
+  setWritten,
+  setWriterInfo,
+) {
+  try {
+    const boardResponse = await axios.get(`/api/gameboard/id/${id}`);
+    setBoard(boardResponse.data);
+
+    const likeResponse = await axios.get(`/api/like/gameboard/${id}`);
+    setLike(likeResponse.data);
+
+    if (boardResponse.data !== null) {
+      const writtenResponse = await axios.get(
+        `/api/gameboard/list/written/post/${boardResponse.data.member_id}`,
+      );
+      setWritten(writtenResponse.data);
+
+      const writerInfoResponse = await axios.get(
+        `/api/gameboard/list/info/${boardResponse.data.member_id}`,
+      );
+      setWriterInfo(writerInfoResponse.data);
+    }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
 
 function LikeContainer({ like, onClick }) {
-  const { isAuthenticated, isAdmin, hasAccess } = useContext(LoginContext);
+  const { isAuthenticated } = useContext(LoginContext);
 
   if (like === null) {
     return <Spinner />;
@@ -55,9 +103,11 @@ function LikeContainer({ like, onClick }) {
   );
 }
 
-export function GameBoardView(props) {
+export function GameBoardView() {
   const [board, setBoard] = useState(null);
   const [like, setLike] = useState(null);
+  const [written, setWritten] = useState(null);
+  const [writerInfo, setWriterInfo] = useState(null);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -65,47 +115,43 @@ export function GameBoardView(props) {
   const { isAuthenticated, hasAccess, isAdmin } = useContext(LoginContext);
 
   useEffect(() => {
-    axios.get("/api/gameboard/id/" + id).then((response) => {
-      setBoard(response.data);
-    });
+    const fetchData = async () => {
+      await fetchBoardData(id, setBoard, setLike, setWritten, setWriterInfo);
+    };
+    fetchData();
   }, [id]);
 
-  useEffect(() => {
-    axios
-      .get("/api/like/gameboard/" + id)
-      .then((response) => setLike(response.data));
-  }, [id]);
-
-  function handleDelete() {
-    axios
-      .delete("/api/gameboard/remove/" + id)
-      .then((response) => {
-        toast({
-          description: id + "번 게시물 삭제 완료",
-          status: "success",
-        });
-        navigate(-1);
-      })
-      .catch((error) => {
-        toast({
-          description: "실패",
-          status: "error",
-        });
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`/api/gameboard/remove/${id}`);
+      toast({
+        description: `${id}번 게시물 삭제 완료`,
+        status: "success",
       });
-  }
+      navigate(-1);
+    } catch (error) {
+      toast({
+        description: "실패",
+        status: "error",
+      });
+    }
+  };
 
-  function handleLike() {
-    axios
-      .post("/api/like", { game_board_id: board.id })
-      .then((response) => setLike(response.data))
-      .catch(() =>
-        toast({
-          description: "로그인 후 이용 해주세요.",
-          status: "error",
-        }),
-      )
-      .finally(() => console.log("done"));
-  }
+  const handleLike = async () => {
+    try {
+      const response = await axios.post("/api/like", {
+        game_board_id: board.id,
+      });
+      setLike(response.data);
+    } catch (error) {
+      toast({
+        description: "로그인 후 이용 해주세요.",
+        status: "error",
+      });
+    } finally {
+      console.log("done");
+    }
+  };
 
   if (board === null) {
     return <Spinner />;
@@ -113,7 +159,7 @@ export function GameBoardView(props) {
 
   return (
     <Center>
-      <VStack spacing={6} align="start" w="50%" px={4}>
+      <VStack spacing={6} align="start" w="35%" px={4}>
         <HStack spacing={2} w="100%" justify="space-between">
           <Button onClick={() => navigate(-1)}>이전</Button>
           <Spacer />
@@ -122,7 +168,7 @@ export function GameBoardView(props) {
             <>
               <Button
                 colorScheme="purple"
-                onClick={() => navigate("/gameboard/edit/" + id)}
+                onClick={() => navigate(`/gameboard/edit/${id}`)}
               >
                 수정
               </Button>
@@ -155,6 +201,7 @@ export function GameBoardView(props) {
             작성일: {new Date(board.reg_time).toLocaleString()}
           </Text>
         </HStack>
+
         <Divider my={4} />
         <Text fontSize="lg">{board.board_content}</Text>
         {board.files.map((file) => (
@@ -167,6 +214,85 @@ export function GameBoardView(props) {
             my={4}
           />
         ))}
+
+        <Accordion allowMultiple w="100%" as="span" isLazy defaultIndex={[0]}>
+          <AccordionItem>
+            <h2>
+              <AccordionButton _expanded={{ bg: "whitesmoke", color: "black" }}>
+                <Box
+                  as="span"
+                  flex="1"
+                  textAlign="left"
+                  width="100%"
+                  paddingX={2}
+                  paddingY={2}
+                >
+                  {board.member_id}의 정보
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+            </h2>
+            <AccordionPanel pb={4}>
+              <Flex gap="20px" align="center">
+                <Image
+                  borderRadius="full"
+                  boxSize="100px"
+                  src="https://bit.ly/dan-abramov"
+                  alt="tempProfileImg"
+                />
+
+                {writerInfo && (
+                  <div>
+                    <br />
+                    닉네임: {writerInfo.member_name}
+                    <br />
+                    이메일: {writerInfo.member_email}
+                    <br />
+                    연락처: {writerInfo.member_phone_number}
+                    <br />
+                    <br />
+                  </div>
+                )}
+              </Flex>
+
+              <Tabs isFitted variant="enclosed">
+                <TabList mb="1em">
+                  <Tab>최근 글</Tab>
+                  <Tab>최근 댓글</Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel>
+                    {written && (
+                      <TableContainer>
+                        <Table variant="simple">
+                          <TableCaption></TableCaption>
+
+                          <Tbody>
+                            {written.map((posties) => (
+                              <Tr
+                                key={posties.id}
+                                onClick={() => {
+                                  navigate(`/gameboard/id/${posties.id}`);
+                                  window.scrollTo(0, 0);
+                                }}
+                                _hover={{ cursor: "pointer" }}
+                              >
+                                <TableCaption>{posties.title}</TableCaption>
+                                <Divider />
+                              </Tr>
+                            ))}
+                          </Tbody>
+                        </Table>
+                      </TableContainer>
+                    )}
+                  </TabPanel>
+                  <TabPanel></TabPanel>
+                  <TabPanel></TabPanel>
+                </TabPanels>
+              </Tabs>
+            </AccordionPanel>
+          </AccordionItem>
+        </Accordion>
         <GameBoardCommentContainer />
       </VStack>
     </Center>
