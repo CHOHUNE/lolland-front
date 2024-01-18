@@ -311,7 +311,9 @@ export function GameBoardView() {
                               <Tr
                                 key={commen.id}
                                 onClick={() => {
-                                  navigate(`/gameboard/id/${commen.id}`);
+                                  navigate(
+                                    `/gameboard/id/${commen.game_board_id}`,
+                                  );
                                   window.scrollTo(0, 0);
                                 }}
                                 _hover={{ cursor: "pointer" }}
