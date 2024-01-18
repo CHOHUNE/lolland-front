@@ -31,6 +31,9 @@ export function MemberFindPassword() {
   const [email1, setEmail1] = useState("");
   const [email2, setEmail2] = useState("");
 
+  // 임시 비밀번호
+  const [randomPassword, setRandomPassword] = useState("");
+
   const toast = useToast();
 
   const navigate = useNavigate();
@@ -43,6 +46,10 @@ export function MemberFindPassword() {
 
   // 비밀번호 찾기 버튼 클릭 --------------------------------------
   function handleFindPasswordClick() {
+    // 찾기 버튼을 누르면 난수 생성 하기 ( 문자열과 숫자를 섞어서 생성 )----------------------------
+    const randomNumber = Math.random().toString(36).substr(2, 9);
+
+    // 해당 맴버가 DB에 존재 하는지 확인 ----------------------------
     axios
       .get("/api/member/findPassword", {
         params: {
@@ -50,8 +57,9 @@ export function MemberFindPassword() {
           member_email,
         },
       })
+      .then(() => setRandomPassword(randomNumber))
       .then(() => {
-        // TODO : 임시 비밀 번호 발급 모달 띄우기
+        // 임시 비밀 번호 발급 모달 띄우기
         onOpen();
       })
       .catch(() => {
@@ -61,10 +69,18 @@ export function MemberFindPassword() {
 
   // 모달 창 내의 발송 버튼 클릭시 로직 --------------------------------------------------
   function handleModalSendClick() {
+    // 메일로 임시 비밀 번호 발송 하기 --------------------------------------------------
     axios
       .post("/api/memberEmail/findPassword", {
         member_email,
-        message: member_email,
+        message: randomPassword,
+      })
+      .then(() => {
+        // 임시 비밀번호가 발송 되면 회원의 비밀번호 변경 하기 -------------------------------
+        axios.put("/api/member/setRandomPassword", {
+          member_login_id,
+          member_password: randomPassword,
+        });
       })
       .then(() =>
         toast({
