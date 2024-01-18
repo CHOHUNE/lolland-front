@@ -200,6 +200,11 @@ export function MemberEdit() {
       .finally();
   }
 
+  // 비밀번호 수정 버튼 클릭시 ---------------------------------------------
+  function handleEditPasswordClick() {
+    navigate("/memberPage/passwordEdit");
+  }
+
   return (
     <Center>
       <Card w={"700px"}>
@@ -259,6 +264,7 @@ export function MemberEdit() {
                   color: "whitesmoke",
                   fontWeight: "700",
                 }}
+                onClick={handleEditPasswordClick}
               >
                 비밀번호 수정
               </Button>
