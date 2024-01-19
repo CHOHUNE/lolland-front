@@ -193,8 +193,7 @@ export function Cart() {
             variant="outline"
             color="black"
             border="1px solid black"
-            isDisabled
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/memberPage/productLike")}
           >
             찜한 목록 보기
           </Button>
