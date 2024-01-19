@@ -31,6 +31,9 @@ export function MemberList() {
   const [memberList, setMemberList] = useState([]);
   const [selectMember, setSelectMember] = useState("");
 
+  // 회원 탈퇴 처리 인식
+  const [checkMember, setCheckMember] = useState(false);
+
   const toast = useToast();
 
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -46,13 +49,40 @@ export function MemberList() {
           description: "회원 목록 조회에 실패 했습니다.",
           status: "error",
         });
+      })
+      .finally(() => {
+        setCheckMember(false);
       });
-  }, []);
+  }, [checkMember]);
 
   // 삭제 버튼 클릭시 동작
   const handleMemberDeleteClick = (e) => {
     setSelectMember(e);
     onOpen();
+  };
+
+  // 모달내 삭제 버튼 클릭시 실제 삭제
+  const handleModalDeleteClick = (e) => {
+    console.log(e.id);
+    axios
+      .delete("/api/member/DeleteMember/" + e.id)
+      .then(() => {
+        toast({
+          description: e.member_login_id + " 님 이 삭체 처리 되었습니다.",
+          status: "success",
+        });
+      })
+      .then(() => {
+        setCheckMember(true);
+      })
+      .catch(() => {
+        toast({
+          title: "탈퇴는 관리자만 가능합니다.",
+          description: "로그인 상태를 확인해주세요.",
+          status: "error",
+        });
+      })
+      .finally(onClose());
   };
 
   return (
@@ -132,7 +162,10 @@ export function MemberList() {
                   Close
                 </Button>
                 <Button colorScheme={"red"}>
-                  <FontAwesomeIcon icon={faTrashCan} />
+                  <FontAwesomeIcon
+                    icon={faTrashCan}
+                    onClick={() => handleModalDeleteClick(selectMember)}
+                  />
                 </Button>
               </ModalFooter>
             </ModalContent>
