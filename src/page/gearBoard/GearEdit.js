@@ -3,10 +3,13 @@ import {
   Button,
   Flex,
   FormControl,
+  FormHelperText,
   FormLabel,
+  Image,
   Input,
   Select,
   Spinner,
+  Switch,
   Textarea,
   useToast,
   VStack,
@@ -15,6 +18,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useImmer } from "use-immer";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 export function GearEdit() {
   const { gear_id } = useParams();
@@ -23,6 +28,8 @@ export function GearEdit() {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [gearboard, updateGearboard] = useImmer(null);
   const categories = ["전체", "잡담", "질문", "정보", "축하", "고민", "인사"];
+  const [removeFileIds, setRemoveFileIds] = useState([]);
+  const [uploadFiles, setUploadFiles] = useState(null);
 
   useEffect(() => {
     axios
@@ -36,7 +43,9 @@ export function GearEdit() {
 
   function handleSave() {
     axios
-      .put("/api/gearboard/saveup", {
+      .putForm("/api/gearboard/saveup", {
+        uploadFiles,
+        removeFileIds,
         gear_id: gearboard.gear_id,
         category: selectedCategory,
         gear_title: gearboard.gear_title,
@@ -46,6 +55,16 @@ export function GearEdit() {
         toast({ description: "수정이 완료 되었습니다", status: "success" });
         navigate("/gearlistlayout");
       });
+  }
+  //e 이벤트 객체 받기
+  function handleRemoveFileSwitch(e) {
+    if (e.target.checked) {
+      // removefileid 에 추가
+      setRemoveFileIds([...removeFileIds, e.target.value]);
+    } else {
+      // removeFileids에 삭제
+      setRemoveFileIds(removeFileIds.filter((item) => item !== e.target));
+    }
   }
 
   return (
@@ -91,6 +110,36 @@ export function GearEdit() {
             })
           }
         ></Textarea>
+      </FormControl>
+      {gearboard.files.length > 0 &&
+        gearboard.files.map((file) => (
+          <Box key={file.id} my={"5px"}>
+            <FormControl display={"flex"} alignItems={"center"}>
+              <FormLabel>
+                <FontAwesomeIcon color={"orange"} icon={faTrashCan} />
+              </FormLabel>
+              <Switch
+                vlaue={file.id}
+                colorScheme={"orange"}
+                onChange={handleRemoveFileSwitch}
+              />
+            </FormControl>
+            <Box>
+              <Image src={file.url} alt={file.name} w={"100%"} />
+            </Box>
+          </Box>
+        ))}
+      <FormControl>
+        <FormLabel>이미지</FormLabel>
+        <Input
+          type="file"
+          multiple // 글을 쓸때  여러개의 파일을 읽을 수 잇따 .
+          accept="image/*"
+          onChange={(e) => setUploadFiles(e.target.files)}
+        />
+        <FormHelperText>
+          한 개 파일은 1MB 이내, 총 용량으 10MB 이내로 첨부 하세요.
+        </FormHelperText>
       </FormControl>
 
       <Button colorScheme={"blue"} onClick={handleSave}>
