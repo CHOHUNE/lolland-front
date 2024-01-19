@@ -257,7 +257,9 @@ export function NavBar() {
             >
               <VStack spacing={2} align="flex-start">
                 <Text>게임 커뮤니티</Text>
-                <Text>게임 장비 커뮤니티</Text>
+                <Text onClick={() => navigate("/gearlistlayout")}>
+                  게임 장비 커뮤니티
+                </Text>
               </VStack>
             </TabPanel>
             {categories.map((category) => (
