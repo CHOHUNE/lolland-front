@@ -326,8 +326,9 @@ export function MemberSignup() {
                 ml={120}
                 color={"gray"}
                 fontSize={"0.9rem"}
+                mb={3}
               >
-                3자에서 20자 사이의 영문자와 숫자만 허용
+                5자에서 20자 사이의 영문자와 숫자만 허용
               </FormHelperText>
             </Flex>
           </FormControl>
