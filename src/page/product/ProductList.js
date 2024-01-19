@@ -1,18 +1,56 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import { Box, Flex, Image, SimpleGrid, Spinner, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Image,
+  SimpleGrid,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
+
+function Pagination({ pageInfo }) {
+  const navigate = useNavigate();
+  const pageNumbers = [];
+
+  if (!pageInfo) {
+    // pageInfo가 null이면 빈 배열을 반환하여 렌더링하지 않음
+    return null;
+  }
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <Box>
+      {pageNumbers.map((pageNumber) => (
+        <Button key={pageNumber} onClick={() => navigate("?p=" + pageNumber)}>
+          {pageNumber}
+        </Button>
+      ))}
+    </Box>
+  );
+}
 
 export function ProductList() {
-  const [productList, setProductList] = useState(null);
+  const [productList, setProductList] = useState([]);
   const navigate = useNavigate();
   const [hoveredBoardId, setHoveredBoardId] = useState(null); // 메인이미지 변경 상태
+  const [pageInfo, setPageInfo] = useState(null);
+
+  const [params] = useSearchParams();
+
+  const location = useLocation();
 
   useEffect(() => {
-    axios
-      .get("/api/product/list")
-      .then((response) => setProductList(response.data));
-  }, []);
+    axios.get("/api/product/list?" + params).then((response) => {
+      setProductList(response.data.product);
+      setPageInfo(response.data.pageInfo);
+    });
+  }, [location]);
 
   // ---------------------------- 로딩로직 ----------------------------
   const FullPageSpinner = () => {
@@ -110,6 +148,7 @@ export function ProductList() {
           ))}
         </SimpleGrid>
       </Flex>
+      <Pagination pageInfo={pageInfo} />
     </Box>
   );
 }
