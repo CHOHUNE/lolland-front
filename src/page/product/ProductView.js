@@ -55,7 +55,7 @@ export function ProductView() {
   const [product, setProduct] = useState(null);
   const [option, setOption] = useState([]);
   const [selectedOption, setSelectedOption] = useState("");
-  const [selectedOptionList, setSelectedOptionList] = useState({});
+  const [selectedOptionList, setSelectedOptionList] = useState([]);
 
   const { product_id } = useParams();
   const [isFavorited, setIsFavorited] = useState(false); // 찜하기
@@ -122,19 +122,16 @@ export function ProductView() {
 
   // ------------------------------ 상세 옵션 관련 로직 ------------------------------
   const handleOptionChange = (optionId) => {
-    // 선택된 옵션의 정보를 가져옵니다.
     const selectedOptionInfo = option.find((opt) => opt.option_id === optionId);
 
     if (selectedOptionInfo) {
-      // 선택된 옵션을 상태에 추가합니다.
-      setSelectedOptionList((prev) => ({
-        ...prev,
-        [selectedOptionInfo.option_id]: {
+      setSelectedOptionList((prev) => [
+        ...prev.filter((opt) => opt.option_id !== selectedOptionInfo.option_id),
+        {
           ...selectedOptionInfo,
-          quantity: prev[selectedOptionInfo.option_id]?.quantity || 1,
+          quantity: 1,
         },
-      }));
-      // 선택된 옵션 ID를 상태에 설정합니다.
+      ]);
       setSelectedOption(selectedOptionInfo.option_id.toString());
     }
   };
@@ -242,7 +239,7 @@ export function ProductView() {
     axios
       .post("/api/cart/add", {
         product_id: product_id,
-        selectedOptionList: selectedOptionList,
+        selectedOptionList: Object.values(selectedOptionList),
       })
       .then(() => {
         toast({
