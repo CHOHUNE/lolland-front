@@ -146,16 +146,18 @@ function SearchComponent() {
 
 function GameBoardList() {
   const [gameBoardList, setGameBoardList] = useState(null);
+  const [notice, setNotice] = useState(null);
+  const [top, setTop] = useState(null);
+  const [today, setToday] = useState(null);
+
+  const [params] = useSearchParams();
   const [pageInfo, setPageInfo] = useState(null);
   const [sortBy, setSortBy] = useState("");
 
   const navigate = useNavigate();
-  const [params] = useSearchParams();
   const location = useLocation();
   const { isAuthenticated } = useContext(LoginContext);
   const toast = useToast();
-  const [notice, setNotice] = useState(null);
-  const [top, setTop] = useState(null);
 
   useEffect(() => {
     // params.set("s", sortBy);
@@ -179,6 +181,12 @@ function GameBoardList() {
       .then((response) => setTop(response.data));
   }, []);
 
+  useEffect(() => {
+    axios
+      .get("/api/gameboard/list/today")
+      .then((response) => setToday(response.data));
+  }, []);
+
   if (gameBoardList === null || pageInfo === null) {
     return <Spinner />;
   }
@@ -190,7 +198,7 @@ function GameBoardList() {
           <VStack w={"100%"} ml={"10%"}>
             <Center>
               <Heading as="h2" size="lg" my={"15px"}>
-                오늘의 BEST
+                BEST 게시판
               </Heading>
             </Center>
             <Center w={"75%"}>
@@ -544,51 +552,26 @@ function GameBoardList() {
         <Box w={"25%"} margin={"15px auto"} mr={"5%"}>
           <Card>
             <CardHeader>
-              <Heading size="md">자유게시판 BEST(추천순)</Heading>
+              <Heading size="md">오늘의 BEST</Heading>
             </CardHeader>
 
             <CardBody>
               <Stack divider={<StackDivider />} spacing="4">
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Summary
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    View a summary of all your clients over the last month.
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Overview
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    Check out the overview of your clients.
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Analysis
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    See a detailed analysis of all your business clients.
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Analysis
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    See a detailed analysis of all your business clients.
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Analysis
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    See a detailed analysis of all your business clients.
-                  </Text>
-                </Box>
+                {today &&
+                  today.map((todayPost) => (
+                    <Box key={todayPost.id}>
+                      <Heading
+                        size="xs"
+                        textTransform="uppercase"
+                        _hover={{ cursor: "pointer" }}
+                        onClick={() =>
+                          navigate("/gameboard/id/" + todayPost.id)
+                        }
+                      >
+                        {todayPost.title}
+                      </Heading>
+                    </Box>
+                  ))}
               </Stack>
             </CardBody>
           </Card>
