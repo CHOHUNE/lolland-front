@@ -82,7 +82,7 @@ export function MemberList() {
           status: "error",
         });
       })
-      .finally(onClose());
+      .finally(() => onClose());
   };
 
   return (
@@ -114,23 +114,35 @@ export function MemberList() {
               </Tr>
             </Thead>
             <Tbody>
-              {memberList.map((member) => (
-                <Tr key={member.id}>
-                  <Td textAlign={"center"}>{member.member_login_id}</Td>
-                  <Td textAlign={"center"}>{member.member_name}</Td>
-                  <Td textAlign={"center"}>{member.member_phone_number}</Td>
-                  <Td textAlign={"center"}>{member.member_email}</Td>
-                  <Td textAlign={"center"}>{member.reg_time}</Td>
-                  <Td textAlign={"center"}>
-                    <Button
-                      colorScheme={"yellow"}
-                      onClick={() => handleMemberDeleteClick(member)}
-                    >
-                      탈퇴
-                    </Button>
-                  </Td>
-                </Tr>
-              ))}
+              {memberList.map((member) => {
+                const formatDate = (dateString) => {
+                  const date = new Date(dateString);
+                  const year = date.getFullYear();
+                  const month = (date.getMonth() + 1)
+                    .toString()
+                    .padStart(2, "0");
+                  const day = date.getDate().toString().padStart(2, "0");
+                  return `${year}년 ${month}월 ${day}일`;
+                };
+
+                return (
+                  <Tr key={member.id}>
+                    <Td textAlign={"center"}>{member.member_login_id}</Td>
+                    <Td textAlign={"center"}>{member.member_name}</Td>
+                    <Td textAlign={"center"}>{member.member_phone_number}</Td>
+                    <Td textAlign={"center"}>{member.member_email}</Td>
+                    <Td textAlign={"center"}>{formatDate(member.reg_time)}</Td>
+                    <Td textAlign={"center"}>
+                      <Button
+                        colorScheme={"yellow"}
+                        onClick={() => handleMemberDeleteClick(member)}
+                      >
+                        탈퇴
+                      </Button>
+                    </Td>
+                  </Tr>
+                );
+              })}
             </Tbody>
           </Table>
         </CardBody>
