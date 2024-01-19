@@ -98,18 +98,46 @@ function Pagination({ pageInfo }) {
 
 function SearchComponent() {
   const [keyword, setKeyword] = useState("");
+  const [category, setCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("");
   const navigate = useNavigate();
 
   function handleSearch() {
     // /?k=keyword&c=all
     const params = new URLSearchParams();
     params.set("k", keyword);
+    params.set("c", category);
+    params.set("s", sortBy);
 
     navigate("/gameboard/list?" + params); // 경로 수정
   }
 
   return (
     <Flex>
+      <Box>
+        <Select
+          defaultValue="default"
+          w={"120px"}
+          onChange={(e) => setSortBy(e.target.value)}
+          ml={4}
+        >
+          <option value="">최신순</option>
+          <option value="count_like">추천순</option>
+          <option value="board_count">조회수순</option>
+        </Select>
+      </Box>
+      <Box>
+        <Select
+          defaultValue="all"
+          w={"100px"}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value="all">전체</option>
+          <option value="title">제목</option>
+          <option value="content">본문</option>
+        </Select>
+      </Box>
+
       <Input value={keyword} onChange={(e) => setKeyword(e.target.value)} />
       <Button onClick={handleSearch}>검색</Button>
     </Flex>
@@ -118,22 +146,28 @@ function SearchComponent() {
 
 function GameBoardList() {
   const [gameBoardList, setGameBoardList] = useState(null);
+  const [notice, setNotice] = useState(null);
+  const [top, setTop] = useState(null);
+  const [today, setToday] = useState(null);
+
+  const [params] = useSearchParams();
   const [pageInfo, setPageInfo] = useState(null);
+  const [sortBy, setSortBy] = useState("");
 
   const navigate = useNavigate();
-  const [params] = useSearchParams();
   const location = useLocation();
   const { isAuthenticated } = useContext(LoginContext);
   const toast = useToast();
-  const [notice, setNotice] = useState(null);
-  const [top, setTop] = useState(null);
 
   useEffect(() => {
+    // params.set("s", sortBy);
+
+    console.log({ sortBy });
     axios.get("/api/gameboard/list?" + params).then((response) => {
       setGameBoardList(response.data.gameBoardList);
       setPageInfo(response.data.pageInfo);
     });
-  }, [location, isAuthenticated]);
+  }, [location, isAuthenticated, sortBy]);
 
   useEffect(() => {
     axios.get("/api/gameboard/list/notice").then((response) => {
@@ -147,6 +181,12 @@ function GameBoardList() {
       .then((response) => setTop(response.data));
   }, []);
 
+  useEffect(() => {
+    axios
+      .get("/api/gameboard/list/today")
+      .then((response) => setToday(response.data));
+  }, []);
+
   if (gameBoardList === null || pageInfo === null) {
     return <Spinner />;
   }
@@ -158,7 +198,7 @@ function GameBoardList() {
           <VStack w={"100%"} ml={"10%"}>
             <Center>
               <Heading as="h2" size="lg" my={"15px"}>
-                오늘의 BEST
+                BEST 게시판
               </Heading>
             </Center>
             <Center w={"75%"}>
@@ -307,7 +347,16 @@ function GameBoardList() {
                 <Table size="sm" border={"1px solid whitesmoke"}>
                   <Thead>
                     <Tr>
-                      <Th w="5%" textAlign={"center"}>
+                      <Th
+                        w="5%"
+                        textAlign={"center"}
+                        cursor={"pointer"}
+                        onClick={() => {
+                          setSortBy("count_like");
+                          params.set("s", sortBy);
+                          navigate("/gameboard/list?" + params);
+                        }}
+                      >
                         추천
                       </Th>
                       <Th w="5%" pl="0">
@@ -316,9 +365,29 @@ function GameBoardList() {
                       <Th w="40%" colSpan={2} textAlign={"center"}>
                         제목
                       </Th>
-                      <Th w="10%">조회수</Th>
+                      <Th
+                        w="10%"
+                        cursor={"pointer"}
+                        onClick={() => {
+                          setSortBy("board_count");
+                          params.set("s", sortBy);
+                          navigate("/gameboard/list?" + params);
+                        }}
+                      >
+                        조회수
+                      </Th>
                       <Th w="10%">작성자</Th>
-                      <Th w="10%">날짜</Th>
+                      <Th
+                        w="10%"
+                        cursor={"pointer"}
+                        onClick={() => {
+                          setSortBy("");
+                          params.set("s", sortBy);
+                          navigate("/gameboard/list?" + params);
+                        }}
+                      >
+                        날짜
+                      </Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -483,51 +552,26 @@ function GameBoardList() {
         <Box w={"25%"} margin={"15px auto"} mr={"5%"}>
           <Card>
             <CardHeader>
-              <Heading size="md">자유게시판 BEST(추천순)</Heading>
+              <Heading size="md">오늘의 BEST</Heading>
             </CardHeader>
 
             <CardBody>
               <Stack divider={<StackDivider />} spacing="4">
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Summary
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    View a summary of all your clients over the last month.
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Overview
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    Check out the overview of your clients.
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Analysis
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    See a detailed analysis of all your business clients.
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Analysis
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    See a detailed analysis of all your business clients.
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Analysis
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    See a detailed analysis of all your business clients.
-                  </Text>
-                </Box>
+                {today &&
+                  today.map((todayPost) => (
+                    <Box key={todayPost.id}>
+                      <Heading
+                        size="xs"
+                        textTransform="uppercase"
+                        _hover={{ cursor: "pointer" }}
+                        onClick={() =>
+                          navigate("/gameboard/id/" + todayPost.id)
+                        }
+                      >
+                        {todayPost.title}
+                      </Heading>
+                    </Box>
+                  ))}
               </Stack>
             </CardBody>
           </Card>
