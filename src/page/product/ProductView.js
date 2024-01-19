@@ -276,46 +276,30 @@ export function ProductView() {
     const newFavoriteStatus = !isFavorited;
     // UI를 먼저 업데이트하고 서버 요청을 보냄
     setIsFavorited(newFavoriteStatus);
-    // 서버에 좋아요 상태 전송
-    if (isFavorited !== true) {
-      axios
-        .post("/api/productLike", {
-          product_id: product_id,
-          isFavorited: newFavoriteStatus,
-        })
-        .then(() => {
-          toast({
-            description: "상품 찜목록에 저장되었습니다.",
-            status: "success",
-          });
-        })
-        .catch((error) => {
-          toast({
-            description: "로그인 해주시기 바랍니다.",
-            status: "error",
-          });
-          setIsFavorited(!newFavoriteStatus);
+
+    // 서버에 좋아요 상태와 선택된 옵션 상태 전송
+    axios
+      .post("/api/productLike", {
+        product_id: product_id,
+        isFavorited: newFavoriteStatus,
+        selectedOptions: selectedOptionList, // 여기에 선택된 옵션을 추가
+      })
+      .then(() => {
+        toast({
+          description: newFavoriteStatus
+            ? "상품이 찜목록에 저장되었습니다."
+            : "상품이 찜목록에서 삭제되었습니다.",
+          status: "success",
         });
-    } else {
-      axios
-        .post("/api/productLike", {
-          product_id: product_id,
-          isFavorited: newFavoriteStatus,
-        })
-        .then(() => {
-          toast({
-            description: "상품 찜목록에서 삭제되었습니다.",
-            status: "error",
-          });
-        })
-        .catch((error) => {
-          toast({
-            description: "로그인 해주시기 바랍니다.",
-            status: "error",
-          });
-          setIsFavorited(!newFavoriteStatus);
+      })
+      .catch((error) => {
+        toast({
+          description: "로그인 해주시기 바랍니다.",
+          status: "error",
         });
-    }
+        // 서버 요청 실패 시 UI 상태를 이전으로 되돌림
+        setIsFavorited(!newFavoriteStatus);
+      });
   };
 
   // ----------------------------------- 평점 별 표시 로직 -----------------------------------
