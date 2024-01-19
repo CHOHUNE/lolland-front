@@ -99,6 +99,7 @@ function Pagination({ pageInfo }) {
 function SearchComponent() {
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("");
   const navigate = useNavigate();
 
   function handleSearch() {
@@ -106,12 +107,25 @@ function SearchComponent() {
     const params = new URLSearchParams();
     params.set("k", keyword);
     params.set("c", category);
+    params.set("s", sortBy);
 
     navigate("/gameboard/list?" + params); // 경로 수정
   }
 
   return (
     <Flex>
+      <Box>
+        <Select
+          defaultValue="default"
+          w={"120px"}
+          onChange={(e) => setSortBy(e.target.value)}
+          ml={4}
+        >
+          <option value="">최신순</option>
+          <option value="count_like">추천순</option>
+          <option value="board_count">조회수순</option>
+        </Select>
+      </Box>
       <Box>
         <Select
           defaultValue="all"
@@ -133,6 +147,7 @@ function SearchComponent() {
 function GameBoardList() {
   const [gameBoardList, setGameBoardList] = useState(null);
   const [pageInfo, setPageInfo] = useState(null);
+  const [sortBy, setSortBy] = useState("");
 
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -143,11 +158,14 @@ function GameBoardList() {
   const [top, setTop] = useState(null);
 
   useEffect(() => {
+    // params.set("s", sortBy);
+
+    console.log({ sortBy });
     axios.get("/api/gameboard/list?" + params).then((response) => {
       setGameBoardList(response.data.gameBoardList);
       setPageInfo(response.data.pageInfo);
     });
-  }, [location, isAuthenticated]);
+  }, [location, isAuthenticated, sortBy]);
 
   useEffect(() => {
     axios.get("/api/gameboard/list/notice").then((response) => {
@@ -321,7 +339,16 @@ function GameBoardList() {
                 <Table size="sm" border={"1px solid whitesmoke"}>
                   <Thead>
                     <Tr>
-                      <Th w="5%" textAlign={"center"}>
+                      <Th
+                        w="5%"
+                        textAlign={"center"}
+                        cursor={"pointer"}
+                        onClick={() => {
+                          setSortBy("count_like");
+                          params.set("s", sortBy);
+                          navigate("/gameboard/list?" + params);
+                        }}
+                      >
                         추천
                       </Th>
                       <Th w="5%" pl="0">
@@ -330,9 +357,29 @@ function GameBoardList() {
                       <Th w="40%" colSpan={2} textAlign={"center"}>
                         제목
                       </Th>
-                      <Th w="10%">조회수</Th>
+                      <Th
+                        w="10%"
+                        cursor={"pointer"}
+                        onClick={() => {
+                          setSortBy("board_count");
+                          params.set("s", sortBy);
+                          navigate("/gameboard/list?" + params);
+                        }}
+                      >
+                        조회수
+                      </Th>
                       <Th w="10%">작성자</Th>
-                      <Th w="10%">날짜</Th>
+                      <Th
+                        w="10%"
+                        cursor={"pointer"}
+                        onClick={() => {
+                          setSortBy("");
+                          params.set("s", sortBy);
+                          navigate("/gameboard/list?" + params);
+                        }}
+                      >
+                        날짜
+                      </Th>
                     </Tr>
                   </Thead>
                   <Tbody>
