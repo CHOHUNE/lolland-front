@@ -32,6 +32,7 @@ import { ProductLike } from "./page/productLike/ProductLike";
 import { MemberFindId } from "./page/member/MemberFindId";
 import { MemberFindPassword } from "./page/member/MemberFindPassword";
 import { PasswordEdit } from "./page/member/MemberViewPage/PasswordEdit";
+import { AdminView } from "./page/admin/AdminView";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -81,6 +82,9 @@ const routes = createBrowserRouter(
       <Route path="gearlistlayout" element={<GearListlayout />} />
       <Route path="gearlist/gear_id/:gear_id" element={<GearView />} />
       <Route path="gearlist/edit/:gear_id" element={<GearEdit />} />
+
+      {/* 관리자 페이지 */}
+      <Route path="adminPage" element={<AdminView />} />
     </Route>,
   ),
 );
