@@ -69,6 +69,14 @@ export function GearView() {
         <FormLabel>타이틀</FormLabel>
         <Input value={gearboard.gear_content} />
       </FormControl>
+      {/* 이미지 출력*/}
+      <FormLabel>이미지</FormLabel>
+      {gearboard.files.map((file) => (
+        <Box key={file.id} my="5px">
+          <Image width="100%" src={file.url} alt={file.name} />
+        </Box>
+      ))}
+
       <FormControl>
         <FormLabel>작성일</FormLabel>
         <Input value={gearboard.gear_inserted} />

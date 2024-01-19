@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   FormControl,
+  FormHelperText,
   FormLabel,
   Input,
   Select,
@@ -9,36 +10,40 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { LoginContext } from "../../component/LoginProvider";
 
 export function GearBoard() {
   const [gear_title, setGear_title] = useState("");
   const [gear_content, setGear_content] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("전체");
-  const [member, setMember] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
-
+  const [uploadFiles, setUploadFiles] = useState(null);
   const categories = ["전체", "잡담", "질문", "정보", "축하", "고민", "인사"];
+  const { isAuthenticated } = useContext(LoginContext);
 
   function handleSave() {
+    setIsSubmitting(true);
     axios
-      .post("/api/gearboard/save", {
+      .postForm("/api/gearboard/saves", {
         gear_title,
         gear_content,
         category: selectedCategory,
+        uploadFiles,
       })
       .then(() => {
         toast({ description: "글쓰기가 완료되었습니다", status: "success" });
-        navigate("/gearlist");
+        navigate("/gearlistlayout");
       })
 
-      .catch((error) => {
-        console.error("Error saving the gear post:", error);
+      .catch(() => {
         toast({ description: "글쓰기 실패", status: "error" });
-      });
+      })
+      .finally(() => setIsSubmitting(true));
   }
 
   return (
@@ -73,6 +78,18 @@ export function GearBoard() {
           onChange={(e) => setGear_content(e.target.value)}
         />
       </FormControl>
+      <FormControl>
+        <FormLabel>이미지</FormLabel>
+        <Input
+          type="file"
+          multiple // 글을 쓸때  여러개의 파일을 읽을 수 잇따 .
+          accept="image/*"
+          onChange={(e) => setUploadFiles(e.target.files)}
+        />
+        <FormHelperText>
+          한 개 파일은 1MB 이내, 총 용량으 10MB 이내로 첨부 하세요.
+        </FormHelperText>
+      </FormControl>
 
       {/*<FormControl>*/}
       {/*  <FormLabel>작성자</FormLabel>*/}
@@ -81,7 +98,11 @@ export function GearBoard() {
       {/*    onChange={(e) => setGear_title(e.target.value)}*/}
       {/*  />*/}
       {/*</FormControl>*/}
-      <Button onClick={handleSave} colorScheme={"orange"}>
+      <Button
+        isDisabled={isSubmitting}
+        onClick={handleSave}
+        colorScheme={"orange"}
+      >
         글쓰기
       </Button>
     </Box>

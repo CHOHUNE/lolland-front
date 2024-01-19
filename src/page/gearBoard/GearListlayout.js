@@ -16,9 +16,11 @@ import {
   CardBody,
   Flex,
   Divider,
+  Button,
 } from "@chakra-ui/react";
 import { GearList } from "./GearList";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Pageing() {
   return null;
@@ -26,9 +28,10 @@ function Pageing() {
 
 export function GearListlayout() {
   const [category, setCategory] = useState("전체");
-
+  const navigate = useNavigate();
   return (
     <Box w={"80%"} margin={"15px auto"}>
+      <Button onClick={() => navigate("/gearboard")}> 글쓰기</Button>
       <Flex>
         {/* 왼쪽 70%  오늘의 베스트 , 게시판 리스트 */}
         <Box w={"70%"} margin={"15px  auto"} mr={"20px"}>
