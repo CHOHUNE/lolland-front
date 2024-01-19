@@ -340,7 +340,7 @@ export function ProductView() {
     axios
       .post("/api/cart/add", {
         product_id: product_id,
-        selectedOptionList: selectedOptionList,
+        selectedOptionList: Object.values(selectedOptionList),
       })
       .then(() => {
         toast({
