@@ -8,6 +8,7 @@ import {
   Flex,
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   Input,
   useToast,
@@ -68,11 +69,20 @@ export function PasswordEdit() {
       .then(() => {
         navigate("/login");
       })
-      .catch(() => {
-        toast({
-          description: "수정 중 문제가 발생하였습니다.",
-          status: "error",
-        });
+      .catch((error) => {
+        if (error.response && error.response.status === 400) {
+          let errorMessage = error.response.data[0];
+          toast({
+            description: errorMessage,
+            status: "error",
+          });
+        } else {
+          // 기타 오류에 대한 처리
+          toast({
+            description: "가입에 실패하셨습니다.",
+            status: "error",
+          });
+        }
       });
   }
 
