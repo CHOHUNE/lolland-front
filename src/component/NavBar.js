@@ -150,7 +150,16 @@ export function NavBar() {
                   onClick={() => navigate("/memberPage")}
                 />
                 {isAdmin() && (
-                  <IconButton icon={<FontAwesomeIcon icon={faUsersGear} />} />
+                  <IconButton
+                    icon={
+                      <FontAwesomeIcon
+                        icon={faUsersGear}
+                        onClick={() => {
+                          navigate("adminPage");
+                        }}
+                      />
+                    }
+                  />
                 )}
                 <IconButton
                   icon={<FontAwesomeIcon icon={faArrowRightFromBracket} />}

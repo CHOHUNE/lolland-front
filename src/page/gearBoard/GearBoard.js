@@ -22,7 +22,7 @@ export function GearBoard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
-  const [files, setFiles] = useState(null);
+  const [uploadFiles, setUploadFiles] = useState(null);
   const categories = ["전체", "잡담", "질문", "정보", "축하", "고민", "인사"];
   const { isAuthenticated } = useContext(LoginContext);
 
@@ -33,7 +33,7 @@ export function GearBoard() {
         gear_title,
         gear_content,
         category: selectedCategory,
-        files,
+        uploadFiles,
       })
       .then(() => {
         toast({ description: "글쓰기가 완료되었습니다", status: "success" });
@@ -84,7 +84,7 @@ export function GearBoard() {
           type="file"
           multiple // 글을 쓸때  여러개의 파일을 읽을 수 잇따 .
           accept="image/*"
-          onChange={(e) => setFiles(e.target.files)}
+          onChange={(e) => setUploadFiles(e.target.files)}
         />
         <FormHelperText>
           한 개 파일은 1MB 이내, 총 용량으 10MB 이내로 첨부 하세요.

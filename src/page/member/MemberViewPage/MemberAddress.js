@@ -31,6 +31,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDaumPostcodePopup } from "react-daum-postcode";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 export function MemberAddress() {
   const [memberAddress, setMemberAddress] = useState([]);
@@ -201,7 +203,7 @@ export function MemberAddress() {
 
   return (
     <Center>
-      <Card w={"1000px"}>
+      <Card w={"1200px"}>
         <CardHeader mt={4}>
           <Flex gap={4} alignItems={"flex-end"}>
             <Box fontSize={"1.4rem"} fontWeight={"900"}>
@@ -229,6 +231,8 @@ export function MemberAddress() {
                 <Th fontSize={"1.2rem"} w={"170px"} textAlign={"center"}>
                   기본 주소 여부
                 </Th>
+                <Th fontSize={"1.2rem"} w={"50px"} textAlign={"center"}></Th>
+                <Th fontSize={"1.2rem"} w={"50px"} textAlign={"center"}></Th>
               </Tr>
             </Thead>
 
@@ -253,17 +257,18 @@ export function MemberAddress() {
                           <Box as="span"> - </Box>
                         )}
                       </Td>
-                    </Tr>
-                    <Tr>
-                      <Td colSpan={5}>
-                        <Flex gap={2} mt={2}>
-                          <Button onClick={() => openEditModal(address)}>
-                            수정
-                          </Button>
-                          <Button onClick={() => openDeleteModal(address)}>
-                            삭제
-                          </Button>
-                        </Flex>
+                      <Td>
+                        <Button onClick={() => openEditModal(address)}>
+                          수정
+                        </Button>
+                      </Td>
+                      <Td>
+                        <Button
+                          colorScheme={"yellow"}
+                          onClick={() => openDeleteModal(address)}
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </Button>
                       </Td>
                     </Tr>
                   </Tbody>
@@ -274,7 +279,7 @@ export function MemberAddress() {
 
         <CardFooter>
           <Button onClick={() => navigate("/memberPage/addressWrite")}>
-            배송지 추가
+            <FontAwesomeIcon icon={faPlus} />
           </Button>
         </CardFooter>
       </Card>
