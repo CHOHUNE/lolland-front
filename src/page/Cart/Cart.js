@@ -266,12 +266,9 @@ export function Cart() {
               return (
                 <Tr
                   key={product.product_id}
-                  // onClick={() => navigate(`product/${product.product_id}`)}
+                  onClick={() => navigate(`/product/${product.product_id}`)}
                 >
-                  <Td
-                    textAlign="center"
-                    // onClick={(e) => e.stopPropagation()}
-                  >
+                  <Td textAlign="center" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       colorScheme="gray"
                       isChecked={selectedProducts.includes(product.product_id)}
@@ -281,9 +278,17 @@ export function Cart() {
                     />
                   </Td>
                   <Td textAlign="center" justifyContent="center" display="flex">
-                    <Image src={product.main_img_url} w="70px" />
+                    <Image src={product.main_img_uri} w="70px" />
                   </Td>
-                  <Td textAlign="center">{product.product_name}</Td>
+                  <Td textAlign="center">
+                    {product.option_name ? (
+                      <Text whiteSpace={"nowrap"}>
+                        {product.product_name} : {product.option_name}
+                      </Text>
+                    ) : (
+                      <Text whiteSpace={"nowrap"}>{product.product_name}</Text>
+                    )}
+                  </Td>
                   <Td textAlign="center" whiteSpace={"nowrap"}>
                     {product.category_name} / {product.subcategory_name}
                   </Td>
