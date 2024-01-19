@@ -305,21 +305,36 @@ export function GameBoardView() {
                       <TableContainer>
                         <Table variant="simple">
                           <TableCaption></TableCaption>
-
+                          {/* 해당 코멘트의 좌표로 이동하게끔 설정 */}
                           <Tbody>
-                            {writtenComment.map((commen) => (
+                            {writtenComment.map((comment) => (
                               <Tr
-                                key={commen.id}
+                                key={comment.id}
                                 onClick={() => {
                                   navigate(
-                                    `/gameboard/id/${commen.game_board_id}`,
+                                    `/gameboard/id/${comment.game_board_id}`,
                                   );
-                                  window.scrollTo(0, 0);
+                                  const commentElement =
+                                    document.getElementById(
+                                      `comment-${comment.id}`,
+                                    );
+                                  if (commentElement) {
+                                    const yOffset = -100; // 추가적인 Y offset을 설정
+                                    const y =
+                                      commentElement.getBoundingClientRect()
+                                        .top +
+                                      window.pageYOffset +
+                                      yOffset;
+                                    window.scrollTo({
+                                      top: y,
+                                      behavior: "smooth",
+                                    });
+                                  }
                                 }}
                                 _hover={{ cursor: "pointer" }}
                               >
-                                <TableCaption>
-                                  {commen.comment_content}
+                                <TableCaption id={`comment-${comment.id}`}>
+                                  {comment.comment_content}
                                 </TableCaption>
                                 <Divider />
                               </Tr>
