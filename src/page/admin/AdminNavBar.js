@@ -20,6 +20,11 @@ import { useNavigate } from "react-router-dom";
 export function AdminNavBar() {
   const navigate = useNavigate();
 
+  // 회원 목록 클릭시
+  function handleMemberListClick() {
+    navigate("/adminPage/memberList");
+  }
+
   return (
     <Card>
       <CardHeader>관리자 페이지 입니다.</CardHeader>
@@ -49,7 +54,9 @@ export function AdminNavBar() {
               <FormLabel
                 _hover={{ cursor: "pointer" }}
                 fontWeight={"900"}
-                // onClick={handleMemberManageClick}
+                onClick={() => {
+                  navigate("/product/list/");
+                }}
               >
                 상품 목록 >
               </FormLabel>
@@ -66,16 +73,15 @@ export function AdminNavBar() {
               <FormLabel
                 _hover={{ cursor: "pointer" }}
                 fontWeight={"900"}
-                // onClick={handleMemberManageClick}
+                onClick={handleMemberListClick}
               >
-                회원 목록 >
+                회원 목록 관리 >
               </FormLabel>
               <Box>
                 <FontAwesomeIcon icon={faPeopleGroup} />
               </Box>
             </Flex>
           </FormControl>
-          <Box border={"1px solid whitesmoke"}></Box>
         </Flex>
       </CardBody>
     </Card>
