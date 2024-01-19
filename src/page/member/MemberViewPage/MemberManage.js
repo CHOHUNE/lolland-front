@@ -8,7 +8,9 @@ import {
   Center,
   Flex,
   FormControl,
+  FormHelperText,
   FormLabel,
+  Image,
   Input,
   Modal,
   ModalBody,
@@ -66,6 +68,21 @@ export function MemberManage() {
         <CardHeader>{member.member_name}_님 정보 입니다.</CardHeader>
         <CardBody>
           <FormControl mt={4}>
+            <Flex>
+              <FormLabel w={"100px"}>프로필 사진</FormLabel>
+              <Image
+                borderRadius="full"
+                boxSize="150px"
+                src={member.memberImageDto.file_url}
+                alt={member.memberImageDto.file_name}
+              />
+            </Flex>
+            {member.memberImageDto.image_type === "default" && (
+              <FormHelperText ml={"110px"}>기본 이미지 입니다.</FormHelperText>
+            )}
+          </FormControl>
+
+          <FormControl mt={6}>
             <Flex>
               <FormLabel w={"100px"}>이름</FormLabel>
               <Input readOnly value={member.member_name} />
