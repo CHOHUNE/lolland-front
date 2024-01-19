@@ -4,11 +4,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Button,
+  Card,
   Center,
   Flex,
   FormLabel,
   HStack,
   Image,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -32,20 +37,25 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar as farStar } from "@fortawesome/free-regular-svg-icons"; // 꽉 찬 아이콘
 import {
   faCartShopping,
   faHeart as fasHeart,
-} from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 하트
-import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons";
+  faSpinner,
+  faStar,
+  faStarHalfAlt,
+} from "@fortawesome/free-solid-svg-icons"; // 꽉 찬 아이콘
+import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons"; // 빈 아이콘
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { ReviewView } from "../review/ReviewView";
 import { selectOptions } from "@testing-library/user-event/dist/select-options"; // 빈 하트
-import { ReviewView } from "../review/ReviewView"; // 빈 하트
+import { ProductStats } from "../review/ProductStats"; // 빈 하트
 
 export function ProductView() {
   const [product, setProduct] = useState(null);
   const [option, setOption] = useState([]);
-  const [seletedOption, setSeletedOption] = useState("");
-  const [seletedOptionList, setSeletedOptionList] = useState({});
+  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOptionList, setSelectedOptionList] = useState({});
 
   const { product_id } = useParams();
   const [isFavorited, setIsFavorited] = useState(false); // 찜하기
@@ -85,7 +95,19 @@ export function ProductView() {
   // ---------------------------- 로딩로직 ----------------------------
 
   if (product === null) {
-    return <Spinner />;
+    return (
+      <Center textAlign={"center"}>
+        <Card
+          size={"500px"}
+          w="500px"
+          h="500px"
+          alignItems={"center"}
+          display={"flex"}
+        >
+          <FontAwesomeIcon fontSize={"3.5rem"} icon={faSpinner} spinPulse />
+        </Card>
+      </Center>
+    );
   }
 
   // ------------------------------ 가격 ex) 1,000 ,로 구분지어 보여지게 처리 ------------------------------
@@ -99,30 +121,27 @@ export function ProductView() {
   };
 
   // ------------------------------ 상세 옵션 관련 로직 ------------------------------
-  const handleOptionChange = (e) => {
-    const selectedValue = e.target.value;
-    setSeletedOption(selectedValue);
-
-    // 선택된 옵션을 찾아 해당 옵션 정보를 추가
-    const selectedOptionInfo = option.find(
-      (opt) => opt.option_id.toString() === selectedValue,
-    );
+  const handleOptionChange = (optionId) => {
+    // 선택된 옵션의 정보를 가져옵니다.
+    const selectedOptionInfo = option.find((opt) => opt.option_id === optionId);
 
     if (selectedOptionInfo) {
-      setSeletedOptionList((prev) => ({
+      // 선택된 옵션을 상태에 추가합니다.
+      setSelectedOptionList((prev) => ({
         ...prev,
         [selectedOptionInfo.option_id]: {
-          ...prev[selectedOptionInfo.option_id],
           ...selectedOptionInfo,
           quantity: prev[selectedOptionInfo.option_id]?.quantity || 1,
         },
       }));
+      // 선택된 옵션 ID를 상태에 설정합니다.
+      setSelectedOption(selectedOptionInfo.option_id.toString());
     }
   };
 
   // ------------------------------ 목록에있는 상품 삭제 로직 ------------------------------
   const handleRemoveDetail = (key) => {
-    setSeletedOptionList((prevDetails) => {
+    setSelectedOptionList((prevDetails) => {
       const { [key]: _, ...rest } = prevDetails;
       return rest;
     });
@@ -130,7 +149,7 @@ export function ProductView() {
 
   // ------------------------------ 수량 증가 로직 ------------------------------
   const increaseQuantity = (key) => {
-    setSeletedOptionList((prevDetails) => {
+    setSelectedOptionList((prevDetails) => {
       const currentQuantity = prevDetails[key].quantity;
       const maxQuantity = prevDetails[key].stock; // 'stock'이 재고 수량을 나타냄
 
@@ -159,7 +178,7 @@ export function ProductView() {
 
   // ------------------------------ 수량 감소 로직 ------------------------------
   const decreaseQuantity = (key) => {
-    setSeletedOptionList((prevDetails) => {
+    setSelectedOptionList((prevDetails) => {
       // 현재 항목의 수량 확인
       const currentQuantity = prevDetails[key].quantity;
 
@@ -183,9 +202,9 @@ export function ProductView() {
   // ------------------------------ 수량에 따라 총 가격 계산 로직 ------------------------------
   const calculateTotalPrice = () => {
     // 상세선택이 있고 선택된 상세선택이 있는 경우
-    if (option.length > 0 && Object.keys(seletedOptionList).length > 0) {
+    if (option.length > 0 && Object.keys(selectedOptionList).length > 0) {
       return formatPrice(
-        Object.values(seletedOptionList).reduce((sum, optionItem) => {
+        Object.values(selectedOptionList).reduce((sum, optionItem) => {
           // 옵션 가격이 있으면 사용, 없으면 기본 상품 가격 사용
           const pricePerItem =
             optionItem.price || product.product.product_price;
@@ -223,7 +242,7 @@ export function ProductView() {
     axios
       .post("/api/cart/add", {
         product_id: product_id,
-        seletedOptionList: seletedOptionList,
+        selectedOptionList: selectedOptionList,
       })
       .then(() => {
         toast({
@@ -233,7 +252,7 @@ export function ProductView() {
       })
       .catch(() => {
         toast({
-          description: "이동중 오류가 발생하였습니다.",
+          description: "장바구니로 이동 중 오류가 발생하였습니다.",
           status: "error",
         });
       });
@@ -261,24 +280,71 @@ export function ProductView() {
     // UI를 먼저 업데이트하고 서버 요청을 보냄
     setIsFavorited(newFavoriteStatus);
     // 서버에 좋아요 상태 전송
-    axios
-      .post("/api/productLike", {
-        product_id: product_id,
-        isFavorited: newFavoriteStatus,
-      })
-      .then(() => {
-        toast({
-          description: "상품 찜목록에 저장되었습니다.",
-          status: "success",
+    if (isFavorited !== true) {
+      axios
+        .post("/api/productLike", {
+          product_id: product_id,
+          isFavorited: newFavoriteStatus,
+        })
+        .then(() => {
+          toast({
+            description: "상품 찜목록에 저장되었습니다.",
+            status: "success",
+          });
+        })
+        .catch((error) => {
+          toast({
+            description: "로그인 해주시기 바랍니다.",
+            status: "error",
+          });
+          setIsFavorited(!newFavoriteStatus);
         });
-      })
-      .catch((error) => {
-        toast({
-          description: "찜목록으로 이동되지 않았습니다.",
-          status: "error",
+    } else {
+      axios
+        .post("/api/productLike", {
+          product_id: product_id,
+          isFavorited: newFavoriteStatus,
+        })
+        .then(() => {
+          toast({
+            description: "상품 찜목록에서 삭제되었습니다.",
+            status: "error",
+          });
+        })
+        .catch((error) => {
+          toast({
+            description: "로그인 해주시기 바랍니다.",
+            status: "error",
+          });
+          setIsFavorited(!newFavoriteStatus);
         });
-        setIsFavorited(!newFavoriteStatus);
-      });
+    }
+  };
+
+  // ----------------------------------- 평점 별 표시 로직 -----------------------------------
+  const renderStars = (rate) => {
+    // 평점이 없거나 0인 경우 빈 별 5개로 출력
+    if (rate == null || rate === 0) {
+      return Array.from({ length: 5 }, (_, i) => (
+        <FontAwesomeIcon icon={farStar} color="#EAEAE7" key={i} />
+      ));
+    }
+    let stars = [];
+    for (let i = 0; i < 5; i++) {
+      if (i < Math.floor(rate)) {
+        // 꽉찬 별
+        stars.push(<FontAwesomeIcon icon={faStar} color="#FFE000" key={i} />);
+      } else if (i === Math.floor(rate) && !Number.isInteger(rate)) {
+        // 반쪽 별
+        stars.push(
+          <FontAwesomeIcon icon={faStarHalfAlt} color="#FFE000" key={i} />,
+        );
+      } else {
+        // 빈 별
+        stars.push(<FontAwesomeIcon icon={farStar} color="#EAEAE7" key={i} />);
+      }
+    }
+    return stars;
   };
 
   return (
@@ -306,7 +372,7 @@ export function ProductView() {
         <Box justify="center" align="start" maxW="100%" m="auto">
           {/* ---------------------- 상품명 ---------------------- */}
           <Text ml={4} fontWeight={"bold"} fontSize={"1.7rem"}>
-            [{product.company_name}]{product.product.product_name}
+            [{product.company_name}] {product.product.product_name}
           </Text>
 
           {/* ---------------------- 상품설명 ---------------------- */}
@@ -315,7 +381,7 @@ export function ProductView() {
           </Text>
         </Box>
 
-        <Flex minW={"500px"} mt={-10}>
+        <Flex minW="1000px" maxW="1500px" mt={-5}>
           {/* 메인 이미지 */}
           <Box p={2}>
             {product &&
@@ -332,7 +398,7 @@ export function ProductView() {
               )}
 
             {/* 썸네일 이미지 */}
-            <HStack justifyContent={"center"} mt={2}>
+            <HStack justifyContent={"center"} mt={-10}>
               {product &&
                 product.productImgs &&
                 product.productImgs.map((img, index) => (
@@ -373,17 +439,6 @@ export function ProductView() {
             <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
               <HStack mt={3} mb={3}>
                 <FormLabel w={"100px"} fontWeight="bold">
-                  총 재고
-                </FormLabel>
-                <Box fontWeight={400} mt={-2} border={"none"} flex={1}>
-                  {product.product.total_stock}개
-                </Box>
-              </HStack>
-            </HStack>
-
-            <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
-              <HStack mt={3} mb={3}>
-                <FormLabel w={"100px"} fontWeight="bold">
                   제조사
                 </FormLabel>
                 <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
@@ -398,7 +453,10 @@ export function ProductView() {
                   평점
                 </FormLabel>
                 <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
-                  {product.product.average_rate}
+                  {renderStars(product.product.average_rate)}{" "}
+                  {product.product.average_rate !== null
+                    ? product.product.average_rate
+                    : "0"}
                 </Text>
               </HStack>
             </HStack>
@@ -452,24 +510,35 @@ export function ProductView() {
             </HStack>
 
             {/* 상세옵션 로직 */}
-            <Box w="100%">
+            <Box w="100%" mt={5}>
               {option.length > 0 && (
-                <Box w="100%" position="relative" mt={5}>
-                  <Box>
-                    <Select value={seletedOption} onChange={handleOptionChange}>
-                      <option value="">옵션을 선택하세요</option>
-                      {option.map((opt, index) => (
-                        <option key={index} value={opt.option_id}>
-                          {opt.option_name}
-                        </option>
-                      ))}
-                    </Select>
-                  </Box>
-                </Box>
+                <Menu matchWidth>
+                  <MenuButton as={Button} w="100%" h="50px">
+                    {selectedOption
+                      ? option.find(
+                          (opt) => opt.option_id.toString() === selectedOption,
+                        )?.option_name || "옵션을 선택하세요"
+                      : "옵션을 선택하세요"}
+                  </MenuButton>
+                  <MenuList>
+                    {option.map((opt, index) => (
+                      <MenuItem
+                        key={index}
+                        onClick={() => handleOptionChange(opt.option_id)} // 여기서 handleOptionChange 호출
+                      >
+                        <Flex justifyContent="space-between" w="100%">
+                          <Text>{opt.option_name}</Text>
+                          <Text>수량: {opt.stock}</Text>
+                        </Flex>
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
               )}
+
               <Box>
-                {Object.keys(seletedOptionList).length > 0 &&
-                  Object.entries(seletedOptionList).map(
+                {Object.keys(selectedOptionList).length > 0 &&
+                  Object.entries(selectedOptionList).map(
                     ([key, optionList], index) => (
                       <Box
                         mt={5}
@@ -569,7 +638,7 @@ export function ProductView() {
                     <Text
                       style={{
                         color: "red",
-                        fontSize: "25px",
+                        fontSize: "2rem",
                         fontWeight: "bold",
                       }}
                     >

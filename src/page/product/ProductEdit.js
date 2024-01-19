@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Center,
   Flex,
   FormControl,
   FormLabel,
@@ -9,6 +10,7 @@ import {
   Select,
   Spinner,
   Switch,
+  Text,
   Textarea,
   useToast,
 } from "@chakra-ui/react";
@@ -203,238 +205,243 @@ export function ProductEdit() {
   }
 
   return (
-    <Box>
-      {/* ------------------- 대분류 로직 ------------------- */}
-      <FormControl>
-        <FormLabel>대분류</FormLabel>
-        <Select value={selectedCategory} onChange={handleCategoryChange}>
-          <option value="">---Select Category---</option>
-          {categories.map((category) => (
-            <option key={category.category_id} value={category.category_id}>
-              {category.category_name}
-            </option>
-          ))}
-        </Select>
-      </FormControl>
-
-      {/* ------------------- 소분류 로직 ------------------- */}
-      <FormControl>
-        <FormLabel>소분류</FormLabel>
-        <Select value={selectedSubCategory} onChange={handleSubCategoryChange}>
-          <option value="">---Select Subcategory---</option>
-          {selectedCategory &&
-            categories
-              .find((c) => c.category_id === parseInt(selectedCategory))
-              ?.subCategory.map((subCategory) => (
-                <option
-                  key={subCategory.subcategory_id}
-                  value={subCategory.subcategory_id}
-                >
-                  {subCategory.subcategory_name}
+    <Box mt={10}>
+      <Text
+        fontSize={"1.5rem"}
+        fontWeight={"bold"}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
+      >
+        상품수정
+      </Text>
+      <Center>
+        <Box>
+          {/* ------------------- 대분류 로직 ------------------- */}
+          <FormControl mt={3}>
+            <FormLabel fontWeight={"bold"}>대분류</FormLabel>
+            <Select value={selectedCategory} onChange={handleCategoryChange}>
+              <option value="">---Select Category---</option>
+              {categories.map((category) => (
+                <option key={category.category_id} value={category.category_id}>
+                  {category.category_name}
                 </option>
               ))}
-        </Select>
-      </FormControl>
+            </Select>
+          </FormControl>
 
-      <FormControl>
-        <FormLabel>상품명</FormLabel>
-        <Input
-          value={product.product.product_name}
-          onChange={(e) =>
-            setProduct((prevProduct) => ({
-              ...prevProduct,
-              product: {
-                ...prevProduct.product,
-                product_name: e.target.value,
-              },
-            }))
-          }
-        />
-      </FormControl>
+          {/* ------------------- 소분류 로직 ------------------- */}
+          <FormControl mt={3}>
+            <FormLabel fontWeight={"bold"}>소분류</FormLabel>
+            <Select
+              value={selectedSubCategory}
+              onChange={handleSubCategoryChange}
+            >
+              <option value="">---Select Subcategory---</option>
+              {selectedCategory &&
+                categories
+                  .find((c) => c.category_id === parseInt(selectedCategory))
+                  ?.subCategory.map((subCategory) => (
+                    <option
+                      key={subCategory.subcategory_id}
+                      value={subCategory.subcategory_id}
+                    >
+                      {subCategory.subcategory_name}
+                    </option>
+                  ))}
+            </Select>
+          </FormControl>
 
-      <FormControl>
-        <FormLabel>금액</FormLabel>
-        <Input
-          value={product.product.product_price}
-          onChange={(e) =>
-            setProduct((prevProduct) => ({
-              ...prevProduct,
-              product: {
-                ...prevProduct.product,
-                product_price: e.target.value,
-              },
-            }))
-          }
-        />
-      </FormControl>
-
-      <FormControl>
-        <FormLabel>상품설명</FormLabel>
-        <Input
-          value={product.product.product_content}
-          onChange={(e) =>
-            setProduct((prevProduct) => ({
-              ...prevProduct,
-              product: {
-                ...prevProduct.product,
-                product_content: e.target.value,
-              },
-            }))
-          }
-        />
-      </FormControl>
-
-      <FormControl>
-        <FormLabel>재고</FormLabel>
-        <Input
-          value={product.product.total_stock}
-          onChange={(e) =>
-            setProduct((prevProduct) => ({
-              ...prevProduct,
-              product: {
-                ...prevProduct.product,
-                total_stock: e.target.value,
-              },
-            }))
-          }
-        />
-      </FormControl>
-
-      <FormControl>
-        <FormLabel>제조사</FormLabel>
-        <Input
-          value={product.company_name}
-          onChange={(e) =>
-            setProduct({ ...product, company_name: e.target.value })
-          }
-        />
-      </FormControl>
-
-      {/* ------------------- 메인이미지 로직 ------------------- */}
-      <Flex>
-        {product.productImgs.map((productImg, index) => (
-          <Box key={productImg.main_img_id} my="5px">
-            <FormControl display="flex" alignItems="center">
-              <FormLabel htmlFor={`switch-${index}`}>
-                <FontAwesomeIcon color="red" icon={faTrashCan} />
-              </FormLabel>
-              <Switch
-                id={`switch-${index}`}
-                isChecked={removeMainImgs.includes(productImg.main_img_id)}
-                colorScheme="red"
-                onChange={() =>
-                  handleRemoveMainImgSwitch(productImg.main_img_id)
-                }
-              />
-            </FormControl>
-            <Image
-              src={productImg.main_img_uri}
-              alt={`Main Image ${index}`}
-              w="150px"
+          <FormControl mt={3}>
+            <FormLabel fontWeight={"bold"}>상품명</FormLabel>
+            <Input
+              value={product.product.product_name}
+              onChange={(e) =>
+                setProduct((prevProduct) => ({
+                  ...prevProduct,
+                  product: {
+                    ...prevProduct.product,
+                    product_name: e.target.value,
+                  },
+                }))
+              }
             />
-          </Box>
-        ))}
-      </Flex>
+          </FormControl>
 
-      <FormControl>
-        <FormLabel>메인 이미지</FormLabel>
-        <Input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleImageChange}
-        />
-      </FormControl>
-
-      <Flex>
-        {previewImages.map((image, index) => (
-          <Box key={index} my="5px">
-            <Image src={image} alt={`Preview ${index}`} w="150px" />
-          </Box>
-        ))}
-      </Flex>
-
-      {/* ------------------- 설명이미지 로직 ------------------- */}
-      <Flex>
-        {product.productDetailsImgs.map((productDetailsImg, index) => (
-          <Box key={productDetailsImg.details_img_id} my="5px">
-            <FormControl display="flex" alignItems="center">
-              <FormLabel htmlFor={`switch-${index}`}>
-                <FontAwesomeIcon color="red" icon={faTrashCan} />
-              </FormLabel>
-              <Switch
-                id={`content-switch-${index}`} // 고유한 id를 사용해야 합니다.
-                isChecked={removeContentImgs.includes(
-                  productDetailsImg.details_img_id,
-                )}
-                colorScheme="red"
-                onChange={() =>
-                  handleRemoveContentImage(productDetailsImg.details_img_id)
-                }
-              />
-            </FormControl>
-            <Image
-              src={productDetailsImg.sub_img_uri}
-              alt={`Main Image ${index}`}
-              w="150px"
+          <FormControl mt={3}>
+            <FormLabel fontWeight={"bold"}>금액</FormLabel>
+            <Input
+              value={product.product.product_price}
+              onChange={(e) =>
+                setProduct((prevProduct) => ({
+                  ...prevProduct,
+                  product: {
+                    ...prevProduct.product,
+                    product_price: e.target.value,
+                  },
+                }))
+              }
             />
-          </Box>
-        ))}
-      </Flex>
+          </FormControl>
 
-      <FormControl>
-        <FormLabel>설명 이미지</FormLabel>
-        <Input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleContentImageChange}
-        />
-      </FormControl>
+          <FormControl mt={3}>
+            <FormLabel fontWeight={"bold"}>상품설명</FormLabel>
+            <Textarea
+              value={product.product.product_content}
+              onChange={(e) =>
+                setProduct((prevProduct) => ({
+                  ...prevProduct,
+                  product: {
+                    ...prevProduct.product,
+                    product_content: e.target.value,
+                  },
+                }))
+              }
+            />
+          </FormControl>
 
-      {/* ------------------- 상세옵션 로직 ------------------- */}
-      <Box>
-        {options.map((option, index) => (
-          <Flex>
-            <FormControl key={index}>
-              <FormLabel>{index + 1}번째 상세옵션추가</FormLabel>
-              <Input
-                value={option.option_name}
-                placeholder="예) 화이트/청축"
-                onChange={(e) => handleInputChange(e, index)}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>수량</FormLabel>
-              <Input
-                type="number"
-                value={option.stock || ""} // 수량이 없으면 빈 문자열
-                onChange={(e) => handleStockChange(e, index)}
-              />
-            </FormControl>
+          <FormControl mt={3}>
+            <FormLabel fontWeight={"bold"}>제조사</FormLabel>
+            <Input
+              value={product.company_name}
+              onChange={(e) =>
+                setProduct({ ...product, company_name: e.target.value })
+              }
+            />
+          </FormControl>
+
+          {/* ------------------- 메인이미지 로직 ------------------- */}
+          <Flex mt={3}>
+            {product.productImgs.map((productImg, index) => (
+              <Box key={productImg.main_img_id} my="5px">
+                <FormControl display="flex" alignItems="center">
+                  <FormLabel htmlFor={`switch-${index}`}>
+                    <FontAwesomeIcon color="red" icon={faTrashCan} />
+                  </FormLabel>
+                  <Switch
+                    id={`switch-${index}`}
+                    isChecked={removeMainImgs.includes(productImg.main_img_id)}
+                    colorScheme="red"
+                    onChange={() =>
+                      handleRemoveMainImgSwitch(productImg.main_img_id)
+                    }
+                  />
+                </FormControl>
+                <Image
+                  src={productImg.main_img_uri}
+                  alt={`Main Image ${index}`}
+                  w="150px"
+                />
+              </Box>
+            ))}
           </Flex>
-        ))}
-        <Flex justifyContent="center" mt={4}>
-          <Button colorScheme="teal" onClick={handleAddInput}>
-            상세 옵션 추가
+
+          <FormControl mt={3}>
+            <FormLabel fontWeight={"bold"}>메인 이미지</FormLabel>
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageChange}
+            />
+          </FormControl>
+
+          <Flex mt={3}>
+            {previewImages.map((image, index) => (
+              <Box key={index} my="5px">
+                <Image src={image} alt={`Preview ${index}`} w="150px" />
+              </Box>
+            ))}
+          </Flex>
+
+          {/* ------------------- 설명이미지 로직 ------------------- */}
+          <Flex mt={3}>
+            {product.productDetailsImgs.map((productDetailsImg, index) => (
+              <Box key={productDetailsImg.details_img_id} my="5px">
+                <FormControl display="flex" alignItems="center">
+                  <FormLabel htmlFor={`switch-${index}`}>
+                    <FontAwesomeIcon color="red" icon={faTrashCan} />
+                  </FormLabel>
+                  <Switch
+                    id={`content-switch-${index}`} // 고유한 id를 사용해야 합니다.
+                    isChecked={removeContentImgs.includes(
+                      productDetailsImg.details_img_id,
+                    )}
+                    colorScheme="red"
+                    onChange={() =>
+                      handleRemoveContentImage(productDetailsImg.details_img_id)
+                    }
+                  />
+                </FormControl>
+                <Image
+                  src={productDetailsImg.sub_img_uri}
+                  alt={`Main Image ${index}`}
+                  w="150px"
+                />
+              </Box>
+            ))}
+          </Flex>
+
+          <FormControl mt={3}>
+            <FormLabel fontWeight={"bold"}>설명 이미지</FormLabel>
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleContentImageChange}
+            />
+          </FormControl>
+
+          {/* ------------------- 상세옵션 로직 ------------------- */}
+          <Box mt={3}>
+            {options.map((option, index) => (
+              <Flex mt={3} gap={3}>
+                <FormControl key={index}>
+                  <FormLabel fontWeight={"bold"}>
+                    {index + 1}번째 상세옵션추가
+                  </FormLabel>
+                  <Input
+                    value={option.option_name}
+                    placeholder="예) 화이트/청축"
+                    onChange={(e) => handleInputChange(e, index)}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontWeight={"bold"}>수량</FormLabel>
+                  <Input
+                    type="number"
+                    value={option.stock || ""} // 수량이 없으면 빈 문자열
+                    onChange={(e) => handleStockChange(e, index)}
+                  />
+                </FormControl>
+              </Flex>
+            ))}
+            <Flex justifyContent="center" mt={4} mb={10}>
+              <Button colorScheme="teal" onClick={handleAddInput}>
+                상세 옵션 추가
+              </Button>
+              <Button
+                colorScheme="pink"
+                onClick={() => handleRemoveInput(options.length - 1)}
+                isDisabled={options.length === 1} // 옵션이 하나만 있을 때는 비활성화
+                ml={2}
+              >
+                마지막 상세 옵션 삭제
+              </Button>
+            </Flex>
+          </Box>
+
+          <Button colorScheme="blue" onClick={handleUpdateClick}>
+            저장
           </Button>
           <Button
-            colorScheme="pink"
-            onClick={() => handleRemoveInput(options.length - 1)}
-            isDisabled={options.length === 1} // 옵션이 하나만 있을 때는 비활성화
-            ml={2}
+            colorScheme="purple"
+            onClick={() => navigate("/product/list")}
           >
-            마지막 상세 옵션 삭제
+            돌아가기
           </Button>
-        </Flex>
-      </Box>
-
-      <Button colorScheme="blue" onClick={handleUpdateClick}>
-        저장
-      </Button>
-      <Button colorScheme="purple" onClick={() => navigate("/product/list")}>
-        돌아가기
-      </Button>
+        </Box>
+      </Center>
     </Box>
   );
 }

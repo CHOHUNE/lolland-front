@@ -67,14 +67,27 @@ export function MemberManage() {
         <CardBody>
           <FormControl mt={4}>
             <Flex>
+              <FormLabel w={"100px"}>이름</FormLabel>
+              <Input readOnly value={member.member_name} />
+            </Flex>
+          </FormControl>
+          <FormControl mt={4}>
+            <Flex>
               <FormLabel w={"100px"}>아이디</FormLabel>
               <Input readOnly value={member.member_login_id} />
             </Flex>
           </FormControl>
           <FormControl mt={4}>
-            <Flex>
-              <FormLabel w={"100px"}>이름</FormLabel>
-              <Input readOnly value={member.member_name} />
+            <Flex justifyContent={"center"}>
+              <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
+                휴대폰번호
+              </FormLabel>
+              <Input
+                maxLength={3}
+                h={"50px"}
+                borderRadius={"0"}
+                value={member.member_phone_number}
+              />
             </Flex>
           </FormControl>
           <FormControl mt={4}>
