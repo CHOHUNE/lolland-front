@@ -69,6 +69,7 @@ export function GearView() {
         <FormLabel>타이틀</FormLabel>
         <Input value={gearboard.gear_content} />
       </FormControl>
+
       <FormControl>
         <FormLabel>작성일</FormLabel>
         <Input value={gearboard.gear_inserted} />
