@@ -67,29 +67,30 @@ export function ProductLike() {
     }
   };
 
-  // 전체선택 버튼을 눌렀을 때 실행되는 함수
+  // 전체선택 버튼을 눌렀을 때 실행되는 로직
   const handleSelectAll = () => {
     setProductChecked(new Array(productLike.length).fill(true));
   };
 
-  // 선택해제 버튼을 눌렀을 때 실행되는 함수
+  // 선택해제 버튼을 눌렀을 때 실행되는 로직
   const handleDeselectAll = () => {
     setProductChecked(new Array(productLike.length).fill(false));
   };
 
-  // 체크박스를 클릭했을 때 실행되는 함수
+  // 체크박스를 클릭했을 때 실행되는 로직
   const handleCheckboxClick = (index) => {
     const updatedProductChecked = productChecked.slice();
     updatedProductChecked[index] = !updatedProductChecked[index];
     setProductChecked(updatedProductChecked);
   };
 
+  // 전체삭제 버튼을 클릭했을 때 실행되는 로직
   const handleDeleteSelectedProducts = async () => {
     try {
-      // productChecked 배열에서 선택된 상품의 인덱스를 찾아서 삭제
+      // 선택된 모든 상품의 ID 배열 생성
       const selectedProductIds = productLike
-        .map((item, index) => (productChecked[index] ? item.like_id : null))
-        .filter((id) => id !== null);
+        .filter((_, index) => productChecked[index])
+        .map((item) => item.like_id);
 
       if (selectedProductIds.length === 0) {
         toast({
@@ -99,28 +100,28 @@ export function ProductLike() {
         return;
       }
 
-      // 선택된 상품 삭제 요청 보내기
-      const response = await axios.post(
-        "/api/productLike/deleteSelected",
-        selectedProductIds,
+      // 선택된 모든 상품에 대해 삭제 요청
+      await Promise.all(
+        selectedProductIds.map((productLikeId) =>
+          axios.delete(`/api/productLike/like/${productLikeId}`),
+        ),
       );
 
-      if (response.status === 200) {
-        // 선택된 상품 삭제 후 UI 업데이트
-        const updatedProductLike = productLike.filter(
-          (item) => !selectedProductIds.includes(item.like_id),
-        );
-        setProductLike(updatedProductLike);
+      // UI에서 선택된 상품들 제거
+      const updatedProductLike = productLike.filter(
+        (item) => !selectedProductIds.includes(item.like_id),
+      );
+      setProductLike(updatedProductLike);
 
-        // 선택박스 초기화
-        setProductChecked(new Array(updatedProductLike.length).fill(false));
+      // 체크박스 초기화
+      setProductChecked(new Array(updatedProductLike.length).fill(false));
 
-        toast({
-          description: "선택한 상품이 삭제되었습니다.",
-          status: "success",
-        });
-      }
+      toast({
+        description: "선택한 상품이 삭제되었습니다.",
+        status: "success",
+      });
     } catch (error) {
+      console.error("Error during batch product deletion:", error);
       toast({
         description: "상품 삭제중 오류 발생, 관리자에게 문의해주시기 바랍니다.",
         status: "error",

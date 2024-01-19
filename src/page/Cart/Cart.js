@@ -62,25 +62,26 @@ export function Cart() {
             status: "error",
           });
         }
-      })
-      .finally(() => setLoading(false));
+      });
+    setLoading(false);
   }
 
   // 전체 선택
   function handleSelectAllProducts(checked) {
     if (checked) {
-      setSelectedProducts(productList.map((product) => product.product_id));
+      setSelectedProducts(productList.map((product) => product.cart_id));
     } else {
       setSelectedProducts([]);
     }
   }
 
-  // 개별 선택
   function handleCheckBoxChange(product) {
+    const productIdentifier = product.cart_id;
+
     setSelectedProducts((prevSelectedProducts) =>
-      prevSelectedProducts.includes(product.product_id)
-        ? prevSelectedProducts.filter((id) => id !== product.product_id)
-        : [...prevSelectedProducts, product.product_id],
+      prevSelectedProducts.includes(productIdentifier)
+        ? prevSelectedProducts.filter((id) => id !== productIdentifier)
+        : [...prevSelectedProducts, productIdentifier],
     );
   }
 
@@ -93,8 +94,11 @@ export function Cart() {
 
   function handleDelete(selectedProducts) {
     axios
-      .delete("/api/cart/selected", {
-        cart_ids: selectedProducts,
+      .delete("/api/cart/delete/selected", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: selectedProducts,
       })
       .then(() => {
         toast({
@@ -127,7 +131,7 @@ export function Cart() {
 
   function handleDeleteAll() {
     axios
-      .delete("/api/cart/delete")
+      .delete("/api/cart/delete/all")
       .then(() => {
         toast({
           description: "장바구니 비우기에 성공하였습니다",
@@ -164,7 +168,7 @@ export function Cart() {
       });
   }
 
-  if (loading && productList === null) {
+  if (loading) {
     return <Spinner />;
   }
 
@@ -189,8 +193,7 @@ export function Cart() {
             variant="outline"
             color="black"
             border="1px solid black"
-            isDisabled
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/memberPage/productLike")}
           >
             찜한 목록 보기
           </Button>
@@ -208,6 +211,7 @@ export function Cart() {
     );
   }
 
+  console.log("selectedProducts: " + selectedProducts);
   return (
     <>
       <Heading my={5} mx={10}>
@@ -221,14 +225,16 @@ export function Cart() {
         <Flex justifyContent="space-between" mx={10} mb={5}>
           <Checkbox
             colorScheme="gray"
-            isChecked={selectedProducts.length === productList.length}
+            isChecked={
+              productList.length > 0 &&
+              selectedProducts.length === productList.length
+            }
             onChange={(e) => handleSelectAllProducts(e.target.checked)}
           >
             전체 선택
           </Checkbox>
           <ButtonGroup>
             <Button
-              isDisabled={true}
               {...buttonStyles}
               onClick={() => handleDelete(selectedProducts)}
             >
@@ -241,11 +247,7 @@ export function Cart() {
             >
               선택 결제
             </Button>
-            <Button
-              isDisabled={true}
-              {...buttonStyles}
-              onClick={() => handleDeleteAll()}
-            >
+            <Button {...buttonStyles} onClick={() => handleDeleteAll()}>
               전부 비우기
             </Button>
           </ButtonGroup>
@@ -259,41 +261,62 @@ export function Cart() {
               <Th textAlign="center">정보</Th>
               <Th textAlign="center">제조사</Th>
               <Th textAlign="center">가격</Th>
+              <Th textAlign="center">수량</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {productList.map((product) => {
-              return (
-                <Tr
-                  key={product.product_id}
-                  // onClick={() => navigate(`product/${product.product_id}`)}
-                >
-                  <Td
-                    textAlign="center"
-                    // onClick={(e) => e.stopPropagation()}
+            {productList &&
+              productList.map((product) => {
+                return (
+                  <Tr
+                    key={product.cart_id}
+                    onClick={() => navigate(`/product/${product?.product_id}`)}
                   >
-                    <Checkbox
-                      colorScheme="gray"
-                      isChecked={selectedProducts.includes(product.product_id)}
-                      onChange={() => {
-                        handleCheckBoxChange(product);
-                      }}
-                    />
-                  </Td>
-                  <Td textAlign="center" justifyContent="center" display="flex">
-                    <Image src={product.main_img_url} w="70px" />
-                  </Td>
-                  <Td textAlign="center">{product.product_name}</Td>
-                  <Td textAlign="center" whiteSpace={"nowrap"}>
-                    {product.category_name} / {product.subcategory_name}
-                  </Td>
-                  <Td textAlign="center">{product.company_name}</Td>
-                  <Td textAlign="center">
-                    {product.product_price.toLocaleString()}
-                  </Td>
-                </Tr>
-              );
-            })}
+                    <Td textAlign="center" onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        colorScheme="gray"
+                        isChecked={selectedProducts.includes(product.cart_id)}
+                        onChange={() => {
+                          handleCheckBoxChange(product);
+                        }}
+                      />
+                    </Td>
+                    <Td
+                      textAlign="center"
+                      justifyContent="center"
+                      display="flex"
+                    >
+                      <Image src={product?.main_img_uri} w="70px" />
+                    </Td>
+                    <Td textAlign="center">
+                      {product?.option_name ? (
+                        <Text whiteSpace={"nowrap"}>
+                          {product?.product_name} : {product?.option_name}
+                        </Text>
+                      ) : (
+                        <Text whiteSpace={"nowrap"}>
+                          {product?.product_name}
+                        </Text>
+                      )}
+                    </Td>
+                    <Td textAlign="center" whiteSpace={"nowrap"}>
+                      {product?.category_name} / {product?.subcategory_name}
+                    </Td>
+                    <Td textAlign="center">{product?.company_name}</Td>
+                    <Td textAlign="center">
+                      <Text color="orange" fontWeight="bold">
+                        {(
+                          product?.product_price * product?.quantity
+                        ).toLocaleString() + "원"}
+                      </Text>
+                      <Text fontSize="xs">
+                        {product?.product_price.toLocaleString() + "원"}
+                      </Text>
+                    </Td>
+                    <Td textAlign="center">{product?.quantity}</Td>
+                  </Tr>
+                );
+              })}
           </Tbody>
         </Table>
       </TableContainer>

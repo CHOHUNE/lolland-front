@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   Box,
   Button,
@@ -10,6 +10,7 @@ import {
   FormLabel,
   HStack,
   Image,
+  Input,
   Menu,
   MenuButton,
   MenuItem,
@@ -39,8 +40,11 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as farStar } from "@fortawesome/free-regular-svg-icons"; // 꽉 찬 아이콘
 import {
+  faAngleLeft,
+  faAngleRight,
   faCartShopping,
   faHeart as fasHeart,
+  faSearch,
   faSpinner,
   faStar,
   faStarHalfAlt,
@@ -51,11 +55,108 @@ import { ReviewView } from "../review/ReviewView";
 import { selectOptions } from "@testing-library/user-event/dist/select-options"; // 빈 하트
 import { ProductStats } from "../review/ProductStats"; // 빈 하트
 
+function PageButton({ variant, pageNumber, children }) {
+  // 검색을 했을때 p=pageNumber&k=keyword(검색내용)
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+
+  function handleClick() {
+    params.set("p", pageNumber);
+    navigate("/?" + params);
+  }
+
+  return (
+    <Button variant={variant} onClick={handleClick}>
+      {children}
+    </Button>
+  );
+}
+
+function Pagination({ pageInfo }) {
+  const pageNumbers = [];
+
+  const navigate = useNavigate();
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <Center mt={5} mb={40}>
+      <Box>
+        {pageInfo.prevPageNumber && (
+          <PageButton variant="ghost" pageNumber={pageInfo.prevPageNumber}>
+            <FontAwesomeIcon icon={faAngleLeft} />
+          </PageButton>
+        )}
+
+        {pageNumbers.map((pageNumber) => (
+          <PageButton
+            key={pageNumber}
+            variant={
+              pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
+            }
+            pageNumber={pageNumber}
+          >
+            {pageNumber}
+          </PageButton>
+        ))}
+
+        {pageInfo.nextPageNumber && (
+          <PageButton variant="ghost" pageNumber={pageInfo.nextPageNumber}>
+            <FontAwesomeIcon icon={faAngleRight} />
+          </PageButton>
+        )}
+      </Box>
+    </Center>
+  );
+}
+
+// 검색 컴포넌트
+function SearchComponent() {
+  const [keyword, setKeyword] = useState("");
+  const navigate = useNavigate();
+  const [category, setCategory] = useState(null);
+
+  function handleSearch() {
+    // /?k=keyword&c=all
+    const params = new URLSearchParams();
+    params.set("k", keyword); // k=value{keyword}
+    params.set("c", category);
+
+    navigate("/?" + params);
+  }
+
+  return (
+    <Center mt={5}>
+      <Flex gap={1}>
+        <Box>
+          <Select
+            defaultValue="all"
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="all">전체</option>
+            <option value="title">제목</option>
+            <option value="content">본문</option>
+          </Select>
+        </Box>
+        <Box>
+          <Input value={keyword} onChange={(e) => setKeyword(e.target.value)} />
+        </Box>
+        <Button onClick={handleSearch}>
+          <FontAwesomeIcon icon={faSearch} />
+        </Button>
+      </Flex>
+    </Center>
+  );
+}
+
 export function ProductView() {
   const [product, setProduct] = useState(null);
   const [option, setOption] = useState([]);
   const [selectedOption, setSelectedOption] = useState("");
-  const [selectedOptionList, setSelectedOptionList] = useState({});
+  const [selectedOptionList, setSelectedOptionList] = useState([]);
+  const [pageInfo, setPageInfo] = useState(null);
 
   const { product_id } = useParams();
   const [isFavorited, setIsFavorited] = useState(false); // 찜하기
@@ -122,19 +223,16 @@ export function ProductView() {
 
   // ------------------------------ 상세 옵션 관련 로직 ------------------------------
   const handleOptionChange = (optionId) => {
-    // 선택된 옵션의 정보를 가져옵니다.
     const selectedOptionInfo = option.find((opt) => opt.option_id === optionId);
 
     if (selectedOptionInfo) {
-      // 선택된 옵션을 상태에 추가합니다.
-      setSelectedOptionList((prev) => ({
-        ...prev,
-        [selectedOptionInfo.option_id]: {
+      setSelectedOptionList((prev) => [
+        ...prev.filter((opt) => opt.option_id !== selectedOptionInfo.option_id),
+        {
           ...selectedOptionInfo,
-          quantity: prev[selectedOptionInfo.option_id]?.quantity || 1,
+          quantity: 1,
         },
-      }));
-      // 선택된 옵션 ID를 상태에 설정합니다.
+      ]);
       setSelectedOption(selectedOptionInfo.option_id.toString());
     }
   };
@@ -242,7 +340,7 @@ export function ProductView() {
     axios
       .post("/api/cart/add", {
         product_id: product_id,
-        selectedOptionList: selectedOptionList,
+        selectedOptionList: Object.values(selectedOptionList),
       })
       .then(() => {
         toast({
@@ -279,46 +377,30 @@ export function ProductView() {
     const newFavoriteStatus = !isFavorited;
     // UI를 먼저 업데이트하고 서버 요청을 보냄
     setIsFavorited(newFavoriteStatus);
-    // 서버에 좋아요 상태 전송
-    if (isFavorited !== true) {
-      axios
-        .post("/api/productLike", {
-          product_id: product_id,
-          isFavorited: newFavoriteStatus,
-        })
-        .then(() => {
-          toast({
-            description: "상품 찜목록에 저장되었습니다.",
-            status: "success",
-          });
-        })
-        .catch((error) => {
-          toast({
-            description: "로그인 해주시기 바랍니다.",
-            status: "error",
-          });
-          setIsFavorited(!newFavoriteStatus);
+
+    // 서버에 좋아요 상태와 선택된 옵션 상태 전송
+    axios
+      .post("/api/productLike", {
+        product_id: product_id,
+        isFavorited: newFavoriteStatus,
+        selectedOptions: selectedOptionList, // 여기에 선택된 옵션을 추가
+      })
+      .then(() => {
+        toast({
+          description: newFavoriteStatus
+            ? "상품이 찜목록에 저장되었습니다."
+            : "상품이 찜목록에서 삭제되었습니다.",
+          status: "success",
         });
-    } else {
-      axios
-        .post("/api/productLike", {
-          product_id: product_id,
-          isFavorited: newFavoriteStatus,
-        })
-        .then(() => {
-          toast({
-            description: "상품 찜목록에서 삭제되었습니다.",
-            status: "error",
-          });
-        })
-        .catch((error) => {
-          toast({
-            description: "로그인 해주시기 바랍니다.",
-            status: "error",
-          });
-          setIsFavorited(!newFavoriteStatus);
+      })
+      .catch((error) => {
+        toast({
+          description: "로그인 해주시기 바랍니다.",
+          status: "error",
         });
-    }
+        // 서버 요청 실패 시 UI 상태를 이전으로 되돌림
+        setIsFavorited(!newFavoriteStatus);
+      });
   };
 
   // ----------------------------------- 평점 별 표시 로직 -----------------------------------
@@ -714,6 +796,11 @@ export function ProductView() {
           {renderProductDetailsImages()}
         </Flex>
       </Box>
+
+      {/* 검색 컴포넌트 */}
+      <SearchComponent />
+
+      <Pagination pageInfo={pageInfo} />
 
       {/* --------------- 상품 상세 설명, 리뷰 , Q&A --------------- */}
       <ReviewView

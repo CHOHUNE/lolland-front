@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Spinner,
   Table,
@@ -11,6 +12,9 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faImage } from "@fortawesome/free-solid-svg-icons";
+import { faImages } from "@fortawesome/free-regular-svg-icons";
 
 export function GearList({ category }) {
   const [gearboardList, setGearboardList] = useState(null);
@@ -48,7 +52,17 @@ export function GearList({ category }) {
               >
                 <Td>{item.gear_recommand}</Td>
                 <Td>{item.category}</Td>
-                <Td>{item.gear_title}</Td>
+                <Td>
+                  {item.gear_title}
+                  {item.countFile > 0 && (
+                    <Badge
+                      style={{ backgroundColor: "white", color: "orange" }}
+                    >
+                      <FontAwesomeIcon icon={faImages} />
+                      {item.countFile}
+                    </Badge>
+                  )}
+                </Td>
                 <Td>{item.gear_content}</Td>
                 {/*<Td>{item.member_name}</Td>*/}
                 <Td>{item.gear_views}</Td>
