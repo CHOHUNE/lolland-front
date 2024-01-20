@@ -77,6 +77,7 @@ export function AdminNavBar() {
             <IconButton
               {...buttonStyle}
               icon={<FontAwesomeIcon icon={faComment} />}
+              onClick={() => navigate("qna")}
             />
           </Tooltip>
           <Tooltip hasArrow label="회원 목록" placement="right">
