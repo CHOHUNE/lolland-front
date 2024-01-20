@@ -23,12 +23,6 @@ export function MemberNavBarTest() {
   const [member, setMember] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    axios.get("/api/member/memberInfo").then((response) => {
-      setMember(response.data);
-    });
-  }, []);
-
   const buttonStyle = {
     variant: "undefined",
     isRound: true,
@@ -38,13 +32,17 @@ export function MemberNavBarTest() {
   return (
     <Flex
       flexDir="column"
+      ml={5}
+      my={5}
       px={2}
       py={5}
       justifyContent="center"
+      borderRadius={20}
       textAlign="center"
       // bgColor="#F4F4F4"
       bgColor="#FFF"
-      boxShadow="5px 0px 5px -5px rgba(0, 0, 0, 0.1)"
+      // boxShadow="5px 0px 5px -5px rgba(0, 0, 0, 0.1)"
+      shadow="md"
     >
       <VStack spacing={10}>
         <Tooltip hasArrow label="내 정보 관리" placement="right">
