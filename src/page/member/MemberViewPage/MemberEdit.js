@@ -31,9 +31,6 @@ export function MemberEdit() {
   // 맴버 로그인 id --------------------------------------------------------------------------------
   const [member_login_id, setMember_login_id] = useState("");
 
-  // 맴버 비밀번호 --------------------------------------------------------------------------------
-  const [member_password, setMember_password] = useState("");
-
   // 맴버 핸드폰 번호 --------------------------------------------------------------------------------
   const [member_phone_number, setMember_phone_number] = useState("");
   const [member_phone_number1, setMember_phone_number1] = useState("");
