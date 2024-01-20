@@ -8,7 +8,7 @@ import { faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import { faStar as farStar } from '@fortawesome/free-regular-svg-icons';
 
 
-export const ProductStats = ({ product_id, average_rate }) => {
+export const ProductStats = ({ product_id }) => {
   const [ratingDistribution, setRatingDistribution] = useState({});
   const [product, setProduct] = useState(null);
 
@@ -79,7 +79,7 @@ export const ProductStats = ({ product_id, average_rate }) => {
         <Box>
           <Text>전체 만족도 평점</Text>
           <Text fontSize={"2rem"} mt={5}>{renderStars(product.product.average_rate)}</Text>
-          <Text fontWeight={"bold"} fontSize={"2.5rem"} mt={5}>{product.product.average_rate !== null
+          <Text fontWeight={"bold"} fontSize={"2.7rem"} mt={2}>{product.product.average_rate !== null
             ? product.product.average_rate.toFixed(1)
             : "0"}
           </Text>
