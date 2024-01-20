@@ -455,7 +455,7 @@ export function ProductView() {
                 <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
                   {renderStars(product.product.average_rate)}{" "}
                   {product.product.average_rate !== null
-                    ? product.product.average_rate
+                    ? product.product.average_rate.toFixed(1)
                     : "0"}
                 </Text>
               </HStack>
@@ -720,6 +720,8 @@ export function ProductView() {
         product_id={product_id}
         product_content={product.product_content}
       />
+
+
     </Box>
   );
 }
