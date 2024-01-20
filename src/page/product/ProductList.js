@@ -7,6 +7,7 @@ import {
   Flex,
   Image,
   Input,
+  Select,
   SimpleGrid,
   Spinner,
   Text,
@@ -76,16 +77,25 @@ function Pagination({ pageInfo }) {
 function SearchComponent() {
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
+  const [category, setCategory] = useState("all");
 
   function handleSearch() {
     const params = new URLSearchParams();
     params.set("k", keyword);
+    params.set("c", category);
 
     navigate("?" + params);
   }
 
   return (
     <Flex>
+      <Select onChange={(e) => setCategory(e.target.value)}>
+        <option selected value="all">
+          전체
+        </option>
+        <option value="product_name">상품명</option>
+        <option value="company_name">회사명</option>
+      </Select>
       <Input value={keyword} onChange={(e) => setKeyword(e.target.value)} />
       <Button onClick={handleSearch}>검색</Button>
     </Flex>
