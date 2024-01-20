@@ -67,6 +67,7 @@ export function MemberManage() {
       <Card w={"700px"}>
         <CardHeader>{member.member_name}_님 정보 입니다.</CardHeader>
         <CardBody>
+          {/* 프로필 사진 */}
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>프로필 사진</FormLabel>
@@ -82,18 +83,23 @@ export function MemberManage() {
             )}
           </FormControl>
 
+          {/* 이름 */}
           <FormControl mt={6}>
             <Flex>
               <FormLabel w={"100px"}>이름</FormLabel>
               <Input readOnly value={member.member_name} />
             </Flex>
           </FormControl>
+
+          {/* 아이디 */}
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>아이디</FormLabel>
               <Input readOnly value={member.member_login_id} />
             </Flex>
           </FormControl>
+
+          {/* 휴대폰 번호 */}
           <FormControl mt={4}>
             <Flex justifyContent={"center"}>
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
@@ -107,12 +113,16 @@ export function MemberManage() {
               />
             </Flex>
           </FormControl>
+
+          {/* 이메일 */}
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>이메일</FormLabel>
               <Input readOnly value={member.member_email} />
             </Flex>
           </FormControl>
+
+          {/* 우편번호 */}
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>우편번호</FormLabel>
@@ -122,12 +132,16 @@ export function MemberManage() {
               />
             </Flex>
           </FormControl>
+
+          {/* 주소 */}
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>주소</FormLabel>
               <Input readOnly value={member.memberAddressDto.member_address} />
             </Flex>
           </FormControl>
+
+          {/* 상세 주소 */}
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>상세주소</FormLabel>
@@ -137,6 +151,8 @@ export function MemberManage() {
               />
             </Flex>
           </FormControl>
+
+          {/* 내 주소록 조회 버튼 */}
           <FormControl mt={4}>
             <Button onClick={() => navigate("/memberPage/addressInfo")}>
               내 주소록 조회 하기
