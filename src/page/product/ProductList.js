@@ -10,6 +10,8 @@ import {
   Spinner,
   Text,
 } from "@chakra-ui/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 
 function Pagination({ pageInfo }) {
   const navigate = useNavigate();
@@ -26,11 +28,23 @@ function Pagination({ pageInfo }) {
 
   return (
     <Box>
+      {pageInfo.prevPageNumber && (
+        <Button onClick={() => navigate("?p=" + pageInfo.prevPageNumber)}>
+          <FontAwesomeIcon icon={faAngleLeft} />
+        </Button>
+      )}
+
       {pageNumbers.map((pageNumber) => (
         <Button key={pageNumber} onClick={() => navigate("?p=" + pageNumber)}>
           {pageNumber}
         </Button>
       ))}
+
+      {pageInfo.nextPageNumber && (
+        <Button onClick={() => navigate("?p=" + pageInfo.nextPageNumber)}>
+          <FontAwesomeIcon icon={faAngleRight} />
+        </Button>
+      )}
     </Box>
   );
 }
@@ -88,9 +102,9 @@ export function ProductList() {
           spacing={9}
           m={10}
         >
-          {productList.map((product) => (
+          {productList.map((product, index) => (
             <Box
-              key={product.product_id}
+              key={index}
               onMouseEnter={() => setHoveredBoardId(product.product_id)} // 마우스 호버 시 상태 변경
               onMouseLeave={() => setHoveredBoardId(null)}
               borderRadius="10px"
