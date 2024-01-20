@@ -217,7 +217,7 @@ export function ProductView() {
   // ------------------------------ 게시물 삭제 로직 ------------------------------
   function handleDelete() {
     axios
-      .delete("/api/product/remove/" + product_id)
+      .put("/api/product/remove/" + product_id)
       .then((response) => {
         toast({
           description: product_id + "번 게시물이 삭제되었습니다.",
