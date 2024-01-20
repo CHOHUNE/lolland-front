@@ -16,9 +16,18 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export function MemberNavBarTest() {
+  const [member, setMember] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get("/api/member/memberInfo").then((response) => {
+      setMember(response.data);
+    });
+  }, []);
 
   const buttonStyle = {
     variant: "undefined",
