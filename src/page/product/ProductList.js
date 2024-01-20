@@ -91,7 +91,7 @@ function SearchComponent() {
   return (
     <Flex display={"flex"} justifyContent={"center"}>
       <Box>
-        <Select w={"120px"} onChange={(e) => setCategory(e.target.value)}>
+        <Select w={"100px"} onChange={(e) => setCategory(e.target.value)}>
           <option selected value="all">
             전체
           </option>
@@ -214,8 +214,8 @@ export function ProductList() {
                     position="absolute"
                     src={product.mainImgs[0]?.main_img_uri}
                     alt="Board Image"
-                    width="280px"
-                    height="200px"
+                    width="100%"
+                    height="100%"
                     zIndex={1}
                     transition="opacity 0.5s ease-in-out" // 부드러운 투명도 변화
                     opacity={product.id === hoveredBoardId ? 0 : 1} // 호버 상태에 따른 투명도
@@ -225,8 +225,8 @@ export function ProductList() {
                     position="absolute"
                     src={product.mainImgs[1]?.main_img_uri}
                     alt="Hover Image"
-                    width="280px"
-                    height="200px"
+                    width="100%"
+                    height="100%"
                     zIndex={2}
                     transition="opacity 0.5s ease-in-out" // 부드러운 투명도 변화
                     opacity={product.product_id === hoveredBoardId ? 1 : 0} // 호버 상태에 따른 투명도
