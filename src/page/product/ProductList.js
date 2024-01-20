@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Flex,
+  HStack,
   Image,
   Input,
   Select,
@@ -46,7 +47,7 @@ function Pagination({ pageInfo }) {
   }
 
   return (
-    <Box>
+    <Box mb={10} mt={6} display={"flex"} justifyContent={"center"}>
       {pageInfo.prevPageNumber && (
         <PageButton variant="ghost" pageNumber={pageInfo.prevPageNumber}>
           <FontAwesomeIcon icon={faAngleLeft} />
@@ -88,16 +89,24 @@ function SearchComponent() {
   }
 
   return (
-    <Flex>
-      <Select onChange={(e) => setCategory(e.target.value)}>
-        <option selected value="all">
-          전체
-        </option>
-        <option value="product_name">상품명</option>
-        <option value="company_name">회사명</option>
-      </Select>
-      <Input value={keyword} onChange={(e) => setKeyword(e.target.value)} />
-      <Button onClick={handleSearch}>검색</Button>
+    <Flex display={"flex"} justifyContent={"center"}>
+      <Box>
+        <Select w={"120px"} onChange={(e) => setCategory(e.target.value)}>
+          <option selected value="all">
+            전체
+          </option>
+          <option value="product_name">상품명</option>
+          <option value="company_name">회사명</option>
+        </Select>
+      </Box>
+      <Box>
+        <Input
+          w={"300px"}
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+        />
+        <Button onClick={handleSearch}>검색</Button>
+      </Box>
     </Flex>
   );
 }
@@ -142,79 +151,101 @@ export function ProductList() {
     return <FullPageSpinner />;
   }
 
+  // ------------------------------ 가격 ex) 1,000 ,로 구분지어 보여지게 처리 ------------------------------
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("ko-KR", { style: "decimal" }).format(price);
+  };
+
   return (
-    <Box>
-      <Box>상품 목록</Box>
-      <Flex w="70%" h={"100%"} display={"flex"} justifyContent={"center"}>
-        <SimpleGrid
-          h={"100%"}
-          w={"80%"}
+    <Box mt={5}>
+      <Box
+        fontSize={"2rem"}
+        fontWeight={"bold"}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
+      >
+        상품 목록
+      </Box>
+      <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
+        <Flex
+          w="80%"
+          display={"flex"}
           justifyContent={"center"}
           alignItems={"center"}
-          columns={3}
-          spacing={9}
-          m={10}
         >
-          {productList.map((product, index) => (
-            <Box
-              key={index}
-              onMouseEnter={() => setHoveredBoardId(product.product_id)} // 마우스 호버 시 상태 변경
-              onMouseLeave={() => setHoveredBoardId(null)}
-              borderRadius="10px"
-              boxShadow="md"
-              _hover={{
-                cursor: "pointer",
-                // transform: "scale(1.05)",
-                // transition: "transform 0.2s",
-              }}
-              overflow="hidden"
-              onClick={() => navigate("/product/" + product.product_id)}
-              border={"1px solid gray"}
-              alignItems={"center"}
-              h={"320px"}
-            >
+          <SimpleGrid h={"100%"} w={"100%"} columns={4} spacing={9} m={10}>
+            {productList.map((product, index) => (
               <Box
-                position="relative" // 상대 위치 설정
-                p={5}
-                height="200px"
-                width="100%"
-                bg="white"
-                display={"flex"}
-                justifyContent={"center"}
+                key={index}
+                onMouseEnter={() => {
+                  // 호버 상태 변경 전에 두 번째 이미지 존재 여부 확인
+                  if (product.mainImgs && product.mainImgs.length > 1) {
+                    setHoveredBoardId(product.product_id);
+                  }
+                }}
+                onMouseLeave={() => setHoveredBoardId(null)}
+                borderRadius="10px"
+                boxShadow="md"
+                _hover={{
+                  cursor: "pointer",
+                  // transform: "scale(1.05)",
+                  // transition: "transform 0.2s",
+                }}
+                overflow="hidden"
+                onClick={() => navigate("/product/" + product.product_id)}
+                border={"1px solid gray"}
                 alignItems={"center"}
+                h={"100%"}
               >
-                {/* 마우스 호버 시 2번째 이미지로 변경 */}
-                {/* 기본 이미지 */}
-                <Image
-                  position="absolute"
-                  src={product.mainImgs[0]?.main_img_uri}
-                  alt="Board Image"
-                  width="280px"
+                <Box
+                  position="relative" // 상대 위치 설정
+                  p={5}
                   height="200px"
-                  zIndex={1}
-                  transition="opacity 0.5s ease-in-out" // 부드러운 투명도 변화
-                  opacity={product.id === hoveredBoardId ? 0 : 1} // 호버 상태에 따른 투명도
-                />
-                {/* 호버 시 이미지 */}
-                <Image
-                  position="absolute"
-                  src={product.mainImgs[1]?.main_img_uri}
-                  alt="Hover Image"
-                  width="280px"
-                  height="200px"
-                  zIndex={2}
-                  transition="opacity 0.5s ease-in-out" // 부드러운 투명도 변화
-                  opacity={product.product_id === hoveredBoardId ? 1 : 0} // 호버 상태에 따른 투명도
-                />
-              </Box>
+                  width="100%"
+                  bg="white"
+                  display={"flex"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                >
+                  {/* 마우스 호버 시 2번째 이미지로 변경 */}
+                  {/* 기본 이미지 */}
+                  <Image
+                    position="absolute"
+                    src={product.mainImgs[0]?.main_img_uri}
+                    alt="Board Image"
+                    width="280px"
+                    height="200px"
+                    zIndex={1}
+                    transition="opacity 0.5s ease-in-out" // 부드러운 투명도 변화
+                    opacity={product.id === hoveredBoardId ? 0 : 1} // 호버 상태에 따른 투명도
+                  />
+                  {/* 호버 시 이미지 */}
+                  <Image
+                    position="absolute"
+                    src={product.mainImgs[1]?.main_img_uri}
+                    alt="Hover Image"
+                    width="280px"
+                    height="200px"
+                    zIndex={2}
+                    transition="opacity 0.5s ease-in-out" // 부드러운 투명도 변화
+                    opacity={product.product_id === hoveredBoardId ? 1 : 0} // 호버 상태에 따른 투명도
+                  />
+                </Box>
 
-              <Flex direction="column" p={4} justifyContent={"center"}>
-                <Text>{product.product_name}</Text>
-              </Flex>
-            </Box>
-          ))}
-        </SimpleGrid>
-      </Flex>
+                <Flex direction="column" p={4} justifyContent={"center"}>
+                  <Text>
+                    [{product.company_name}] {product.product_name}
+                  </Text>
+                  <Text mt={2} fontWeight={"bold"} fontSize={"1.2rem"}>
+                    {formatPrice(product.product_price)}원
+                  </Text>
+                </Flex>
+              </Box>
+            ))}
+          </SimpleGrid>
+        </Flex>
+      </Box>
       <SearchComponent />
       <Pagination pageInfo={pageInfo} />
     </Box>

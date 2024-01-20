@@ -214,7 +214,7 @@ export function ProductView() {
     return formatPrice(option.length > 0 ? 0 : product.product.product_price);
   };
 
-  // ------------------------------ 게시물 삭제 로직 ------------------------------
+  // ------------------------------ 게시물 삭제(숨김) 로직 ------------------------------
   function handleDelete() {
     axios
       .put("/api/product/remove/" + product_id)
@@ -238,8 +238,10 @@ export function ProductView() {
   function handleBucketClick() {
     axios
       .post("/api/cart/add", {
-        product_id: product_id,
-        selectedOptionList: selectedOptionList,
+        cartDto: {
+          product_id: product_id,
+          selectedOptionList: selectedOptionList,
+        },
       })
       .then(() => {
         toast({
