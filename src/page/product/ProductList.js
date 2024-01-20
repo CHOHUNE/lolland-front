@@ -6,6 +6,7 @@ import {
   Button,
   Flex,
   Image,
+  Input,
   SimpleGrid,
   Spinner,
   Text,
@@ -29,23 +30,54 @@ function Pagination({ pageInfo }) {
   return (
     <Box>
       {pageInfo.prevPageNumber && (
-        <Button onClick={() => navigate("?p=" + pageInfo.prevPageNumber)}>
+        <Button
+          variant="ghost"
+          onClick={() => navigate("?p=" + pageInfo.prevPageNumber)}
+        >
           <FontAwesomeIcon icon={faAngleLeft} />
         </Button>
       )}
 
       {pageNumbers.map((pageNumber) => (
-        <Button key={pageNumber} onClick={() => navigate("?p=" + pageNumber)}>
+        <Button
+          variant={
+            pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
+          }
+          key={pageNumber}
+          onClick={() => navigate("?p=" + pageNumber)}
+        >
           {pageNumber}
         </Button>
       ))}
 
       {pageInfo.nextPageNumber && (
-        <Button onClick={() => navigate("?p=" + pageInfo.nextPageNumber)}>
+        <Button
+          variant="ghost"
+          onClick={() => navigate("?p=" + pageInfo.nextPageNumber)}
+        >
           <FontAwesomeIcon icon={faAngleRight} />
         </Button>
       )}
     </Box>
+  );
+}
+
+function SearchComponent() {
+  const [keyword, setKeyword] = useState("");
+  const navigate = useNavigate();
+
+  function handleSearch() {
+    const params = new URLSearchParams();
+    params.set("k", keyword);
+
+    navigate("?" + params);
+  }
+
+  return (
+    <Flex>
+      <Input value={keyword} onChange={(e) => setKeyword(e.target.value)} />
+      <Button onClick={handleSearch}>검색</Button>
+    </Flex>
   );
 }
 
@@ -162,6 +194,7 @@ export function ProductList() {
           ))}
         </SimpleGrid>
       </Flex>
+      <SearchComponent />
       <Pagination pageInfo={pageInfo} />
     </Box>
   );
