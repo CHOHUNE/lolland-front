@@ -20,6 +20,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Spinner,
+  Textarea,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -149,6 +150,14 @@ export function MemberManage() {
                 readOnly
                 value={member.memberAddressDto.member_detail_address}
               />
+            </Flex>
+          </FormControl>
+
+          {/* 자기 소개 */}
+          <FormControl mt={4}>
+            <Flex>
+              <FormLabel w={"100px"}>자기소개</FormLabel>
+              <Textarea readOnly value={member.member_introduce} />
             </Flex>
           </FormControl>
 
