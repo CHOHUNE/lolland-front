@@ -238,10 +238,8 @@ export function ProductView() {
   function handleBucketClick() {
     axios
       .post("/api/cart/add", {
-        cartDto: {
-          product_id: product_id,
-          selectedOptionList: selectedOptionList,
-        },
+        product_id: product_id,
+        selectedOptionList: selectedOptionList,
       })
       .then(() => {
         toast({
