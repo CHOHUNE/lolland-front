@@ -137,62 +137,32 @@ export function ProductView() {
   };
 
   // ------------------------------ 목록에있는 상품 삭제 로직 ------------------------------
-  const handleRemoveDetail = (key) => {
-    setSelectedOptionList((prevDetails) => {
-      const { [key]: _, ...rest } = prevDetails;
-      return rest;
-    });
+  const handleRemoveDetail = (optionId) => {
+    setSelectedOptionList((prevList) =>
+      prevList.filter((item) => item.option_id !== optionId)
+    );
   };
 
-  // ------------------------------ 수량 증가 로직 ------------------------------
-  const increaseQuantity = (key) => {
-    setSelectedOptionList((prevDetails) => {
-      const currentQuantity = prevDetails[key].quantity;
-      const maxQuantity = prevDetails[key].stock; // 'stock'이 재고 수량을 나타냄
 
-      // 수량이 재고 수량 이하인 경우에만 증가
-      if (currentQuantity < maxQuantity) {
-        return {
-          ...prevDetails,
-          [key]: {
-            ...prevDetails[key],
-            quantity: currentQuantity + 1,
-          },
-        };
-      } else {
-        // 재고 수량을 초과하는 경우, 변경 없이 현재 상태를 반환
-        toast({
-          title: "재고 수량 초과",
-          description: "더 이상 수량을 늘릴 수 없습니다.",
-          status: "error",
-          duration: 2000,
-          isClosable: true,
-        });
-        return prevDetails;
-      }
+  // ------------------------------ 수량 증가 로직 ------------------------------
+  const increaseQuantity = (optionId) => {
+    setSelectedOptionList((prevList) => {
+      return prevList.map((item) =>
+        item.option_id === optionId
+          ? { ...item, quantity: item.quantity < item.stock ? item.quantity + 1 : item.quantity }
+          : item
+      );
     });
   };
 
   // ------------------------------ 수량 감소 로직 ------------------------------
-  const decreaseQuantity = (key) => {
-    setSelectedOptionList((prevDetails) => {
-      // 현재 항목의 수량 확인
-      const currentQuantity = prevDetails[key].quantity;
-
-      if (currentQuantity > 1) {
-        // 수량이 1보다 크면 수량 감소
-        return {
-          ...prevDetails,
-          [key]: {
-            ...prevDetails[key],
-            quantity: currentQuantity - 1,
-          },
-        };
-      } else {
-        // 수량이 1이면 해당 항목을 목록에서 제거
-        const { [key]: _, ...rest } = prevDetails;
-        return rest;
-      }
+  const decreaseQuantity = (optionId) => {
+    setSelectedOptionList((prevList) => {
+      return prevList.map((item) =>
+        item.option_id === optionId
+          ? { ...item, quantity: item.quantity > 1 ? item.quantity - 1 : item.quantity }
+          : item
+      );
     });
   };
 
@@ -236,11 +206,22 @@ export function ProductView() {
 
   // ------------------------------ 장바구니로 정보 전달 로직 ------------------------------
   function handleBucketClick() {
-    axios
-      .post("/api/cart/add", {
-        product_id: product_id,
-        selectedOptionList: selectedOptionList,
-      })
+    // 상세 옵션이 선택되지 않았을 경우 경고 메시지를 표시하고 함수 실행 중지
+    if (!selectedOptionList.length) {
+      toast({
+        description: "상세 옵션을 선택해주세요.",
+        status: "warning",
+        duration: 2000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // 상세 옵션이 선택되었을 경우 서버로 데이터 전송
+    axios.post("/api/cart/add", {
+      product_id: product_id,
+      selectedOptionList: selectedOptionList,
+    })
       .then(() => {
         toast({
           description: "장바구니로 이동되었습니다.",
@@ -254,6 +235,7 @@ export function ProductView() {
         });
       });
   }
+
 
   // ----------------------------------- 상품 상세이미지 관련 로직 -----------------------------------
   const renderProductDetailsImages = () => {
@@ -563,7 +545,7 @@ export function ProductView() {
                           {/* ------------------- 목록상품 삭제 버튼 ------------------- */}
                           <Button
                             size={"sm"}
-                            onClick={() => handleRemoveDetail(key)}
+                            onClick={() => handleRemoveDetail(optionList.option_id)}
                             bg={"none"}
                             _hover={{ cursor: "background: none" }}
                             _active={{ bg: "none" }}
@@ -591,7 +573,7 @@ export function ProductView() {
                               borderRadius: 0,
                               padding: 0,
                             }}
-                            onClick={() => increaseQuantity(key)}
+                            onClick={() => increaseQuantity(optionList.option_id)} // 변경: key 대신 option_id 사용
                             _hover={{ bg: "none" }}
                             _active={{ bg: "none" }}
                           >
@@ -620,7 +602,7 @@ export function ProductView() {
                               borderRadius: 0,
                               padding: 0,
                             }}
-                            onClick={() => decreaseQuantity(key)}
+                            onClick={() => decreaseQuantity(optionList.option_id)} // 변경: key 대신 option_id 사용
                             _hover={{ bg: "none" }}
                             _active={{ bg: "none" }}
                           >
