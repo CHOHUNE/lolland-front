@@ -8,8 +8,8 @@ export function CommentForm() {
 
   const { gear_id } = useParams();
   function handleSubmit() {
-    axios.post("/api/gearboard/addcomment", {
-      gear_id: gear_id,
+    axios.post("/api/gearboard/add", {
+      boardid: gear_id,
       comment: comment,
     });
   }
