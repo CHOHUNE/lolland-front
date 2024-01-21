@@ -2,21 +2,32 @@ import React, { useRef, useEffect } from "react";
 import { Chart, Tooltip, TooltipItem } from "chart.js/auto";
 import { Bar } from "react-chartjs-2";
 
-const RatingChart = ({ ratingDistribution }) => {
-  const labels = [0, 1, 2, 3, 4, 5];
-  const data = labels.map((label) =>
-    ratingDistribution[label] !== undefined ? ratingDistribution[label] : 0,
-  );
+const RatingChart = ({ ratingDistribution, boxDimensions }) => {
+  const chartRef = useRef(null);
 
-  const chartData = {
-    labels: labels.map(String),
-    datasets: [
-      {
-        data: data,
-        backgroundColor: 'orange',
-      },
-    ],
-  };
+  useEffect(() => {
+    if (chartRef.current) {
+      chartRef.current.destroy();
+    }
+
+    const labels = [0, 1, 2, 3, 4, 5];
+    const data = labels.map((label) =>
+      ratingDistribution[label] !== undefined ? ratingDistribution[label] : 0,
+    );
+
+    const chartContainer = document.getElementById("rating-chart");
+    chartContainer.width = boxDimensions.width;
+    chartContainer.height = boxDimensions.height;
+
+    const chartData = {
+      labels: labels.map(Number),
+      datasets: [
+        {
+          data: data,
+          backgroundColor: "orange",
+        },
+      ],
+    };
 
     const options = {
       scales: {
@@ -71,7 +82,18 @@ const RatingChart = ({ ratingDistribution }) => {
       },
     };
 
-  return <Bar data={chartData} options={options} />;
+    chartRef.current = new Chart(document.getElementById("rating-chart"), {
+      type: "bar",
+      data: chartData,
+      options: options,
+    });
+
+    return () => {
+      chartRef.current.destroy();
+    };
+  }, [ratingDistribution, boxDimensions]);
+
+  return <canvas id="rating-chart" />;
 };
 
 export default RatingChart;
