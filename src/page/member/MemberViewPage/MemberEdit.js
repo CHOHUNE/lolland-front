@@ -6,22 +6,25 @@ import {
   CardFooter,
   CardHeader,
   Center,
+  Checkbox,
   Flex,
   FormControl,
-  FormErrorMessage,
   FormHelperText,
   FormLabel,
+  Image,
   Input,
-  Spinner,
+  Textarea,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
-import { useImmer } from "use-immer";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useDaumPostcodePopup } from "react-daum-postcode";
 
 export function MemberEdit() {
+  const fileInputRef = useRef();
+
   // 맴버 고유 id --------------------------------------------------------------------------------
   const [id, setId] = useState("");
 
@@ -87,6 +90,23 @@ export function MemberEdit() {
     setEditChangeCheck(false);
   };
 
+  // 회원 자기 소개 ----------------------------------------------------------------
+  const [member_introduce, setMember_introduce] = useState("");
+
+  // 회원 프로필 사진 ----------------------------------------------------------------
+  // 이미지 이름
+  const [file_name, setFile_name] = useState("");
+  // 이미지 경로
+  const [file_url, setFile_url] = useState("");
+  // 이미지 타입
+  const [image_type, setImage_type] = useState("");
+  // 사진변경 체크박스 인식
+  const [changeImageCheck, setChangeImageCheck] = useState(false);
+  // 새로운 이미지
+  const [file, setFile] = useState(null);
+  // 이미지 업로드창 가능 불가능 하게 바꾸기
+  const [fileInputStatus, setFileInputStatus] = useState(false);
+
   useEffect(() => {
     axios.get("/api/member/memberInfo").then((response) => {
       setId(response.data.id);
@@ -109,6 +129,14 @@ export function MemberEdit() {
       setMember_detail_address(
         response.data.memberAddressDto.member_detail_address,
       );
+
+      // 회원 자기 소개
+      setMember_introduce(response.data.member_introduce);
+
+      // 회원 프로필 사진
+      setFile_name(response.data.memberImageDto.file_name);
+      setFile_url(response.data.memberImageDto.file_url);
+      setImage_type(response.data.memberImageDto.image_type);
     });
   }, []);
 
@@ -165,12 +193,18 @@ export function MemberEdit() {
           member_phone_number,
           member_email,
           member_type,
+          member_introduce,
         },
         memberAddress: {
           member_address,
           member_detail_address,
           member_post_code,
         },
+      })
+      .then(() => {
+        axios.putForm("/api/member/editMemberImage", {
+          //   TODO: 이부분에 회원 이미지 수정 작성 할것 01/20 작성
+        });
       })
       .then(() =>
         toast({
@@ -202,14 +236,101 @@ export function MemberEdit() {
     navigate("/memberPage/passwordEdit");
   }
 
+  // 사진 변경 체크 박스 클릭시 로직
+  function handleImageChangeClick(e) {
+    setChangeImageCheck(e.target.checked);
+    // 사진 변경을 다시 해제 할 경우
+    if (e.target.checked === false) {
+      setFile(null);
+    }
+  }
+
   return (
     <Center>
       <Card w={"700px"}>
-        <CardHeader>맴버 수정페이지에요</CardHeader>
+        <CardHeader mt={2} fontSize={"1.2rem"} fontWeight={"900"}>
+          회원 정보 수정 페이지 입니다.
+        </CardHeader>
 
         <CardBody>
-          {/* 이름 */}
+          {/* 프로필 사진 */}
           <FormControl mt={2}>
+            <Flex justifyContent={"center"}>
+              <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
+                프로필 사진
+              </FormLabel>
+              <Image
+                borderRadius="full"
+                boxSize="200px"
+                src={file_url}
+                alt={file_name}
+              />
+              <Checkbox
+                mt={"180px"}
+                ml={"100px"}
+                w={"200px"}
+                size={"lg"}
+                colorScheme={"orange"}
+                onChange={handleImageChangeClick}
+              >
+                사진을 변경합니다.
+              </Checkbox>
+            </Flex>
+            {image_type === "default" && (
+              <FormHelperText ml={"180px"}>기본 이미지 입니다.</FormHelperText>
+            )}
+          </FormControl>
+
+          {/* 새 프로필 사진 등록 하기 */}
+          {changeImageCheck && (
+            <FormControl mt={6}>
+              <Flex justifyContent={"center"} alignItems={"center"}>
+                <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
+                  변경할 사진
+                </FormLabel>
+                <Input
+                  ref={fileInputRef}
+                  mt={2}
+                  border={"none"}
+                  type={"file"}
+                  accept="image/*"
+                  w={"250px"}
+                  h={"50px"}
+                  borderRadius={"0"}
+                  alignItems={"center"}
+                  isDisabled={fileInputStatus}
+                  onChange={(e) => {
+                    setEditChangeCheck(false);
+                    setFile(e.target.files[0]);
+                  }}
+                />
+                <Checkbox
+                  mt={-2}
+                  ml={"50px"}
+                  w={"200px"}
+                  size={"lg"}
+                  colorScheme={"orange"}
+                  onChange={(e) => {
+                    if (e.target.checked === true) {
+                      // 기본 이미지 체크 상태
+                      setFile(null); // 체크 전 추가 된 이미지 지우기
+                      fileInputRef.current.value = ""; // 추가된 이미지 지운후 client에도 보이게 적용
+                      setFileInputStatus(true); // 기본이미지로 사용 할꺼 라면 파일 선택 못 하도록 막기
+                    } else {
+                      // 기본 이미지 체크가 해제된 상태
+                      fileInputRef.current.value = ""; //
+                      setFileInputStatus(false); // 기본 이미지 체크가 해제 되면 다시 파일 선택하도록 하기
+                    }
+                  }}
+                >
+                  기본 이미지로 변경
+                </Checkbox>
+              </Flex>
+            </FormControl>
+          )}
+
+          {/* 이름 */}
+          <FormControl mt={6}>
             <Flex justifyContent={"center"}>
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 이 름
@@ -419,6 +540,25 @@ export function MemberEdit() {
                 value={member_detail_address}
                 onChange={(e) => {
                   setMember_detail_address(e.target.value);
+                  setEditChangeCheck(false);
+                }}
+              />
+            </Flex>
+          </FormControl>
+
+          {/* 상세주소 */}
+          <FormControl mt={2}>
+            <Flex justifyContent={"center"}>
+              <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
+                자기소개
+              </FormLabel>
+              <Textarea
+                w={"500px"}
+                h={"50px"}
+                borderRadius={"0"}
+                value={member_introduce}
+                onChange={(e) => {
+                  setMember_introduce(e.target.value);
                   setEditChangeCheck(false);
                 }}
               />
