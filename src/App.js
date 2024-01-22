@@ -34,6 +34,8 @@ import { MemberFindPassword } from "./page/member/MemberFindPassword";
 import { PasswordEdit } from "./page/member/MemberViewPage/PasswordEdit";
 import { AdminView } from "./page/admin/AdminView";
 import { MemberList } from "./page/admin/MemberList";
+import { QnaAnswer } from "./page/qna/QnaAnswer";
+import { QnaWriteAnswer } from "./page/qna/QnaWriteAnswer";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -41,7 +43,6 @@ const routes = createBrowserRouter(
       {/* 메인페이지 */}
 
       {/* 상품관련 */}
-      <Route path="product/write/" element={<ProductWrite />} />
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
       <Route path="edit/:product_id" element={<ProductEdit />} />
@@ -86,7 +87,11 @@ const routes = createBrowserRouter(
 
       {/* 관리자 페이지 */}
       <Route path="adminPage" element={<AdminView />}>
+        <Route path="product/write/" element={<ProductWrite />} />
         <Route path="memberList" element={<MemberList />} />
+        <Route path="qna" element={<QnaAnswer />}>
+          <Route path="write/:question_id" element={<QnaWriteAnswer />} />
+        </Route>
       </Route>
     </Route>,
   ),
