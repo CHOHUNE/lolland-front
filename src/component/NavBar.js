@@ -225,6 +225,7 @@ export function NavBar() {
                     setIndex(null);
                     setOverlayVisible(false);
                   }}
+                  onClick={() => navigate(`/category/${category.category_id}`)}
                 >
                   {category.category_name}
                 </Tab>
@@ -295,7 +296,18 @@ export function NavBar() {
                       mr={10}
                     >
                       {subCategoryArray.map((subCategory) => (
-                        <Text key={subCategory.subcategory_id} fontSize="sm">
+                        <Text
+                          key={subCategory.subcategory_id}
+                          fontSize="sm"
+                          _hover={{
+                            cursor: "pointer",
+                          }}
+                          onClick={() =>
+                            navigate(
+                              `/category/${category.category_id}/${subCategory.subcategory_id}`,
+                            )
+                          }
+                        >
                           {subCategory.subcategory_name}
                         </Text>
                       ))}
