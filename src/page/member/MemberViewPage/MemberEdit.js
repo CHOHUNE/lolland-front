@@ -202,8 +202,9 @@ export function MemberEdit() {
         },
       })
       .then(() => {
-        axios.putForm("/api/member/editMemberImage", {
-          //   TODO: 이부분에 회원 이미지 수정 작성 할것 01/20 작성
+        axios.putForm("/api/memberImage/editMemberImage", {
+          file,
+          image_type,
         });
       })
       .then(() =>
@@ -302,6 +303,7 @@ export function MemberEdit() {
                   onChange={(e) => {
                     setEditChangeCheck(false);
                     setFile(e.target.files[0]);
+                    setImage_type("new");
                   }}
                 />
                 <Checkbox
@@ -313,13 +315,17 @@ export function MemberEdit() {
                   onChange={(e) => {
                     if (e.target.checked === true) {
                       // 기본 이미지 체크 상태
+                      setEditChangeCheck(false);
                       setFile(null); // 체크 전 추가 된 이미지 지우기
                       fileInputRef.current.value = ""; // 추가된 이미지 지운후 client에도 보이게 적용
                       setFileInputStatus(true); // 기본이미지로 사용 할꺼 라면 파일 선택 못 하도록 막기
+                      setImage_type("default");
                     } else {
                       // 기본 이미지 체크가 해제된 상태
-                      fileInputRef.current.value = ""; //
+                      setEditChangeCheck(true);
+                      fileInputRef.current.value = ""; // 기본 이미지가 해제 되면 다시 이미지 선택을 인식 시키도록
                       setFileInputStatus(false); // 기본 이미지 체크가 해제 되면 다시 파일 선택하도록 하기
+                      setImage_type("new");
                     }
                   }}
                 >
@@ -546,7 +552,7 @@ export function MemberEdit() {
             </Flex>
           </FormControl>
 
-          {/* 상세주소 */}
+          {/* 자기소개 */}
           <FormControl mt={2}>
             <Flex justifyContent={"center"}>
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
@@ -554,7 +560,7 @@ export function MemberEdit() {
               </FormLabel>
               <Textarea
                 w={"500px"}
-                h={"50px"}
+                h={"150px"}
                 borderRadius={"0"}
                 value={member_introduce}
                 onChange={(e) => {
