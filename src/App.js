@@ -34,6 +34,7 @@ import { MemberFindPassword } from "./page/member/MemberFindPassword";
 import { PasswordEdit } from "./page/member/MemberViewPage/PasswordEdit";
 import { AdminView } from "./page/admin/AdminView";
 import { MemberList } from "./page/admin/MemberList";
+import { ProductPay } from "./ProductPay";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -45,6 +46,7 @@ const routes = createBrowserRouter(
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
       <Route path="edit/:product_id" element={<ProductEdit />} />
+      <Route path="product/pay/:product_id" element={<ProductPay />} />
 
       {/* 리뷰 */}
 

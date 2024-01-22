@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -49,7 +49,8 @@ import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons"; // �
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { ReviewView } from "../review/ReviewView";
 import { selectOptions } from "@testing-library/user-event/dist/select-options"; // 빈 하트
-import { ProductStats } from "../review/ProductStats"; // 빈 하트
+import { ProductStats } from "../review/ProductStats";
+import { LoginContext } from "../../component/LoginProvider"; // 빈 하트
 
 export function ProductView() {
   const [product, setProduct] = useState(null);
@@ -65,6 +66,8 @@ export function ProductView() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  const { login, isAdmin } = useContext(LoginContext);
 
   // ---------------------------- 상품 렌더링 ----------------------------
   useEffect(() => {
@@ -93,21 +96,26 @@ export function ProductView() {
   }, [product_id]);
 
   // ---------------------------- 로딩로직 ----------------------------
+  const FullPageSpinner = () => {
+    return (
+      <Flex
+        position="fixed"
+        top="0"
+        left="0"
+        right="0"
+        bottom="0"
+        justifyContent="center"
+        alignItems="center"
+        backgroundColor="rgba(0,0,0,0.3)"
+        zIndex="9999"
+      >
+        <Spinner size="xl" color="white" />
+      </Flex>
+    );
+  };
 
   if (product === null) {
-    return (
-      <Center textAlign={"center"}>
-        <Card
-          size={"500px"}
-          w="500px"
-          h="500px"
-          alignItems={"center"}
-          display={"flex"}
-        >
-          <FontAwesomeIcon fontSize={"3.5rem"} icon={faSpinner} spinPulse />
-        </Card>
-      </Center>
-    );
+    return <FullPageSpinner />;
   }
 
   // ------------------------------ 가격 ex) 1,000 ,로 구분지어 보여지게 처리 ------------------------------
@@ -139,18 +147,21 @@ export function ProductView() {
   // ------------------------------ 목록에있는 상품 삭제 로직 ------------------------------
   const handleRemoveDetail = (optionId) => {
     setSelectedOptionList((prevList) =>
-      prevList.filter((item) => item.option_id !== optionId)
+      prevList.filter((item) => item.option_id !== optionId),
     );
   };
-
 
   // ------------------------------ 수량 증가 로직 ------------------------------
   const increaseQuantity = (optionId) => {
     setSelectedOptionList((prevList) => {
       return prevList.map((item) =>
         item.option_id === optionId
-          ? { ...item, quantity: item.quantity < item.stock ? item.quantity + 1 : item.quantity }
-          : item
+          ? {
+              ...item,
+              quantity:
+                item.quantity < item.stock ? item.quantity + 1 : item.quantity,
+            }
+          : item,
       );
     });
   };
@@ -160,8 +171,11 @@ export function ProductView() {
     setSelectedOptionList((prevList) => {
       return prevList.map((item) =>
         item.option_id === optionId
-          ? { ...item, quantity: item.quantity > 1 ? item.quantity - 1 : item.quantity }
-          : item
+          ? {
+              ...item,
+              quantity: item.quantity > 1 ? item.quantity - 1 : item.quantity,
+            }
+          : item,
       );
     });
   };
@@ -218,10 +232,11 @@ export function ProductView() {
     }
 
     // 상세 옵션이 선택되었을 경우 서버로 데이터 전송
-    axios.post("/api/cart/add", {
-      product_id: product_id,
-      selectedOptionList: selectedOptionList,
-    })
+    axios
+      .post("/api/cart/add", {
+        product_id: product_id,
+        selectedOptionList: selectedOptionList,
+      })
       .then(() => {
         toast({
           description: "장바구니로 이동되었습니다.",
@@ -235,7 +250,6 @@ export function ProductView() {
         });
       });
   }
-
 
   // ----------------------------------- 상품 상세이미지 관련 로직 -----------------------------------
   const renderProductDetailsImages = () => {
@@ -327,21 +341,34 @@ export function ProductView() {
     return stars;
   };
 
+  // ------------------------------ 구매하기 이동 로직 ------------------------------
+  function handlePaymentClick() {
+    if (login !== "") {
+      navigate("/product/pay/" + product_id);
+    } else {
+      toast({
+        description: "로그인 해주시기 바랍니다.",
+        status: "error",
+      });
+    }
+  }
+
   return (
     <Box mx={"15%"} p={5}>
-      <Box>
-        {/* ------------------------------ 상품 수정, 삭제 ------------------------------ */}
-        <Button
-          colorScheme="blue"
-          onClick={() => navigate("/edit/" + product_id)}
-        >
-          수정
-        </Button>
-        <Button colorScheme="red" onClick={onOpen}>
-          삭제
-        </Button>
-      </Box>
-
+      {/* ------------------------------ 상품 수정, 삭제 ------------------------------ */}
+      {isAdmin() && (
+        <Box>
+          <Button
+            colorScheme="blue"
+            onClick={() => navigate("/edit/" + product_id)}
+          >
+            수정
+          </Button>
+          <Button colorScheme="red" onClick={onOpen}>
+            삭제
+          </Button>
+        </Box>
+      )}
       {/* ---------------------- 카테고리 순서 ---------------------- */}
       <Box minW={"800px"}>
         <Box justify="center" align="start" maxW="100%" m="auto" mt={10} mb={7}>
@@ -545,7 +572,9 @@ export function ProductView() {
                           {/* ------------------- 목록상품 삭제 버튼 ------------------- */}
                           <Button
                             size={"sm"}
-                            onClick={() => handleRemoveDetail(optionList.option_id)}
+                            onClick={() =>
+                              handleRemoveDetail(optionList.option_id)
+                            }
                             bg={"none"}
                             _hover={{ cursor: "background: none" }}
                             _active={{ bg: "none" }}
@@ -573,7 +602,9 @@ export function ProductView() {
                               borderRadius: 0,
                               padding: 0,
                             }}
-                            onClick={() => increaseQuantity(optionList.option_id)} // 변경: key 대신 option_id 사용
+                            onClick={() =>
+                              increaseQuantity(optionList.option_id)
+                            } // 변경: key 대신 option_id 사용
                             _hover={{ bg: "none" }}
                             _active={{ bg: "none" }}
                           >
@@ -602,7 +633,9 @@ export function ProductView() {
                               borderRadius: 0,
                               padding: 0,
                             }}
-                            onClick={() => decreaseQuantity(optionList.option_id)} // 변경: key 대신 option_id 사용
+                            onClick={() =>
+                              decreaseQuantity(optionList.option_id)
+                            } // 변경: key 대신 option_id 사용
                             _hover={{ bg: "none" }}
                             _active={{ bg: "none" }}
                           >
@@ -656,6 +689,7 @@ export function ProductView() {
               </Button>
 
               {/* --------------- 구매하기 --------------- */}
+
               <Button
                 h={"50px"}
                 w={"50%"}
@@ -664,6 +698,7 @@ export function ProductView() {
                 color={"white"}
                 border={"1px solid #eeeeee"}
                 _hover={{ color: "black", background: "gray.300" }}
+                onClick={handlePaymentClick}
               >
                 구매하기
               </Button>
@@ -700,8 +735,6 @@ export function ProductView() {
         product_id={product_id}
         product_content={product.product_content}
       />
-
-
     </Box>
   );
 }
