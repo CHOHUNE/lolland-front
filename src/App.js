@@ -35,6 +35,7 @@ import { PasswordEdit } from "./page/member/MemberViewPage/PasswordEdit";
 import { AdminView } from "./page/admin/AdminView";
 import { MemberList } from "./page/admin/MemberList";
 import { QnaAnswer } from "./page/qna/QnaAnswer";
+import { QnaWriteAnswer } from "./page/qna/QnaWriteAnswer";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -88,7 +89,9 @@ const routes = createBrowserRouter(
       <Route path="adminPage" element={<AdminView />}>
         <Route path="product/write/" element={<ProductWrite />} />
         <Route path="memberList" element={<MemberList />} />
-        <Route path="qna" element={<QnaAnswer />} />
+        <Route path="qna" element={<QnaAnswer />}>
+          <Route path="write/:question_id" element={<QnaWriteAnswer />} />
+        </Route>
       </Route>
     </Route>,
   ),
