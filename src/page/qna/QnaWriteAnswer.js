@@ -136,6 +136,12 @@ export function QnaWriteAnswer() {
   }
 
   function handleUpdate() {
+    axios.put("api/qna/answer/update", {
+      answer_id: answerCopy.answer_id,
+      question_id: answerCopy.question_id,
+      product_id: answerCopy.product_id,
+      answer_content: answerCopy.answer_content,
+    });
     console.log(answerCopy);
   }
 
