@@ -405,6 +405,7 @@ export function ProductView() {
               )}
 
             {/* 썸네일 이미지 */}
+
             <HStack justifyContent={"center"} mt={-10}>
               {product &&
                 product.productImgs &&
