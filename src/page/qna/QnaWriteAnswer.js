@@ -98,7 +98,14 @@ export function QnaWriteAnswer() {
         product_id: answerCopy.product_id,
         answer_content: answerCopy.answer_content,
       })
-      .then()
+      .then(() => {
+        toast({
+          title: "성공적으로 문의 답변을 등록하였습니다",
+          description: "리스트로 돌아갑니다",
+          status: "success",
+        });
+        navigate(-1);
+      })
       .catch((error) => {
         if (error.response.status === 500) {
           toast({
@@ -137,7 +144,9 @@ export function QnaWriteAnswer() {
   return (
     <Card w="full" px="3%">
       <CardHeader>
-        <Heading size="lg">답변 등록</Heading>
+        <Heading size="lg">
+          답변 {answer.answer_id !== null ? "수정" : "등록"}
+        </Heading>
       </CardHeader>
       <CardBody>
         {questionInfo !== null && (
@@ -268,7 +277,8 @@ export function QnaWriteAnswer() {
               if (answer?.answer_id) {
                 handleDelete();
               } else {
-                console.log("취소");
+                setAnswerCopy(answer);
+                navigate(-1);
               }
             }}
           >
