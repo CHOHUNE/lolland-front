@@ -15,7 +15,7 @@ import { Form, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 
-export function QnaWrite({ setIsWriting, product_id, fetchQna }) {
+export function QnaWriteQuestion({ setIsWriting, product_id, fetchQna }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const toast = useToast();

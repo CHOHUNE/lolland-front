@@ -26,9 +26,35 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+
+function Pagination({ pageInfo }) {
+  const navigate = useNavigate();
+
+  const pageNumbers = [];
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  console.log(pageNumbers);
+  return (
+    <Box>
+      {pageNumbers.map((pageNumber) => (
+        <Button
+          key={pageNumber}
+          onClick={() => navigate("/?page=" + pageNumber)}
+        >
+          {pageNumber}
+        </Button>
+      ))}
+    </Box>
+  );
+}
 
 export function MemberList() {
   const [memberList, setMemberList] = useState([]);
+  const [pageInfo, setPageInfo] = useState("");
   const [selectMember, setSelectMember] = useState("");
 
   // 회원 탈퇴 처리 인식
@@ -38,11 +64,18 @@ export function MemberList() {
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
+  const [params] = useSearchParams();
+
+  const navigate = useNavigate();
+
+  const location = useLocation();
+
   useEffect(() => {
     axios
-      .get("/api/member/listAll")
+      .get("/api/member/listAll?" + params)
       .then((response) => {
-        setMemberList(response.data);
+        setMemberList(response.data.allMember);
+        setPageInfo(response.data.pageInfo);
       })
       .catch(() => {
         toast({
@@ -53,10 +86,11 @@ export function MemberList() {
       .finally(() => {
         setCheckMember(false);
       });
-  }, [checkMember]);
+  }, [checkMember, location]);
 
   // 삭제 버튼 클릭시 동작
   const handleMemberDeleteClick = (e) => {
+    console.log(e);
     setSelectMember(e);
     onOpen();
   };
@@ -145,6 +179,8 @@ export function MemberList() {
               })}
             </Tbody>
           </Table>
+
+          <Pagination pageInfo={pageInfo} />
         </CardBody>
 
         {/* 탈퇴 모달 */}

@@ -12,6 +12,7 @@ import {
   FormHelperText,
   FormLabel,
   Input,
+  Textarea,
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
@@ -81,6 +82,9 @@ export function MemberSignup() {
     setMember_address_name("기본주소1");
     setMember_address_type("main");
   };
+
+  // 맴버 자기소개 ----------------------------------------------------------------------------------
+  const [member_introduce, setMember_introduce] = useState("");
 
   // 맴버 가입시 타입을 유저로 --------------------------------------------------------------------------
   const [member_type, setMember_type] = useState("user");
@@ -175,6 +179,7 @@ export function MemberSignup() {
           member_phone_number,
           member_email,
           member_type,
+          member_introduce,
         },
 
         // 주소정보
@@ -565,6 +570,22 @@ export function MemberSignup() {
                 borderRadius={"0"}
                 value={member_detail_address}
                 onChange={(e) => setMember_detail_address(e.target.value)}
+              />
+            </Flex>
+          </FormControl>
+
+          {/* 자기소개 */}
+          <FormControl mt={2}>
+            <Flex justifyContent={"center"}>
+              <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
+                자기소개
+              </FormLabel>
+              <Textarea
+                w={"500px"}
+                h={"50px"}
+                borderRadius={"0"}
+                value={member_introduce}
+                onChange={(e) => setMember_introduce(e.target.value)}
               />
             </Flex>
           </FormControl>

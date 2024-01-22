@@ -36,7 +36,7 @@ import {
 import { Fragment, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import { QnaWrite } from "../qna/QnaWrite";
+import { QnaWriteQuestion } from "./QnaWriteQuestion";
 
 function PageButton({ variant, pageNumber, children, product_id }) {
   const [params] = useSearchParams();
@@ -308,7 +308,7 @@ export function QnaView({
   return (
     <>
       {isWriting ? (
-        <QnaWrite
+        <QnaWriteQuestion
           setIsWriting={setIsWriting}
           product_id={product_id}
           fetchQna={fetchQna}
