@@ -80,7 +80,7 @@ export function QnaWriteAnswer() {
           });
         }
       });
-  }, []);
+  }, [question_id]);
 
   const formattedDate = (question_reg_time) => {
     const date = new Date(question_reg_time);
@@ -145,7 +145,7 @@ export function QnaWriteAnswer() {
     <Card w="full" px="3%">
       <CardHeader>
         <Heading size="lg">
-          답변 {answer.answer_id !== null ? "수정" : "등록"}
+          답변 {answer?.answer_id !== null ? "수정" : "등록"}
         </Heading>
       </CardHeader>
       <CardBody>
