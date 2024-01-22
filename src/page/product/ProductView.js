@@ -69,6 +69,12 @@ export function ProductView() {
 
   const { login, isAdmin } = useContext(LoginContext);
 
+  const totalOptionPrice = selectedOptionList.reduce((total, option) => {
+    return (
+      total + (option.price || product.product.product_price) * option.quantity
+    );
+  }, 0);
+
   // ---------------------------- 상품 렌더링 ----------------------------
   useEffect(() => {
     axios
@@ -342,9 +348,44 @@ export function ProductView() {
   };
 
   // ------------------------------ 구매하기 이동 로직 ------------------------------
+  // ------------------------------ 로컬스토리지 이용 ------------------------------
   function handlePaymentClick() {
     if (login !== "") {
-      navigate("/product/pay/" + product_id);
+      // 상세 옵션 선택 안하면 선택하라고 토스트 표시
+      if (selectedOptionList.length === 0) {
+        toast({
+          title: "옵션 선택 필요",
+          description: "상세 옵션을 선택해주세요.",
+          status: "warning",
+          duration: 2000,
+          isClosable: true,
+        });
+        return; // 함수 실행을 여기서 중지
+      }
+
+      const mainImgUrl =
+        product.productImgs && product.productImgs.length > 0
+          ? product.productImgs[0].main_img_uri
+          : ""; // 메인 이미지 URL
+
+      const purchaseInfo = {
+        productName: product.product.product_name,
+        mainImgUrl: mainImgUrl,
+        selectedOptions: selectedOptionList,
+        totalOptionPrice: totalOptionPrice, // 총 상품 금액 추가
+        shippingFee: 3000,
+      };
+
+      try {
+        localStorage.setItem("purchaseInfo", JSON.stringify(purchaseInfo));
+        navigate("/product/pay/" + product_id);
+      } catch (error) {
+        console.error("Error saving to localStorage", error);
+        toast({
+          description: "저장 중 오류가 발생했습니다.",
+          status: "error",
+        });
+      }
     } else {
       toast({
         description: "로그인 해주시기 바랍니다.",
