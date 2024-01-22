@@ -27,6 +27,8 @@ import { useEffect } from "react";
 import axios from "axios";
 import * as PropTypes from "prop-types";
 import { GearCommentContainer } from "./comment/GearCommentContainer";
+import { faHeart } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export function GearView() {
   const { gear_id } = useParams();
@@ -51,12 +53,25 @@ export function GearView() {
     });
   }
 
+  function handleLike() {
+    axios
+      .post("/api/gearlike", { gearboardId: gearboard.gear_id })
+      .then(() => console.log(gear_id))
+      .catch(() => console.log("bad"))
+      .finally(() => console.log("done"));
+  }
+
   return (
     <Box w={"80%"} m={"0 auto"}>
-      <Heading size="lg" mt={"20px"}>
-        {gear_id}번 게시물
-      </Heading>
-      <br />
+      <Flex justifyContent={"space-between"}>
+        <Heading size="lg" mt={"20px"}>
+          {gear_id}번 게시물
+        </Heading>
+        <Button variant="ghost" size="xl" ml={"800px"}>
+          <FontAwesomeIcon icon={faHeart} size="xl" onClick={handleLike} />
+        </Button>
+        <br />
+      </Flex>
       <FormControl>
         <FormLabel>category</FormLabel>
         <Input value={gearboard.category} />
