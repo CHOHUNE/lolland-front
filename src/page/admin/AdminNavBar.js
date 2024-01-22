@@ -54,7 +54,7 @@ export function AdminNavBar() {
           <Tooltip hasArrow label="상품 등록" placement="right">
             <IconButton
               {...buttonStyle}
-              onClick={() => navigate("/product/write/")}
+              onClick={() => navigate("product/write/")}
               icon={<FontAwesomeIcon icon={faPlus} />}
             />
           </Tooltip>

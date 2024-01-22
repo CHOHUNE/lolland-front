@@ -42,7 +42,6 @@ const routes = createBrowserRouter(
       {/* 메인페이지 */}
 
       {/* 상품관련 */}
-      <Route path="product/write/" element={<ProductWrite />} />
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
       <Route path="edit/:product_id" element={<ProductEdit />} />
@@ -87,6 +86,7 @@ const routes = createBrowserRouter(
 
       {/* 관리자 페이지 */}
       <Route path="adminPage" element={<AdminView />}>
+        <Route path="product/write/" element={<ProductWrite />} />
         <Route path="memberList" element={<MemberList />} />
         <Route path="qna" element={<QnaAnswer />} />
       </Route>
