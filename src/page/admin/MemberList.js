@@ -26,7 +26,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export function MemberList() {
   const [memberList, setMemberList] = useState([]);
@@ -40,6 +40,8 @@ export function MemberList() {
   const { isOpen, onClose, onOpen } = useDisclosure();
 
   const [params] = useSearchParams();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -56,7 +58,7 @@ export function MemberList() {
       .finally(() => {
         setCheckMember(false);
       });
-  }, [checkMember]);
+  }, [checkMember, params]);
 
   // 삭제 버튼 클릭시 동작
   const handleMemberDeleteClick = (e) => {
@@ -149,6 +151,12 @@ export function MemberList() {
               })}
             </Tbody>
           </Table>
+
+          <Center mt={4} mb={4}>
+            <Button onClick={() => navigate("?page=1")}>1</Button>
+            <Button onClick={() => navigate("?page=2")}>2</Button>
+            <Button onClick={() => navigate("?page=3")}>3</Button>
+          </Center>
         </CardBody>
 
         {/* 탈퇴 모달 */}
