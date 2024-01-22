@@ -136,19 +136,96 @@ export function QnaWriteAnswer() {
   }
 
   function handleUpdate() {
-    axios.put("api/qna/answer/update", {
-      answer_id: answerCopy.answer_id,
-      question_id: answerCopy.question_id,
-      product_id: answerCopy.product_id,
-      answer_content: answerCopy.answer_content,
-    });
-    console.log(answerCopy);
+    axios
+      .put("/api/qna/answer/update", {
+        answer_id: answerCopy.answer_id,
+        answer_content: answerCopy.answer_content,
+      })
+      .then(() => {
+        toast({
+          title: "성공적으로 답변을 수정하였습니다",
+          description: "다시 리스트로 되돌아갑니다",
+          status: "success",
+        });
+        navigate(-1);
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          toast({
+            title: "Internal Server Error",
+            description:
+              "답변을 수정하던 도중 에러가 발생했습니다. 백엔드 코드를 점검해주세요",
+            status: "error",
+          });
+        } else if (error.response.status === 400) {
+          toast({
+            title: "Bad Request Error",
+            description: "백엔드와 프론트 코드의 파라미터를 다시 확인해주세요",
+            status: "error",
+          });
+        } else if (error.response.status === 403) {
+          toast({
+            title: "권한이 없습니다",
+            description: "문의 수정은 관리자만 가능합니다",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "문의 수정 중 에러 발생",
+            description: "현상이 지속되면 관리자에게 문의 바랍니다",
+            status: "error",
+          });
+        }
+      });
   }
 
-  function handleDelete() {}
+  function handleDelete() {
+    axios
+      .delete("/api/qna/answer/delete", {
+        params: {
+          answer_id: answerCopy.answer_id,
+        },
+      })
+      .then(() => {
+        toast({
+          title: "문의 답변을 성공적으로 삭제하였습니다",
+          description: "삭제된 답변은 다시 복구되지 않습니다",
+          status: "success",
+        });
+        navigate("/adminPage/qna");
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          toast({
+            title: "Internal Server Error",
+            description:
+              "답변을 삭제하던 도중 에러가 발생했습니다. 백엔드 코드를 점검해주세요",
+            status: "error",
+          });
+        } else if (error.response.status === 400) {
+          toast({
+            title: "Bad Request Error",
+            description: "백엔드와 프론트 코드의 파라미터를 다시 확인해주세요",
+            status: "error",
+          });
+        } else if (error.response.status === 403) {
+          toast({
+            title: "권한이 없습니다",
+            description: "문의 삭제는 관리자만 가능합니다",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "문의 삭제 중 에러 발생",
+            description: "현상이 지속되면 관리자에게 문의 바랍니다",
+            status: "error",
+          });
+        }
+      });
+  }
 
   return (
-    <Card w="full" px="3%">
+    <Card w="full" px="3%" id="answerSection">
       <CardHeader>
         <Heading size="lg">
           답변 {answer?.answer_id !== null ? "수정" : "등록"}
@@ -284,7 +361,7 @@ export function QnaWriteAnswer() {
                 handleDelete();
               } else {
                 setAnswerCopy(answer);
-                navigate(-1);
+                navigate("/adminPage/qna");
               }
             }}
           >

@@ -83,7 +83,14 @@ export function QnaAnswer() {
                   questionList.map((q) => (
                     <Tr
                       key={q.question_id}
-                      onClick={() => navigate(`write/${q.question_id}`)}
+                      onClick={() => {
+                        navigate(`write/${q.question_id}`);
+                        const targetElement =
+                          document.getElementById("answerSection");
+                        if (targetElement) {
+                          targetElement.scrollIntoView({ behavior: "smooth" });
+                        }
+                      }}
                     >
                       <Td textAlign="center">{q.product_name}</Td>
                       <Td textAlign="center">{q.question_title}</Td>
@@ -93,9 +100,11 @@ export function QnaAnswer() {
                     </Tr>
                   ))
                 ) : (
-                  <Td colSpan={3} h={5}>
-                    아직 등록된 문의가 없습니다
-                  </Td>
+                  <Tr>
+                    <Td colSpan={3} h={5}>
+                      아직 등록된 문의가 없습니다
+                    </Td>
+                  </Tr>
                 )}
               </Tbody>
             </Table>
