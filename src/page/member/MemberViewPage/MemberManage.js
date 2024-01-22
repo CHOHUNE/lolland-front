@@ -157,7 +157,7 @@ export function MemberManage() {
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>자기소개</FormLabel>
-              <Textarea readOnly value={member.member_introduce} />
+              <Textarea h={"150px"} readOnly value={member.member_introduce} />
             </Flex>
           </FormControl>
 
