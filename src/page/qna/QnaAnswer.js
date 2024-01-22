@@ -1,7 +1,10 @@
 import {
+  Box,
+  ButtonGroup,
   Card,
   CardBody,
   CardHeader,
+  Center,
   Heading,
   Table,
   TableContainer,
@@ -15,19 +18,69 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+
+function PageButton({ variant, pageNumber, children }) {
+  return null;
+}
+
+function Pagination({ pageInfo }) {
+  const pageNumbers = [];
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <Center>
+      <Box>
+        <ButtonGroup justifyContent="center">
+          {pageInfo.prevPageNumber && (
+            <PageButton variant="ghost" pageNumber={pageInfo.prevPageNumber}>
+              <FontAwesomeIcon icon={faAngleLeft} />
+            </PageButton>
+          )}
+
+          {pageNumbers.map((pageNumber) => (
+            <PageButton
+              key={pageNumber}
+              variant={
+                pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
+              }
+              pageNumber={pageNumber}
+            >
+              {pageNumber}
+            </PageButton>
+          ))}
+
+          {pageInfo.nextPageNumber && (
+            <PageButton variant="ghost" pageNumber={pageInfo.nextPageNumber}>
+              <FontAwesomeIcon icon={faAngleRight} />
+            </PageButton>
+          )}
+        </ButtonGroup>
+      </Box>
+    </Center>
+  );
+}
 
 export function QnaAnswer() {
   const [questionList, setQuestionList] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
+  const [pageInfo, setPageInfo] = useState(null);
+  const location = useLocation();
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    console.log(params);
     axios
-      .get("/api/qna/view")
+      .get("/api/qna/view?" + params)
       .then((response) => {
-        setQuestionList(response.data);
-        console.log(questionList);
+        setQuestionList(response.data.questionList);
+        setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
         if (error.response.status === 401) {
@@ -109,6 +162,7 @@ export function QnaAnswer() {
               </Tbody>
             </Table>
           </TableContainer>
+          <Pagination pageInfo={pageInfo} />
         </CardBody>
       </Card>
       <Outlet />
