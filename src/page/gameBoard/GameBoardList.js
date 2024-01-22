@@ -164,7 +164,6 @@ function GameBoardList() {
   useEffect(() => {
     // params.set("s", sortBy);
 
-    console.log({ sortBy });
     axios.get("/api/gameboard/list?" + params).then((response) => {
       setGameBoardList(response.data.gameBoardList);
       setPageInfo(response.data.pageInfo);
@@ -192,7 +191,6 @@ function GameBoardList() {
   useEffect(() => {
     axios.get("/api/gameboard/naver").then((response) => {
       setNaver(response.data);
-      console.log(naver);
     });
   }, []);
 
@@ -321,12 +319,7 @@ function GameBoardList() {
                 >
                   전체
                 </Button>
-                <Button
-                  onClick={() => navigate("?k=공지")}
-                  _hover={{ bgColor: "whitesmoke", color: "black" }}
-                >
-                  공지
-                </Button>
+
                 <Button
                   colorScheme={"blue"}
                   onClick={() => navigate("?k=잡담")}

@@ -217,7 +217,7 @@ function CommentList({ commentList, onDelete, setIsSubmitting }) {
           {commentList.map((comment) => (
             <CommentItem
               key={comment.id}
-              isSubmitting={false} // Assuming isSubmitting is not needed here
+              isSubmitting={false}
               setIsSubmitting={setIsSubmitting}
               comment={comment}
               onDelete={onDelete}
