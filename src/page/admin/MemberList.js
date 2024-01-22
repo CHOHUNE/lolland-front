@@ -26,6 +26,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { useSearchParams } from "react-router-dom";
 
 export function MemberList() {
   const [memberList, setMemberList] = useState([]);
@@ -38,9 +39,11 @@ export function MemberList() {
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
+  const [params] = useSearchParams();
+
   useEffect(() => {
     axios
-      .get("/api/member/listAll")
+      .get("/api/member/listAll?" + params)
       .then((response) => {
         setMemberList(response.data);
       })
@@ -57,6 +60,7 @@ export function MemberList() {
 
   // 삭제 버튼 클릭시 동작
   const handleMemberDeleteClick = (e) => {
+    console.log(e);
     setSelectMember(e);
     onOpen();
   };
