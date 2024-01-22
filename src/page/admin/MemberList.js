@@ -43,7 +43,7 @@ function Pagination({ pageInfo }) {
       {pageNumbers.map((pageNumber) => (
         <Button
           key={pageNumber}
-          onClick={() => navigate("/?page=" + pageNumber)}
+          onClick={() => navigate("?page=" + pageNumber)}
         >
           {pageNumber}
         </Button>
