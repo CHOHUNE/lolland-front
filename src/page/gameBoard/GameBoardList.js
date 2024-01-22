@@ -159,10 +159,11 @@ function GameBoardList() {
   const { isAuthenticated } = useContext(LoginContext);
   const toast = useToast();
 
+  const [naver, setNaver] = useState(null);
+
   useEffect(() => {
     // params.set("s", sortBy);
 
-    console.log({ sortBy });
     axios.get("/api/gameboard/list?" + params).then((response) => {
       setGameBoardList(response.data.gameBoardList);
       setPageInfo(response.data.pageInfo);
@@ -185,6 +186,12 @@ function GameBoardList() {
     axios
       .get("/api/gameboard/list/today")
       .then((response) => setToday(response.data));
+  }, []);
+
+  useEffect(() => {
+    axios.get("/api/gameboard/naver").then((response) => {
+      setNaver(response.data);
+    });
   }, []);
 
   if (gameBoardList === null || pageInfo === null) {
@@ -312,12 +319,7 @@ function GameBoardList() {
                 >
                   전체
                 </Button>
-                <Button
-                  onClick={() => navigate("?k=공지")}
-                  _hover={{ bgColor: "whitesmoke", color: "black" }}
-                >
-                  공지
-                </Button>
+
                 <Button
                   colorScheme={"blue"}
                   onClick={() => navigate("?k=잡담")}
@@ -579,61 +581,34 @@ function GameBoardList() {
           <br />
           <br />
           <Box>
-            <Heading size="md">최신 공식 기사</Heading>
-            <br />
             <Divider orientation="horizontal" color={"orange"} />
-            <Flex>
-              <Card maxW="sm">
-                <CardBody>
-                  <Image
-                    src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                    alt="Green double couch with wooden legs"
-                    borderRadius="lg"
-                  />
-                  <Stack mt="6" spacing="3">
-                    <Heading size="md">Living room Sofa</Heading>
-                  </Stack>
-                </CardBody>
-              </Card>
-              <Card maxW="sm">
-                <CardBody>
-                  <Image
-                    src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                    alt="Green double couch with wooden legs"
-                    borderRadius="lg"
-                  />
-                  <Stack mt="6" spacing="3">
-                    <Heading size="md">Living room Sofa</Heading>
-                  </Stack>
-                </CardBody>
-              </Card>
-            </Flex>
-            <Flex>
-              <Card maxW="sm">
-                <CardBody>
-                  <Image
-                    src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                    alt="Green double couch with wooden legs"
-                    borderRadius="lg"
-                  />
-                  <Stack mt="6" spacing="3">
-                    <Heading size="md">Living room Sofa</Heading>
-                  </Stack>
-                </CardBody>
-              </Card>
-              <Card maxW="sm">
-                <CardBody>
-                  <Image
-                    src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                    alt="Green double couch with wooden legs"
-                    borderRadius="lg"
-                  />
-                  <Stack mt="6" spacing="3">
-                    <Heading size="md">Living room Sofa</Heading>
-                  </Stack>
-                </CardBody>
-              </Card>
-            </Flex>
+            <Card>
+              <CardHeader>
+                <Heading size="md">게임 관련 최신 기사</Heading>
+              </CardHeader>
+
+              <CardBody>
+                <Stack divider={<StackDivider />} spacing="4">
+                  {naver &&
+                    naver.items !== null &&
+                    naver.items.map((news) => (
+                      <Box key={news.link}>
+                        <Heading
+                          size="xs"
+                          textTransform="uppercase"
+                          _hover={{ cursor: "pointer" }}
+                          onClick={() => window.open(news.link, "_blank")}
+                        >
+                          {news.title
+                            .replace(/&quot;/g, "") // &quot; 제거
+                            .replace(/<b>/g, "") // <b> 제거
+                            .replace(/<\/b>/g, "") + "..."}
+                        </Heading>
+                      </Box>
+                    ))}
+                </Stack>
+              </CardBody>
+            </Card>
           </Box>
         </Box>
       </Flex>
