@@ -183,9 +183,9 @@ export function MemberEdit() {
   };
 
   // 수정 하기 버튼 클릭시 ----------------------------------------------------------
-  function handleEditClick() {
-    axios
-      .put("/api/member/edit", {
+  async function handleEditClick() {
+    try {
+      await axios.put("/api/member/edit", {
         member: {
           id,
           member_name,
@@ -200,36 +200,32 @@ export function MemberEdit() {
           member_detail_address,
           member_post_code,
         },
-      })
-      .then(() => {
-        axios.putForm("/api/memberImage/editMemberImage", {
-          file,
-          image_type,
-        });
-      })
-      .then(() =>
+      });
+      await axios.putForm("/api/memberImage/editMemberImage", {
+        file,
+        image_type,
+      });
+      toast({
+        description: "회원 정보가 수정 되었습니다.",
+        status: "success",
+      });
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        let errorMessage = error.response.data[0];
         toast({
-          description: "회원 정보가 수정 되었습니다.",
-          status: "success",
-        }),
-      )
-      .then(() => navigate("/memberPage/memberInfo/memberManagePage"))
-      .catch((error) => {
-        if (error.response && error.response.status === 400) {
-          let errorMessage = error.response.data[0];
-          toast({
-            description: errorMessage,
-            status: "error",
-          });
-        } else {
-          // 기타 오류에 대한 처리
-          toast({
-            description: "정보 수정중 문제가 발생하였습니다.",
-            status: "error",
-          });
-        }
-      })
-      .finally();
+          description: errorMessage,
+          status: "error",
+        });
+      } else {
+        // 기타 오류에 대한 처리
+        toast({
+          description: "정보 수정중 문제가 발생하였습니다.",
+          status: "error",
+        });
+      }
+    } finally {
+      navigate("/memberPage/memberInfo/memberManagePage");
+    }
   }
 
   // 비밀번호 수정 버튼 클릭시 ---------------------------------------------
