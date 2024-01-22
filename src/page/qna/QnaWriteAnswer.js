@@ -347,14 +347,9 @@ export function QnaWriteAnswer() {
           </Button>
           <Button
             w="30%"
-            color={answer?.answer_id ? "red" : "black"}
-            border={answer?.answer_id ? "1px solid red" : "1px solid black"}
+            color="white"
+            bgColor={answer?.answer_id ? "red" : "black"}
             variant="undefined"
-            _hover={
-              answer?.answer_id
-                ? { bgColor: "red", color: "white" }
-                : { bgColor: "black", color: "white" }
-            }
             borderRadius={0}
             onClick={() => {
               if (answer?.answer_id) {
