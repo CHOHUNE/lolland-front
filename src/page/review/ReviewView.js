@@ -307,171 +307,188 @@ export const ReviewView = ({ product_id }) => {
   }
 
   return (
-    <>
-      <ProductStats product_id={product_id} />
-      <Tabs position="relative" variant="unstyled">
-        <TabList p={5} justifyContent="space-evenly" align="center">
-          <Tab {...tabStyles}>상품 설명</Tab>
-          <Tab {...tabStyles}>리뷰 ({totalReviews})</Tab>
-          <Tab {...tabStyles}>Q&A</Tab>
-        </TabList>
-        <TabIndicator mt="-1.5px" height="2px" bg="black" borderRadius="1px" />
-        <TabPanels px={10}>
-          {/* -------------------------- 상품 설명 -------------------------- */}
-          <TabPanel>
-            <Text size="md">
-              {"{"} product.product.content {"}"}
-            </Text>
-          </TabPanel>
+    <Tabs position="relative" variant="unstyled">
+      <TabList p={5} justifyContent="space-evenly" align="center">
+        <Tab {...tabStyles}>상품 설명</Tab>
+        <Tab {...tabStyles}>리뷰 ({totalReviews})</Tab>
+        <Tab {...tabStyles}>Q&A</Tab>
+      </TabList>
+      <TabIndicator mt="-1.5px" height="2px" bg="black" borderRadius="1px" />
+      <TabPanels px={10}>
+        {/* -------------------------- 상품 설명 -------------------------- */}
+        <TabPanel>
+          <Text size="md">
+            {"{"} product.product.content {"}"}
+          </Text>
+        </TabPanel>
 
-          {/* -------------------------- 리뷰 & 댓글 -------------------------- */}
-          <TabPanel>
-            {/* -------------------------- 리뷰 입력란 -------------------------- */}
-            <StarRating rate={rate} setRate={setRate} />
-            <Flex justifyContent="center" mx="20%" mb={10}>
-              <Textarea
-                value={review}
-                onChange={(e) => setReview(e.target.value)}
-                placeholder="리뷰를 작성해주세요"
-                mr={2}
-              />
-              <IconButton
-                w="10%"
-                bgColor="black"
-                color="white"
-                height="undefined"
-                icon={<FontAwesomeIcon icon={faPaperPlane} />}
-                onClick={handleSubmit}
-              />
-            </Flex>
-            {/* -------------------------- 리뷰 출력란 -------------------------- */}
-            {reviewList.length > 0 ? (
-              reviewList.map((review, index) => (
-                <Box key={review.review_id} mx="20%" my={5}>
-                  <HStack spacing={5} mb={5}>
-                    <Text
-                      color="white"
-                      bgColor="black"
-                      borderRadius={20}
-                      px={2}
-                      fontSize="xs"
-                    >
-                      {formattedLogId(review.member_login_id)}
-                    </Text>
-                    {/* -------------------------- 별점 출력란 -------------------------- */}
-                    <Star
-                      initialRate={review.rate}
-                      onRateChange={handleRatingChange}
-                      isEditing={isEditing}
-                    />
-                    {/* -------------------------- 시간 출력란 -------------------------- */}
-                    <Text opacity={0.6} fontSize="xs">
-                      {formattedDate(review.review_reg_time)}
-                    </Text>
-                    {/* -------------------------- 수정(취소) / 삭제 버튼 출력란 --------------------------*/}
-                    <ButtonGroup>
-                      {(hasAccess(review.member_login_id) || isAdmin()) && (
-                        <>
-                          {isEditing &&
-                          editingReview.review_id === review.review_id ? (
-                            <>
-                              <IconButton
-                                icon={<FontAwesomeIcon icon={faPaperPlane} />}
-                                size="sm"
-                                variant="ghost"
-                                colorScheme="blue"
-                                onClick={handleUpdateReview}
-                              />
-                              <IconButton
-                                icon={<FontAwesomeIcon icon={faXmark} />}
-                                size="sm"
-                                variant="ghost"
-                                colorScheme="red"
-                                onClick={handleCancelEdit}
-                              />
-                            </>
-                          ) : (
-                            <>
-                              <IconButton
-                                icon={<FontAwesomeIcon icon={faPenToSquare} />}
-                                size="sm"
-                                variant="ghost"
-                                colorScheme="purple"
-                                onClick={() => handleEditReview(review)}
-                              />
-                              <IconButton
-                                icon={<FontAwesomeIcon icon={faTrashCan} />}
-                                size="sm"
-                                variant="ghost"
-                                color="black"
-                                _hover={{ color: "white", bgColor: "black" }}
-                                onClick={() => deleteReview(review.review_id)}
-                              />
-                            </>
-                          )}
-                        </>
-                      )}
-                    </ButtonGroup>
-                  </HStack>
-                  {isEditing && editingReview.review_id === review.review_id ? (
-                    <Textarea
-                      value={editingReview.review_content}
-                      onChange={(e) => {
-                        setEditingReview((prevReview) => ({
-                          ...prevReview,
-                          review_content: e.target.value,
-                        }));
-                      }}
-                      mb={6}
-                      whiteSpace="pre-wrap"
-                    />
-                  ) : (
-                    <Text mb={6} whiteSpace="pre-wrap">
-                      {review.review_content}
-                    </Text>
-                  )}
-                  {index < reviewList.length - 1 && <Divider />}
-                  {index === reviewList.length - 1 &&
-                    reviewList.length !== totalReviews && (
-                      <Center>
-                        <Button
-                          bgColor="black"
-                          color="white"
-                          borderRadius={25}
-                          px="10%"
-                          onClick={handleSeeMore}
-                          mt={4}
-                        >
-                          더보기
-                        </Button>
-                      </Center>
-                    )}
-                </Box>
-              ))
-            ) : (
-              <Box
-                h="xs"
-                fontSize="md"
-                textAlign="center"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-              ></Box>
-            )}
-          </TabPanel>
-          {/* -------------------------- Q&A -------------------------- */}
-          <TabPanel>
-            <QnaView
-              product_id={product_id}
-              formattedLogId={formattedLogId}
-              formattedDate={formattedDate}
-              isAuthenticated={isAuthenticated}
-              hasAccess={hasAccess}
-              isAdmin={isAdmin}
+        {/* -------------------------- 리뷰 & 댓글 -------------------------- */}
+        <TabPanel>
+          {/* -------------------------- 리뷰 입력란 -------------------------- */}
+          <StarRating rate={rate} setRate={setRate} />
+          <Flex justifyContent="center" mx="20%" mb={10}>
+            <Textarea
+              value={review}
+              onChange={(e) => setReview(e.target.value)}
+              placeholder="리뷰를 작성해주세요"
+              mr={2}
             />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-    </>
+            <IconButton
+              w="10%"
+              bgColor="black"
+              color="white"
+              height="undefined"
+              icon={<FontAwesomeIcon icon={faPaperPlane} />}
+              onClick={() => {
+                if (rate !== 0) {
+                  handleSubmit();
+                } else {
+                  toast({
+                    title: "별점을 부여하지 않았습니다",
+                    description: "1점 이상만 가능합니다",
+                    status: "warning",
+                  });
+                }
+              }}
+            />
+          </Flex>
+          {/* -------------------------- 리뷰 출력란 -------------------------- */}
+          {reviewList.length > 0 ? (
+            reviewList.map((review, index) => (
+              <Box key={review.review_id} mx="20%" my={5}>
+                <HStack spacing={5} mb={5}>
+                  <Text
+                    color="white"
+                    bgColor="black"
+                    borderRadius={20}
+                    px={2}
+                    fontSize="xs"
+                  >
+                    {formattedLogId(review.member_login_id)}
+                  </Text>
+                  {/* -------------------------- 별점 출력란 -------------------------- */}
+                  <Star
+                    initialRate={review.rate}
+                    onRateChange={handleRatingChange}
+                    isEditing={isEditing}
+                  />
+                  {/* -------------------------- 시간 출력란 -------------------------- */}
+                  <Text opacity={0.6} fontSize="xs">
+                    {formattedDate(review.review_reg_time)}
+                  </Text>
+                  {/* -------------------------- 수정(취소) / 삭제 버튼 출력란 --------------------------*/}
+                  <ButtonGroup>
+                    {(hasAccess(review.member_login_id) || isAdmin()) && (
+                      <>
+                        {isEditing &&
+                        editingReview.review_id === review.review_id ? (
+                          <>
+                            <IconButton
+                              icon={<FontAwesomeIcon icon={faPaperPlane} />}
+                              size="sm"
+                              variant="ghost"
+                              colorScheme="blue"
+                              onClick={() => {
+                                if (editingReview.rate !== 0) {
+                                  handleUpdateReview();
+                                } else {
+                                  toast({
+                                    title: "별점은 1점 이상만 가능합니다",
+                                    description: "다시 한 번 확인해주세요",
+                                    status: "warning",
+                                  });
+                                }
+                              }}
+                            />
+                            <IconButton
+                              icon={<FontAwesomeIcon icon={faXmark} />}
+                              size="sm"
+                              variant="ghost"
+                              colorScheme="red"
+                              onClick={handleCancelEdit}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <IconButton
+                              icon={<FontAwesomeIcon icon={faPenToSquare} />}
+                              size="sm"
+                              variant="ghost"
+                              colorScheme="purple"
+                              onClick={() => handleEditReview(review)}
+                            />
+                            <IconButton
+                              icon={<FontAwesomeIcon icon={faTrashCan} />}
+                              size="sm"
+                              variant="ghost"
+                              color="black"
+                              _hover={{ color: "white", bgColor: "black" }}
+                              onClick={() => deleteReview(review.review_id)}
+                            />
+                          </>
+                        )}
+                      </>
+                    )}
+                  </ButtonGroup>
+                </HStack>
+                {isEditing && editingReview.review_id === review.review_id ? (
+                  <Textarea
+                    value={editingReview.review_content}
+                    onChange={(e) => {
+                      setEditingReview((prevReview) => ({
+                        ...prevReview,
+                        review_content: e.target.value,
+                      }));
+                    }}
+                    mb={6}
+                    whiteSpace="pre-wrap"
+                  />
+                ) : (
+                  <Text mb={6} whiteSpace="pre-wrap">
+                    {review.review_content}
+                  </Text>
+                )}
+                {index < reviewList.length - 1 && <Divider />}
+                {index === reviewList.length - 1 &&
+                  reviewList.length !== totalReviews && (
+                    <Center>
+                      <Button
+                        bgColor="black"
+                        color="white"
+                        borderRadius={25}
+                        px="10%"
+                        onClick={handleSeeMore}
+                        mt={4}
+                      >
+                        더보기
+                      </Button>
+                    </Center>
+                  )}
+              </Box>
+            ))
+          ) : (
+            <Box
+              h="xs"
+              fontSize="md"
+              textAlign="center"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            ></Box>
+          )}
+        </TabPanel>
+        {/* -------------------------- Q&A -------------------------- */}
+        <TabPanel>
+          <QnaView
+            product_id={product_id}
+            formattedLogId={formattedLogId}
+            formattedDate={formattedDate}
+            isAuthenticated={isAuthenticated}
+            hasAccess={hasAccess}
+            isAdmin={isAdmin}
+          />
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
   );
 };

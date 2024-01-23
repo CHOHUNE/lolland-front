@@ -773,6 +773,12 @@ export function ProductView() {
         </Flex>
       </Box>
 
+      {/*--------------- 상품 스탯 --------------- */}
+      <ProductStats
+        product_id={product_id}
+        average_rate={product.product.average_rate}
+      />
+
       {/* --------------- 상품 상세 설명, 리뷰 , Q&A --------------- */}
       <ReviewView
         product_id={product_id}

@@ -10,7 +10,7 @@ const RatingChart = ({ ratingDistribution, boxDimensions }) => {
       chartRef.current.destroy();
     }
 
-    const labels = [0, 1, 2, 3, 4, 5];
+    const labels = [1, 2, 3, 4, 5];
     const data = labels.map((label) =>
       ratingDistribution[label] !== undefined ? ratingDistribution[label] : 0,
     );
@@ -38,8 +38,8 @@ const RatingChart = ({ ratingDistribution, boxDimensions }) => {
             display: false,
           },
           ticks: {
-            minTicksLimit: 6,
-            maxTicksLimit: 6,
+            minTicksLimit: 5,
+            maxTicksLimit: 5,
           },
         },
         y: {
@@ -54,7 +54,7 @@ const RatingChart = ({ ratingDistribution, boxDimensions }) => {
           font: { size: 20 },
           padding: {
             top: 10,
-            bottom: 30,
+            bottom: 40,
           },
         },
         legend: {
