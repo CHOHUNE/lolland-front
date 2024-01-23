@@ -10,6 +10,7 @@ import {
   Heading,
   Table,
   TableContainer,
+  Tag,
   Tbody,
   Td,
   Th,
@@ -89,8 +90,8 @@ function Pagination({ pageInfo }) {
   );
 }
 
-export function MemberReview() {
-  const [reviewList, setReviewList] = useState(null);
+export function MemberQuestion() {
+  const [questionList, setQuestionList] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
   const [pageInfo, setPageInfo] = useState(null);
@@ -98,14 +99,16 @@ export function MemberReview() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
+    console.log(params);
+
     axios
-      .get("/api/review/my" + params)
+      .get("/api/qna/my" + params)
       .then((response) => {
-        setReviewList(response.data.reviewList);
+        setQuestionList(response.data.questionList);
         setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
-        if (error.response.staus === 401) {
+        if (error.response.status === 401) {
           toast({
             title: "세션이 만료되었습니다",
             description: "재로그인 후 시도해주세요",
@@ -121,7 +124,7 @@ export function MemberReview() {
         } else {
           toast({
             title: error.response.data,
-            description: "리뷰 불러오는 도중 에러 발생, 관리자에게 문의하세요",
+            description: "문의 불러오는 도중 에러 발생, 관리자에게 문의하세요",
             status: "error",
           });
         }
@@ -141,7 +144,7 @@ export function MemberReview() {
     <VStack w="full" mr={5} spacing={5}>
       <Card w="full">
         <CardHeader>
-          <Heading>리뷰 목록</Heading>
+          <Heading>문의 목록</Heading>
         </CardHeader>
         <CardBody>
           <TableContainer>
@@ -149,37 +152,50 @@ export function MemberReview() {
               <Thead>
                 <Tr>
                   <Th testAlign="center">상품명</Th>
-                  <Th testAlign="center">리뷰 내용</Th>
-                  <Th testAlign="center">별점</Th>
+                  <Th testAlign="center">문의 제목</Th>
+                  <Th testAlign="center">답변 상태</Th>
                   <Th textAlign="center">등록일자</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {reviewList && reviewList.length > 0 ? (
-                  reviewList.map((review) => (
+                {questionList && questionList.length > 0 ? (
+                  questionList.map((q) => (
                     <Tr
-                      key={review.review_id}
+                      key={q.question_id}
                       onClick={() => {
-                        navigate(`review/${review.review_id}`);
+                        navigate(`write/${q.question_id}`);
                         const targetElement =
-                          document.getElementById("reviewSection");
+                          document.getElementById("answerSection");
                         if (targetElement) {
                           targetElement.scrollIntoView({ behavior: "smooth" });
                         }
                       }}
                     >
-                      <Td textAlign="center">{review.product_name}</Td>
-                      <Td textAlign="center">{review.review_content}</Td>
-                      <Td textAlign="center">{review.rate}</Td>
+                      <Td textAlign="center">{q.product_name}</Td>
+                      <Td textAlign="center">{q.question_title}</Td>
                       <Td textAlign="center">
-                        {formattedDate(review.review_reg_time)}
+                        <Tag
+                          size="sm"
+                          variant="outline"
+                          colorScheme={
+                            !q.answer_content ? "orange" : "blackAlpha"
+                          }
+                          p={2}
+                        >
+                          {!q.answer_id ? "답변 대기중" : "답변 완료"}
+                        </Tag>
+                      </Td>
+                      <Td textAlign="center">
+                        <Text fontSize="xs" opacity="0.5">
+                          {formattedDate(q.question_reg_time)}
+                        </Text>
                       </Td>
                     </Tr>
                   ))
                 ) : (
                   <Tr>
                     <Td colSpan={3} h={5} textAlign="center">
-                      아직 등록된 리뷰가 없습니다
+                      아직 등록된 문의가 없습니다
                     </Td>
                   </Tr>
                 )}
