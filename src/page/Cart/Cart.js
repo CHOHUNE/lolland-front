@@ -224,7 +224,7 @@ export function Cart() {
       <TableContainer mx={10} mb={10}>
         <Flex justifyContent="space-between" mx={10} mb={5}>
           <Checkbox
-            colorScheme="gray"
+            colorScheme="orange"
             isChecked={
               productList.length > 0 &&
               selectedProducts.length === productList.length
@@ -274,7 +274,7 @@ export function Cart() {
                   >
                     <Td textAlign="center" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
-                        colorScheme="gray"
+                        colorScheme="orange"
                         isChecked={selectedProducts.includes(product.cart_id)}
                         onChange={() => {
                           handleCheckBoxChange(product);
