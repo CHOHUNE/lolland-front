@@ -1,8 +1,10 @@
 import {
   Box,
+  Button,
   ButtonGroup,
   Card,
   CardBody,
+  CardFooter,
   CardHeader,
   Center,
   Heading,
@@ -18,15 +20,36 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import {
+  Outlet,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 
 function PageButton({ variant, pageNumber, children }) {
-  return null;
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+
+  function handleClick() {
+    params.set("p", pageNumber);
+    console.log(params.get("p"));
+    navigate("?" + params);
+  }
+  return (
+    <Button variant={variant} onClick={handleClick}>
+      {children}
+    </Button>
+  );
 }
 
 function Pagination({ pageInfo }) {
+  if (!pageInfo) {
+    return null;
+  }
+
   const pageNumbers = [];
 
   for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
@@ -76,6 +99,7 @@ export function QnaAnswer() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     console.log(params);
+
     axios
       .get("/api/qna/view?" + params)
       .then((response) => {
@@ -104,7 +128,7 @@ export function QnaAnswer() {
           });
         }
       });
-  }, []);
+  }, [location]);
 
   const formattedDate = (question_reg_time) => {
     const date = new Date(question_reg_time);
@@ -154,7 +178,7 @@ export function QnaAnswer() {
                   ))
                 ) : (
                   <Tr>
-                    <Td colSpan={3} h={5}>
+                    <Td colSpan={3} h={5} textAlign="center">
                       아직 등록된 문의가 없습니다
                     </Td>
                   </Tr>
@@ -162,8 +186,10 @@ export function QnaAnswer() {
               </Tbody>
             </Table>
           </TableContainer>
-          <Pagination pageInfo={pageInfo} />
         </CardBody>
+        <CardFooter display="flex" justifyContent="center">
+          <Pagination pageInfo={pageInfo} />
+        </CardFooter>
       </Card>
       <Outlet />
     </VStack>
