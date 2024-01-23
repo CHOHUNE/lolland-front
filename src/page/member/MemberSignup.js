@@ -49,6 +49,11 @@ export function MemberSignup() {
   const [member_email1, setMember_email1] = useState("");
   const [member_email2, setMember_email2] = useState("");
 
+  // 이메일 중복확인 버튼 상태 저장
+  const [emailAbleCheck, setEmailAbleCheck] = useState(false);
+  // 이메일 중복 확인
+  const [emailCheck, setEmailCheck] = useState(false);
+
   // 주소 --------------------------------------------------------------------------------------
   const [member_address, setMember_address] = useState("");
   const [member_detail_address, setMember_detail_address] = useState("");
@@ -269,6 +274,23 @@ export function MemberSignup() {
     }
   }
 
+  // 이메일 중복 확인
+  function handleEmailCheckClick() {
+    axios
+      .get("/api/memberEmail/emailCheck", {
+        params: {
+          member_email,
+        },
+      })
+      .then(() =>
+        toast({ description: "사용 가능한 이메일 입니다.", status: "success" }),
+      )
+      .then(() => setEmailCheck(true))
+      .catch(() => {
+        toast({ description: "이미 사용중인 이메일 입니다.", status: "error" });
+      });
+  }
+
   return (
     <Center mt={8} mb={8}>
       <Card w={"1000px"}>
@@ -449,13 +471,15 @@ export function MemberSignup() {
               <Input
                 id="member_email1"
                 value={member_email1}
-                w={"175px"}
+                w={"150px"}
                 h={"50px"}
                 borderRadius={"0"}
                 onChange={(e) => {
                   setMember_email1(e.target.value);
                   setEmailCodeCheckedState(false);
-                  setSendNumber(true);
+                  setSendNumber(false);
+                  setEmailCheck(false);
+                  setEmailAbleCheck(true);
                 }}
               />
               <Box
@@ -469,24 +493,41 @@ export function MemberSignup() {
               <Input
                 id="member_email2"
                 value={member_email2}
-                w={"175px"}
+                w={"150px"}
                 h={"50px"}
                 borderRadius={"0"}
                 onChange={(e) => {
                   setMember_email2(e.target.value);
                   setEmailCodeCheckedState(false);
                   setSendNumber(false);
+                  setEmailCheck(false);
+                  setEmailAbleCheck(true);
                 }}
               />
-              <Button
-                w={"90px"}
-                h={"50px"}
-                ml={"10px"}
-                fontSize={"0.8rem"}
-                onClick={handleEmailCodeClick}
-              >
-                인증번호 발송
-              </Button>
+              {/* 이메일 중복 체크 */}
+              {emailCheck || (
+                <Button
+                  isDisabled={!emailAbleCheck}
+                  w={"140px"}
+                  h={"50px"}
+                  ml={"10px"}
+                  onClick={handleEmailCheckClick}
+                >
+                  중복 확인
+                </Button>
+              )}
+
+              {/* 이메일 인증 번호 발송 */}
+              {emailCheck && (
+                <Button
+                  w={"140px"}
+                  h={"50px"}
+                  ml={"10px"}
+                  onClick={handleEmailCodeClick}
+                >
+                  인증번호 발송
+                </Button>
+              )}
             </Flex>
           </FormControl>
           {/* 인증번호 입력 */}
