@@ -7,6 +7,10 @@ import {
   Center,
   Flex,
   Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -32,6 +36,7 @@ import {
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
 // 페이지 버튼
 function Pagination({ pageInfo }) {
@@ -90,25 +95,62 @@ function Pagination({ pageInfo }) {
 // 회원 이름으로 찾기 버튼
 function SearchMember() {
   const [keyword, setKeyword] = useState("");
+  const [findType, setFindType] = useState("id");
 
   const navigate = useNavigate();
 
   // 회원명 검색 클릭
   function handleSearch() {
     const params = new URLSearchParams();
-    params.set("k", keyword);
+    params.set(findType, keyword);
 
     navigate("/adminPage/memberList?" + params);
   }
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
-    <Flex>
+    <Flex justifyContent={"center"} mt={10} gap={2}>
+      <Menu>
+        <MenuButton
+          as={Button}
+          rightIcon={<ChevronDownIcon />}
+          w={"130px"}
+          h={"50px"}
+          bg={"white"}
+          border={"1px solid black"}
+        >
+          {findType === "id" && "아이디"}
+          {findType === "name" && "이름"}
+        </MenuButton>
+        <MenuList>
+          <MenuItem onClick={() => setFindType("id")}>아이디</MenuItem>
+          <MenuItem onClick={() => setFindType("name")}>이름</MenuItem>
+        </MenuList>
+      </Menu>
       <Input
+        border={"1px solid black"}
+        w={"300px"}
+        h={"50px"}
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
-        placeholder={"회원 아이디를 입력해 주세요."}
+        placeholder={"검색어를 입력해 주세요."}
+        onKeyDown={handleKeyDown}
       />
-      <Button onClick={handleSearch}>검색</Button>
+      <Button
+        bg={"black"}
+        color={"whitesmoke"}
+        _hover={{ backgroundColor: "white", color: "black" }}
+        w={"100px"}
+        h={"50px"}
+        onClick={handleSearch}
+      >
+        검색
+      </Button>
     </Flex>
   );
 }
