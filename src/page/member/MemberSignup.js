@@ -296,9 +296,10 @@ export function MemberSignup() {
       <Card w={"1000px"} shadow={"1px 1px 3px 1px #dadce0"} fontWeight={"bold"}>
         <CardHeader
           mt={4}
-          fontSize={"1.9rem"}
-          color={"#5F625C"}
           textAlign={"center"}
+          fontSize={"2rem"}
+          fontWeight={"bold"}
+          alignItems={"center"}
         >
           회원가입
         </CardHeader>
