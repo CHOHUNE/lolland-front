@@ -23,6 +23,25 @@ import axios from "axios";
 import { useDaumPostcodePopup } from "react-daum-postcode";
 
 export function MemberEdit() {
+  // 인풋 css
+  const inputStyle = {
+    shadow: "1px 1px 3px 1px #dadce0 inset",
+  };
+
+  // 버튼 css
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
   const fileInputRef = useRef();
 
   // 맴버 고유 id --------------------------------------------------------------------------------
@@ -245,7 +264,13 @@ export function MemberEdit() {
   return (
     <Center>
       <Card w={"700px"}>
-        <CardHeader mt={2} fontSize={"1.2rem"} fontWeight={"900"}>
+        <CardHeader
+          mt={4}
+          textAlign={"center"}
+          fontSize={"2rem"}
+          fontWeight={"bold"}
+          alignItems={"center"}
+        >
           회원 정보 수정 페이지 입니다.
         </CardHeader>
 
@@ -338,9 +363,9 @@ export function MemberEdit() {
                 이 름
               </FormLabel>
               <Input
+                {...inputStyle}
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
                 readOnly
                 value={member_name}
               />
@@ -354,6 +379,7 @@ export function MemberEdit() {
                 아이디
               </FormLabel>
               <Input
+                {...inputStyle}
                 w={"500px"}
                 h={"50px"}
                 borderRadius={"0"}
@@ -375,13 +401,11 @@ export function MemberEdit() {
                 비밀번호
               </FormLabel>
               <Button
+                {...buttonStyle}
                 type={"password"}
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
                 style={{
-                  backgroundColor: "black",
-                  color: "whitesmoke",
                   fontWeight: "700",
                 }}
                 onClick={handleEditPasswordClick}
@@ -398,12 +422,12 @@ export function MemberEdit() {
                 휴대폰번호
               </FormLabel>
               <Input
+                {...inputStyle}
                 type={"number"}
                 id="member_phone_number1"
                 maxLength={3}
                 w={"140px"}
                 h={"50px"}
-                borderRadius={"0"}
                 value={member_phone_number1}
                 onChange={handlePhoneInput1Change}
               />
@@ -422,7 +446,7 @@ export function MemberEdit() {
                 maxLength={4}
                 w={"140px"}
                 h={"50px"}
-                borderRadius={"0"}
+                {...inputStyle}
                 value={member_phone_number2}
                 onChange={handlePhoneInput2Change}
               />
@@ -441,7 +465,7 @@ export function MemberEdit() {
                 maxLength={4}
                 w={"140px"}
                 h={"50px"}
-                borderRadius={"0"}
+                {...inputStyle}
                 value={member_phone_number3}
                 onChange={(e) => {
                   setMember_phone_number3(e.target.value);
@@ -461,7 +485,7 @@ export function MemberEdit() {
                 id="member_email1"
                 w={"225px"}
                 h={"50px"}
-                borderRadius={"0"}
+                {...inputStyle}
                 value={member_email1}
                 onChange={(e) => {
                   setMember_email1(e.target.value);
@@ -480,7 +504,7 @@ export function MemberEdit() {
                 id="member_email2"
                 w={"225px"}
                 h={"50px"}
-                borderRadius={"0"}
+                {...inputStyle}
                 value={member_email2}
                 onChange={(e) => {
                   setMember_email2(e.target.value);
@@ -499,7 +523,6 @@ export function MemberEdit() {
               <Input
                 w={"350px"}
                 h={"50px"}
-                borderRadius={"0"}
                 readOnly
                 defaultValue={member_post_code}
               />
@@ -508,6 +531,7 @@ export function MemberEdit() {
                 h={"50px"}
                 ml={"10px"}
                 onClick={handlePostCodeClick}
+                {...buttonStyle}
               >
                 주소검색
               </Button>
@@ -523,7 +547,6 @@ export function MemberEdit() {
               <Input
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
                 readOnly
                 defaultValue={member_address}
               />
@@ -538,7 +561,7 @@ export function MemberEdit() {
               <Input
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
+                {...inputStyle}
                 value={member_detail_address}
                 onChange={(e) => {
                   setMember_detail_address(e.target.value);
@@ -557,7 +580,7 @@ export function MemberEdit() {
               <Textarea
                 w={"500px"}
                 h={"150px"}
-                borderRadius={"0"}
+                {...inputStyle}
                 value={member_introduce}
                 onChange={(e) => {
                   setMember_introduce(e.target.value);
@@ -572,16 +595,28 @@ export function MemberEdit() {
           <Flex gap={10}>
             <Button
               w="300px"
-              style={{ fontSize: "1.1rem", fontWeight: "900" }}
+              {...buttonStyle}
+              style={{
+                fontSize: "1.1rem",
+                fontWeight: "900",
+              }}
+              bg={"whitesmoke"}
+              color="black"
+              _hover={{
+                backgroundColor: "black",
+                color: "whitesmoke",
+                transition:
+                  "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+                shadow: "1px 1px 3px 1px #dadce0 inset",
+              }}
               onClick={() => navigate(-1)}
             >
               수정 취소
             </Button>
             <Button
               w={"300px"}
+              {...buttonStyle}
               style={{
-                color: "whitesmoke",
-                backgroundColor: "black",
                 fontSize: "1.1rem",
                 fontWeight: "900",
               }}

@@ -94,6 +94,24 @@ function Pagination({ pageInfo }) {
 
 // 회원 이름으로 찾기 버튼
 function SearchMember() {
+  // 인풋 css
+  const inputStyle = {
+    shadow: "1px 1px 3px 1px #dadce0 inset",
+  };
+  // 버튼 css
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
   const [keyword, setKeyword] = useState("");
   const [findType, setFindType] = useState("id");
 
@@ -117,12 +135,13 @@ function SearchMember() {
     <Flex justifyContent={"center"} mt={10} gap={2}>
       <Menu>
         <MenuButton
+          {...inputStyle}
           as={Button}
           rightIcon={<ChevronDownIcon />}
           w={"130px"}
           h={"50px"}
           bg={"white"}
-          border={"1px solid black"}
+          border={"1px solid gray"}
         >
           {findType === "id" && "아이디"}
           {findType === "name" && "이름"}
@@ -133,7 +152,7 @@ function SearchMember() {
         </MenuList>
       </Menu>
       <Input
-        border={"1px solid black"}
+        {...inputStyle}
         w={"300px"}
         h={"50px"}
         value={keyword}
@@ -141,14 +160,7 @@ function SearchMember() {
         placeholder={"검색어를 입력해 주세요."}
         onKeyDown={handleKeyDown}
       />
-      <Button
-        bg={"black"}
-        color={"whitesmoke"}
-        _hover={{ backgroundColor: "white", color: "black" }}
-        w={"100px"}
-        h={"50px"}
-        onClick={handleSearch}
-      >
+      <Button {...buttonStyle} w={"100px"} h={"50px"} onClick={handleSearch}>
         검색
       </Button>
     </Flex>
@@ -156,6 +168,19 @@ function SearchMember() {
 }
 
 export function MemberList() {
+  // 탈퇴 버튼 css
+  const buttonStyle = {
+    background: "orange",
+    color: "black",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
   const [memberList, setMemberList] = useState([]);
   const [pageInfo, setPageInfo] = useState("");
   const [selectMember, setSelectMember] = useState("");
@@ -223,8 +248,14 @@ export function MemberList() {
 
   return (
     <Center>
-      <Card>
-        <CardHeader fontSize={"1.6rem"} fontWeight="bold" mt={4}>
+      <Card shadow={"1px 1px 3px 1px #dadce0"}>
+        <CardHeader
+          mt={4}
+          textAlign={"center"}
+          fontSize={"2rem"}
+          fontWeight={"bold"}
+          alignItems={"center"}
+        >
           회원 목록
         </CardHeader>
         <CardBody>
@@ -274,8 +305,9 @@ export function MemberList() {
                       <Button
                         colorScheme={"yellow"}
                         onClick={() => handleMemberDeleteClick(member)}
+                        {...buttonStyle}
                       >
-                        탈퇴
+                        <FontAwesomeIcon icon={faTrashCan} />
                       </Button>
                     </Td>
                   </Tr>
@@ -297,12 +329,7 @@ export function MemberList() {
               <ModalCloseButton />
               <ModalBody>
                 <Flex mb={2}>
-                  <Box
-                    mr={2}
-                    fontSize={"1.2rem"}
-                    fontWeight={"900"}
-                    color={"yellowgreen"}
-                  >
+                  <Box mr={2} fontSize={"1.2rem"} fontWeight={"900"}>
                     {selectMember.member_login_id}
                   </Box>
                   <Box>님을 탈퇴 처리 합니다.</Box>

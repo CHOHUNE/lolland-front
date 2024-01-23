@@ -37,6 +37,25 @@ export function MemberManage() {
 
   const navigate = useNavigate();
 
+  // 인풋 css
+  const inputStyle = {
+    shadow: "1px 1px 3px 1px #dadce0 inset",
+  };
+
+  // 버튼 css
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
   useEffect(() => {
     axios.get("/api/member/memberInfo").then((response) => {
       setMember(response.data);
@@ -121,7 +140,7 @@ export function MemberManage() {
               <Input
                 maxLength={3}
                 h={"50px"}
-                borderRadius={"0"}
+                readOnly
                 value={member.member_phone_number}
               />
             </Flex>
@@ -181,6 +200,7 @@ export function MemberManage() {
               bg={"none"}
               shadow={"3px 3px 3px 3px #f5f6f6"}
               w={"180px"}
+              {...buttonStyle}
               onClick={() => navigate("/memberPage/addressInfo")}
             >
               내 주소록 조회 하기
@@ -188,13 +208,13 @@ export function MemberManage() {
             <Flex gap={2}>
               <Button
                 bg={"none"}
-                shadow={"3px 3px 3px 3px #f5f6f6"}
                 w={"100px"}
+                {...buttonStyle}
                 onClick={() => navigate("/memberPage/memberEdit")}
               >
                 수정하기
               </Button>
-              <Button w={"100px"} colorScheme={"red"} onClick={onOpen}>
+              <Button {...buttonStyle} w={"100px"} bg={"red"} onClick={onOpen}>
                 회원 탈퇴
               </Button>
             </Flex>
