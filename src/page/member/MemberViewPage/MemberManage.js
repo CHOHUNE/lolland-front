@@ -37,11 +37,6 @@ export function MemberManage() {
 
   const navigate = useNavigate();
 
-  // 인풋 css
-  const inputStyle = {
-    shadow: "1px 1px 3px 1px #dadce0 inset",
-  };
-
   // 버튼 css
   const buttonStyle = {
     background: "black",
@@ -188,7 +183,19 @@ export function MemberManage() {
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>자기소개</FormLabel>
-              <Textarea h={"150px"} readOnly value={member.member_introduce} />
+              {member.member_introduce === "" ? (
+                <Textarea
+                  h={"150px"}
+                  readOnly
+                  value={member.member_introduce}
+                />
+              ) : (
+                <Textarea
+                  h={"150px"}
+                  readOnly
+                  value={"자기 소개를 작성해 주세요."}
+                />
+              )}
             </Flex>
           </FormControl>
         </CardBody>
