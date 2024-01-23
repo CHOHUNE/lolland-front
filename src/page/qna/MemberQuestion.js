@@ -109,7 +109,7 @@ export function MemberQuestion() {
     console.log(params);
 
     axios
-      .get("/api/qna/my" + params)
+      .get("/api/qna/my?" + params)
       .then((response) => {
         setQuestionList(response.data.questionList);
         setPageInfo(response.data.pageInfo);
@@ -158,9 +158,9 @@ export function MemberQuestion() {
             <Table>
               <Thead>
                 <Tr>
-                  <Th testAlign="center">상품명</Th>
-                  <Th testAlign="center">문의 제목</Th>
-                  <Th testAlign="center">답변 상태</Th>
+                  <Th textAlign="center">상품명</Th>
+                  <Th textAlign="center">문의 제목</Th>
+                  <Th textAlign="center">답변 상태</Th>
                   <Th textAlign="center">등록일자</Th>
                 </Tr>
               </Thead>
@@ -170,7 +170,7 @@ export function MemberQuestion() {
                     <Tr
                       key={q.question_id}
                       onClick={() => {
-                        navigate(`write/${q.question_id}`);
+                        navigate(`answer/${q.question_id}`);
                         const targetElement =
                           document.getElementById("detailSection");
                         if (targetElement) {

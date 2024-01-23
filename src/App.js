@@ -76,7 +76,7 @@ const routes = createBrowserRouter(
         {/* 상품 찜하기 목록 - gns14585 - */}
         <Route path="productLike" element={<ProductLike />} />
         <Route path="qna" element={<MemberQuestion />}>
-          <Route path="answer" element={<MemberAnswer />} />
+          <Route path="answer/:question_id" element={<MemberAnswer />} />
         </Route>
         <Route path="review" element={<MemberReview />} />
       </Route>

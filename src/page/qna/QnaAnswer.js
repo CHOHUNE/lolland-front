@@ -161,7 +161,7 @@ export function QnaAnswer() {
                     <Tr
                       key={q.question_id}
                       onClick={() => {
-                        navigate(`write/${q.question_id}`);
+                        navigate(`answer/${q.question_id}`);
                         const targetElement =
                           document.getElementById("answerSection");
                         if (targetElement) {

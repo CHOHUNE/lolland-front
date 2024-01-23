@@ -99,13 +99,13 @@ export function MemberReview() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     axios
-      .get("/api/review/my" + params)
+      .get("/api/review/my?" + params)
       .then((response) => {
         setReviewList(response.data.reviewList);
         setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
-        if (error.response.staus === 401) {
+        if (error.response.status === 401) {
           toast({
             title: "세션이 만료되었습니다",
             description: "재로그인 후 시도해주세요",
@@ -148,9 +148,9 @@ export function MemberReview() {
             <Table>
               <Thead>
                 <Tr>
-                  <Th testAlign="center">상품명</Th>
-                  <Th testAlign="center">리뷰 내용</Th>
-                  <Th testAlign="center">별점</Th>
+                  <Th textAlign="center">상품명</Th>
+                  <Th textAlign="center">리뷰 내용</Th>
+                  <Th textAlign="center">별점</Th>
                   <Th textAlign="center">등록일자</Th>
                 </Tr>
               </Thead>
@@ -160,7 +160,7 @@ export function MemberReview() {
                     <Tr
                       key={review.review_id}
                       onClick={() => {
-                        navigate(`review/${review.review_id}`);
+                        navigate(`/product/${review.product_id}`);
                         const targetElement =
                           document.getElementById("reviewSection");
                         if (targetElement) {

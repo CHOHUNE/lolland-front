@@ -36,6 +36,7 @@ export function MemberAnswer() {
   };
 
   useEffect(() => {
+    setIsEditing(false);
     axios
       .get(`/api/qna/member/${question_id}`)
       .then((response) => {
@@ -45,7 +46,6 @@ export function MemberAnswer() {
           question_title,
           question_content,
           answer_content,
-          answer_reg_time,
         } = response.data;
 
         const questionInfoData = {
@@ -57,7 +57,6 @@ export function MemberAnswer() {
         const answerInfoData = {
           product_name,
           answer_content,
-          answer_reg_time,
         };
 
         setQnaInfo(answerInfoData);
@@ -167,13 +166,17 @@ export function MemberAnswer() {
       });
   }
 
+  if (!question) {
+    return null;
+  }
+
   return (
-    <Card id="detailSection">
+    <Card id="detailSection" w="full">
       <CardHeader>
         <Heading size="lg">문의 상세보기</Heading>
       </CardHeader>
       <CardBody>
-        {question.id !== null && (
+        {question.question_id !== null && (
           <>
             <Form>
               <FormControl mb={5}>
@@ -188,7 +191,12 @@ export function MemberAnswer() {
                     상품명
                   </Text>
                 </FormLabel>
-                <Input p={0} border="none" value={qnaInfo.product_name} />
+                <Input
+                  p={0}
+                  border="none"
+                  readOnly
+                  value={qnaInfo.product_name}
+                />
               </FormControl>
               <FormControl mb={5}>
                 <FormLabel fontWeight="bold" mb={5}>
@@ -207,6 +215,12 @@ export function MemberAnswer() {
                     p={0}
                     border="none"
                     value={questionCopy.question_title}
+                    onChange={(e) =>
+                      setQuestionCopy((prevQ) => ({
+                        ...prevQ,
+                        question_title: e.target.value,
+                      }))
+                    }
                   />
                 ) : (
                   <Input
@@ -233,15 +247,21 @@ export function MemberAnswer() {
                   <Input
                     p={0}
                     border="none"
-                    readOnly
-                    value={question.question_content}
+                    h="xs"
+                    value={questionCopy.question_content}
+                    onChange={(e) =>
+                      setQuestionCopy((prevQ) => ({
+                        ...prevQ,
+                        question_content: e.target.value,
+                      }))
+                    }
                   />
                 ) : (
                   <Input
                     p={0}
-                    h="xs"
                     border="none"
-                    value={questionCopy.question_content}
+                    readOnly
+                    value={question.question_content}
                   />
                 )}
               </FormControl>
@@ -256,11 +276,13 @@ export function MemberAnswer() {
                   >
                     관리자 답변
                   </Text>
-                  <Text as="span" ml={10}>
-                    {formattedDate(qnaInfo.answer_reg_time)}
-                  </Text>
                 </FormLabel>
-                <Text>{qnaInfo.answer_content}</Text>
+                <Input
+                  p={0}
+                  border="none"
+                  readOnly
+                  value={qnaInfo?.answer_content || "아직 답변이 없습니다"}
+                />
               </FormControl>
             </Form>
           </>
