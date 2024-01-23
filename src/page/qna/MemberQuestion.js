@@ -340,7 +340,7 @@ export function MemberQuestion() {
                   ))
                 ) : (
                   <Tr>
-                    <Td colSpan={3} h={5} textAlign="center">
+                    <Td colSpan={5} h={5} textAlign="center">
                       아직 등록된 문의가 없습니다
                     </Td>
                   </Tr>
