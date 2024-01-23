@@ -160,23 +160,28 @@ export function MemberManage() {
               <Textarea h={"150px"} readOnly value={member.member_introduce} />
             </Flex>
           </FormControl>
-
-          {/* 내 주소록 조회 버튼 */}
-          <FormControl mt={4}>
-            <Button onClick={() => navigate("/memberPage/addressInfo")}>
-              내 주소록 조회 하기
-            </Button>
-          </FormControl>
         </CardBody>
 
         <CardFooter>
-          <Flex gap={4}>
-            <Button onClick={() => navigate("/memberPage/memberEdit")}>
-              수정하기
+          <Flex gap={60}>
+            {/* 내 주소록 조회 버튼 */}
+            <Button
+              w={"180px"}
+              onClick={() => navigate("/memberPage/addressInfo")}
+            >
+              내 주소록 조회 하기
             </Button>
-            <Button colorScheme={"red"} onClick={onOpen}>
-              회원 탈퇴
-            </Button>
+            <Flex gap={2}>
+              <Button
+                w={"100px"}
+                onClick={() => navigate("/memberPage/memberEdit")}
+              >
+                수정하기
+              </Button>
+              <Button w={"100px"} colorScheme={"red"} onClick={onOpen}>
+                회원 탈퇴
+              </Button>
+            </Flex>
           </Flex>
         </CardFooter>
       </Card>
