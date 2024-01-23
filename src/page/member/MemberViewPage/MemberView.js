@@ -13,7 +13,7 @@ import { MemberNavBarTest } from "./MemberNavBarTest";
 
 export function MemberView() {
   return (
-    <>
+    <Card shadow={"none"}>
       <Flex position="relative" justifyContent="space-between">
         <MemberNavBarTest />
         <Box
@@ -35,6 +35,6 @@ export function MemberView() {
       {/*    <Outlet />*/}
       {/*  </CardBody>*/}
       {/*</Card>*/}
-    </>
+    </Card>
   );
 }
