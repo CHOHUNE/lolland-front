@@ -171,7 +171,7 @@ export function MemberList() {
   // 탈퇴 버튼 css
   const buttonStyle = {
     background: "orange",
-    color: "black",
+    color: "whitesmoke",
     shadow: "1px 1px 3px 1px #dadce0",
     _hover: {
       backgroundColor: "whitesmoke",
@@ -303,7 +303,6 @@ export function MemberList() {
                     <Td textAlign={"center"}>{formatDate(member.reg_time)}</Td>
                     <Td textAlign={"center"}>
                       <Button
-                        colorScheme={"yellow"}
                         onClick={() => handleMemberDeleteClick(member)}
                         {...buttonStyle}
                       >
