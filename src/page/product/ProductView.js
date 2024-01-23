@@ -369,6 +369,7 @@ export function ProductView() {
           : ""; // 메인 이미지 URL
 
       const purchaseInfo = {
+        product_id: product_id,
         productName: product.product.product_name,
         mainImgUrl: mainImgUrl,
         selectedOptions: selectedOptionList,
