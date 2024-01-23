@@ -49,7 +49,7 @@ export function GearList({ category }) {
                 key={item.gear_id}
                 onClick={() => navigate("/gearlist/gear_id/" + item.gear_id)}
               >
-                <Td>{item.gear_recommand}</Td>
+                <Td>{item.countLike}</Td>
                 <Td>{item.category}</Td>
                 <Td>
                   {item.gear_title}
