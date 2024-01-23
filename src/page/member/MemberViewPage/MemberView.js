@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { MemberNavBar } from "./MemberNavBar";
 import { Outlet } from "react-router-dom";
-import { MemberNavBarTest } from "./MemberNavBarTest";
+import { MemberNavBarTest } from "../../admin/MemberNavBarTest";
 
 export function MemberView() {
   return (

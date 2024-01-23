@@ -7,11 +7,13 @@ import {
   CardFooter,
   CardHeader,
   Center,
+  Checkbox,
   Heading,
   Table,
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
@@ -25,7 +27,11 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAngleLeft,
+  faAngleRight,
+  faStar,
+} from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -137,6 +143,21 @@ export function MemberReview() {
     return `${year}.${month}.${day}`;
   };
 
+  function StarRating({ rate }) {
+    const maxRating = 5;
+    const filledStars = rate || 0;
+
+    const stars = Array.from({ length: maxRating }, (_, index) => (
+      <FontAwesomeIcon
+        key={index}
+        icon={faStar}
+        style={{ color: index < filledStars ? "#FFE000" : "#EAEAE7" }}
+      />
+    ));
+
+    return <>{stars}</>;
+  }
+
   return (
     <VStack w="full" mr={5} spacing={5}>
       <Card w="full">
@@ -148,6 +169,7 @@ export function MemberReview() {
             <Table>
               <Thead>
                 <Tr>
+                  <Th textAlign="center">선택</Th>
                   <Th textAlign="center">상품명</Th>
                   <Th textAlign="center">리뷰 내용</Th>
                   <Th textAlign="center">별점</Th>
@@ -168,11 +190,21 @@ export function MemberReview() {
                         }
                       }}
                     >
+                      <Td
+                        textAlign="center"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Checkbox colorScheme="orange" />
+                      </Td>
                       <Td textAlign="center">{review.product_name}</Td>
                       <Td textAlign="center">{review.review_content}</Td>
-                      <Td textAlign="center">{review.rate}</Td>
                       <Td textAlign="center">
-                        {formattedDate(review.review_reg_time)}
+                        <StarRating rate={review.rate} />
+                      </Td>
+                      <Td textAlign="center">
+                        <Text fontSize="xs" opacity="0.5">
+                          {formattedDate(review.review_reg_time)}
+                        </Text>
                       </Td>
                     </Tr>
                   ))
@@ -187,7 +219,7 @@ export function MemberReview() {
             </Table>
           </TableContainer>
         </CardBody>
-        <CardFooter display="flex" justifyContent="center">
+        <CardFooter display="flex" justifyContent="center" id="reviewSection">
           <Pagination pageInfo={pageInfo} />
         </CardFooter>
       </Card>

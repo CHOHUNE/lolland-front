@@ -40,6 +40,7 @@ import { ProductPay } from "./ProductPay";
 import { MemberQuestion } from "./page/qna/MemberQuestion";
 import { MemberReview } from "./page/review/MemberReview";
 import { MemberAnswer } from "./page/qna/MemberAnswer";
+import { AdminIndex } from "./page/admin/AdminIndex";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -96,6 +97,7 @@ const routes = createBrowserRouter(
 
       {/* 관리자 페이지 */}
       <Route path="adminPage" element={<AdminView />}>
+        <Route index element={<AdminIndex />} />
         <Route path="product/write/" element={<ProductWrite />} />
         <Route path="memberList" element={<MemberList />} />
         <Route path="qna" element={<QnaAnswer />}>

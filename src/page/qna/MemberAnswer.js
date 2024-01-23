@@ -171,7 +171,7 @@ export function MemberAnswer() {
   }
 
   return (
-    <Card id="detailSection" w="full">
+    <Card w="full">
       <CardHeader>
         <Heading size="lg">문의 상세보기</Heading>
       </CardHeader>
@@ -212,8 +212,10 @@ export function MemberAnswer() {
                 </FormLabel>
                 {isEditing ? (
                   <Input
-                    p={0}
-                    border="none"
+                    border="1px solid black"
+                    borderRadius={0}
+                    _hover={{ border: "1px solid black" }}
+                    _focus={{ shadow: "none", border: "1px solid black" }}
                     value={questionCopy.question_title}
                     onChange={(e) =>
                       setQuestionCopy((prevQ) => ({
@@ -245,9 +247,11 @@ export function MemberAnswer() {
                 </FormLabel>
                 {isEditing ? (
                   <Input
-                    p={0}
-                    border="none"
                     h="xs"
+                    border="1px solid black"
+                    borderRadius={0}
+                    _hover={{ border: "1px solid black" }}
+                    _focus={{ shadow: "none", border: "1px solid black" }}
                     value={questionCopy.question_content}
                     onChange={(e) =>
                       setQuestionCopy((prevQ) => ({

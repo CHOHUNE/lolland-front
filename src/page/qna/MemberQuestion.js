@@ -7,6 +7,7 @@ import {
   CardFooter,
   CardHeader,
   Center,
+  Checkbox,
   Heading,
   IconButton,
   Table,
@@ -103,6 +104,7 @@ export function MemberQuestion() {
   const navigate = useNavigate();
   const [pageInfo, setPageInfo] = useState(null);
   const location = useLocation();
+  const [params1] = useSearchParams();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -158,6 +160,7 @@ export function MemberQuestion() {
             <Table>
               <Thead>
                 <Tr>
+                  <Th textAlign="center">선택</Th>
                   <Th textAlign="center">상품명</Th>
                   <Th textAlign="center">문의 제목</Th>
                   <Th textAlign="center">답변 상태</Th>
@@ -170,7 +173,7 @@ export function MemberQuestion() {
                     <Tr
                       key={q.question_id}
                       onClick={() => {
-                        navigate(`answer/${q.question_id}`);
+                        navigate(`answer/${q.question_id}?` + params1);
                         const targetElement =
                           document.getElementById("detailSection");
                         if (targetElement) {
@@ -178,6 +181,12 @@ export function MemberQuestion() {
                         }
                       }}
                     >
+                      <Td
+                        textAlign="center"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Checkbox colorScheme="orange" />
+                      </Td>
                       <Td textAlign="center">{q.product_name}</Td>
                       <Td textAlign="center">{q.question_title}</Td>
                       <Td textAlign="center">
@@ -210,7 +219,7 @@ export function MemberQuestion() {
             </Table>
           </TableContainer>
         </CardBody>
-        <CardFooter display="flex" justifyContent="center">
+        <CardFooter display="flex" justifyContent="center" id="detailSection">
           <Pagination pageInfo={pageInfo} />
         </CardFooter>
       </Card>
