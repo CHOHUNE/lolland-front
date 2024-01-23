@@ -8,11 +8,13 @@ import {
   CardHeader,
   Center,
   Heading,
+  IconButton,
   Table,
   TableContainer,
   Tag,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
@@ -26,8 +28,13 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import {
+  faAngleLeft,
+  faAngleRight,
+  faPenToSquare,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 function PageButton({ variant, pageNumber, children }) {
@@ -165,7 +172,7 @@ export function MemberQuestion() {
                       onClick={() => {
                         navigate(`write/${q.question_id}`);
                         const targetElement =
-                          document.getElementById("answerSection");
+                          document.getElementById("detailSection");
                         if (targetElement) {
                           targetElement.scrollIntoView({ behavior: "smooth" });
                         }

@@ -171,7 +171,7 @@ export function QnaWriteAnswer() {
           });
         } else {
           toast({
-            title: "문의 수정 중 에러 발생",
+            title: "답변 수정 중 에러 발생",
             description: "현상이 지속되면 관리자에게 문의 바랍니다",
             status: "error",
           });
