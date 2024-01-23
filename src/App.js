@@ -51,7 +51,6 @@ const routes = createBrowserRouter(
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
       <Route path="edit/:product_id" element={<ProductEdit />} />
-      <Route path="product/pay/:product_id" element={<ProductPay />} />
 
       {/* 리뷰 */}
 
@@ -61,6 +60,7 @@ const routes = createBrowserRouter(
       {/* Q&A */}
 
       {/* 결제 */}
+      <Route path="product/pay/:product_id" element={<ProductPay />} />
 
       {/* 회원관련 */}
       <Route path="signup" element={<MemberSignup />} />

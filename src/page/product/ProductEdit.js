@@ -205,7 +205,7 @@ export function ProductEdit() {
   }
 
   return (
-    <Box mt={10}>
+    <Box mt={10} mb={5}>
       <Text
         fontSize={"1.5rem"}
         fontWeight={"bold"}
@@ -216,7 +216,7 @@ export function ProductEdit() {
         상품수정
       </Text>
       <Center>
-        <Box>
+        <Box p={5} boxShadow={"md"} w={"60%"}>
           {/* ------------------- 대분류 로직 ------------------- */}
           <FormControl mt={3}>
             <FormLabel fontWeight={"bold"}>대분류</FormLabel>

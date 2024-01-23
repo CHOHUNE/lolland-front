@@ -138,7 +138,7 @@ export function ProductWrite() {
   };
 
   return (
-    <Box mt={5}>
+    <Box mt={5} mb={5}>
       <Text
         fontSize={"2rem"}
         fontWeight={"bold"}
@@ -148,7 +148,7 @@ export function ProductWrite() {
       >
         상품등록
       </Text>
-      <Center mt={5}>
+      <Center mt={5} boxShadow={"md"} p={5}>
         {/* ---------------------------------- 대분류 , 소분류 나누는 로직 ---------------------------------- */}
         <Box>
           <>
