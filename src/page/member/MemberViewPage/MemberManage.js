@@ -66,7 +66,19 @@ export function MemberManage() {
   return (
     <Center>
       <Card w={"700px"}>
-        <CardHeader>{member.member_name}_님 정보 입니다.</CardHeader>
+        <CardHeader
+          textAlign={"left"}
+          lineHeight={"70px"}
+          fontSize={"1.7rem"}
+          fontWeight={"bold"}
+        >
+          <Flex>
+            <Box fontSize={"1.8rem"} color={"#E87F06"}>
+              {member.member_name}
+            </Box>
+            <Box>님 정보 입니다.</Box>
+          </Flex>
+        </CardHeader>
         <CardBody>
           {/* 프로필 사진 */}
           <FormControl mt={4}>
@@ -160,23 +172,32 @@ export function MemberManage() {
               <Textarea h={"150px"} readOnly value={member.member_introduce} />
             </Flex>
           </FormControl>
-
-          {/* 내 주소록 조회 버튼 */}
-          <FormControl mt={4}>
-            <Button onClick={() => navigate("/memberPage/addressInfo")}>
-              내 주소록 조회 하기
-            </Button>
-          </FormControl>
         </CardBody>
 
         <CardFooter>
-          <Flex gap={4}>
-            <Button onClick={() => navigate("/memberPage/memberEdit")}>
-              수정하기
+          <Flex gap={60}>
+            {/* 내 주소록 조회 버튼 */}
+            <Button
+              bg={"none"}
+              shadow={"3px 3px 3px 3px #f5f6f6"}
+              w={"180px"}
+              onClick={() => navigate("/memberPage/addressInfo")}
+            >
+              내 주소록 조회 하기
             </Button>
-            <Button colorScheme={"red"} onClick={onOpen}>
-              회원 탈퇴
-            </Button>
+            <Flex gap={2}>
+              <Button
+                bg={"none"}
+                shadow={"3px 3px 3px 3px #f5f6f6"}
+                w={"100px"}
+                onClick={() => navigate("/memberPage/memberEdit")}
+              >
+                수정하기
+              </Button>
+              <Button w={"100px"} colorScheme={"red"} onClick={onOpen}>
+                회원 탈퇴
+              </Button>
+            </Flex>
           </Flex>
         </CardFooter>
       </Card>

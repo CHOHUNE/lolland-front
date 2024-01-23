@@ -33,6 +33,7 @@ import {
   Tbody,
   Td,
   TableContainer,
+  Textarea,
 } from "@chakra-ui/react";
 import GameBoardCommentContainer from "./GameBoardCommentContainer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -250,27 +251,39 @@ export function GameBoardView() {
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              <Flex gap="20px" align="center">
-                <Image
-                  borderRadius="full"
-                  boxSize="100px"
-                  src="https://bit.ly/dan-abramov"
-                  alt="tempProfileImg"
-                />
+              {writerInfo && (
+                <Flex gap="20px" align="center">
+                  <Image
+                    borderRadius="full"
+                    boxSize="100px"
+                    src={writerInfo.file_url}
+                    alt="프로필 이미지"
+                  />
 
-                {writerInfo && (
-                  <div>
-                    <br />
-                    닉네임: {writerInfo.member_name}
-                    <br />
-                    이메일: {writerInfo.member_email}
-                    <br />
-                    연락처: {writerInfo.member_phone_number}
-                    <br />
-                    <br />
-                  </div>
-                )}
-              </Flex>
+                  <VStack align="start">
+                    <Text fontSize="lg" fontWeight="bold">
+                      {writerInfo.member_name}
+                    </Text>
+                    <Text fontSize="md">
+                      <strong>이메일:</strong> {writerInfo.member_email}
+                    </Text>
+                    <Text fontSize="md">
+                      <strong>연락처:</strong> {writerInfo.member_phone_number}
+                    </Text>
+                    <Box>
+                      <strong>자기소개:</strong>{" "}
+                      <Textarea
+                        value={writerInfo.member_introduce}
+                        isReadOnly
+                        size="sm"
+                        width="300px"
+                        fontSize={"1.1rem"}
+                        mb={"20px"}
+                      />
+                    </Box>
+                  </VStack>
+                </Flex>
+              )}
 
               <Tabs isFitted variant="enclosed">
                 <TabList mb="1em">
