@@ -6,6 +6,7 @@ import {
   CardHeader,
   Center,
   Flex,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -32,8 +33,12 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
+// 페이지 버튼
 function Pagination({ pageInfo }) {
   const navigate = useNavigate();
+
+  const [params] = useSearchParams();
+  const listPage = params.get("page");
 
   const pageNumbers = [];
 
@@ -42,26 +47,69 @@ function Pagination({ pageInfo }) {
   }
 
   return (
-    <Box>
+    <Box mt={10} mb={10}>
       {pageInfo.prevPageNumber && (
-        <Button onClick={() => navigate("?page=" + pageInfo.prevPageNumber)}>
+        <Button
+          bg={"white"}
+          color={"black"}
+          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+          onClick={() => navigate("?page=" + pageInfo.prevPageNumber)}
+        >
           <FontAwesomeIcon icon={faCaretLeft} />
         </Button>
       )}
       {pageNumbers.map((pageNumber) => (
         <Button
+          bg={listPage === pageNumber.toString() ? "black" : "white"}
+          color={listPage === pageNumber.toString() ? "white" : "black"}
+          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+          ml={2}
           key={pageNumber}
-          onClick={() => navigate("?page=" + pageNumber)}
+          onClick={() => {
+            navigate("?page=" + pageNumber);
+          }}
         >
           {pageNumber}
         </Button>
       ))}
       {pageInfo.nextPageNumber && (
-        <Button onClick={() => navigate("?page=" + pageInfo.nextPageNumber)}>
+        <Button
+          bg={"white"}
+          color={"black"}
+          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+          ml={2}
+          onClick={() => navigate("?page=" + pageInfo.nextPageNumber)}
+        >
           <FontAwesomeIcon icon={faCaretRight} />
         </Button>
       )}
     </Box>
+  );
+}
+
+// 회원 이름으로 찾기 버튼
+function SearchMember() {
+  const [keyword, setKeyword] = useState("");
+
+  const navigate = useNavigate();
+
+  // 회원명 검색 클릭
+  function handleSearch() {
+    const params = new URLSearchParams();
+    params.set("k", keyword);
+
+    navigate("/adminPage/memberList?" + params);
+  }
+
+  return (
+    <Flex>
+      <Input
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+        placeholder={"회원 아이디를 입력해 주세요."}
+      />
+      <Button onClick={handleSearch}>검색</Button>
+    </Flex>
   );
 }
 
@@ -194,6 +242,7 @@ export function MemberList() {
             </Tbody>
           </Table>
 
+          <SearchMember />
           <Pagination pageInfo={pageInfo} />
         </CardBody>
 
