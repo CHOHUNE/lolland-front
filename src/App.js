@@ -41,6 +41,8 @@ import { MemberQuestion } from "./page/qna/MemberQuestion";
 import { MemberReview } from "./page/review/MemberReview";
 import { MemberAnswer } from "./page/qna/MemberAnswer";
 import { AdminIndex } from "./page/admin/AdminIndex";
+import { ProductCatList } from "./page/product/ProductCatList";
+import { ProductSubList } from "./page/product/ProductSubList";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -48,6 +50,12 @@ const routes = createBrowserRouter(
       {/* 메인페이지 */}
 
       {/* 상품관련 */}
+      <Route path="/category/:category_id" element={<ProductCatList />} />
+      <Route
+        path="/category/:category_id/:subcategory_id"
+        element={<ProductSubList />}
+      />
+
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
       <Route path="edit/:product_id" element={<ProductEdit />} />
