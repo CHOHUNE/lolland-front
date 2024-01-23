@@ -40,6 +40,23 @@ export function MemberFindPassword() {
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
+  const inputStyle = {
+    shadow: "1px 1px 3px 1px #dadce0 inset",
+  };
+
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
   useEffect(() => {
     setMember_email(email1 + "@" + email2);
   }, [email1, email2]);
@@ -100,8 +117,14 @@ export function MemberFindPassword() {
 
   return (
     <Center mt={8} mb={20}>
-      <Card w={"1000px"}>
-        <CardHeader fontSize={"1.5rem"} color={"#5F625C"} textAlign={"center"}>
+      <Card w={"1000px"} shadow={"1px 1px 3px 1px #dadce0"}>
+        <CardHeader
+          mt={4}
+          textAlign={"center"}
+          fontSize={"2rem"}
+          fontWeight={"bold"}
+          alignItems={"center"}
+        >
           비밀번호 찾기
         </CardHeader>
 
@@ -112,9 +135,9 @@ export function MemberFindPassword() {
                 아이디
               </FormLabel>
               <Input
+                {...inputStyle}
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
                 value={member_login_id}
                 onChange={(e) => setMember_login_id(e.target.value)}
               />
@@ -128,10 +151,10 @@ export function MemberFindPassword() {
                 이메일
               </FormLabel>
               <Input
+                {...inputStyle}
                 id="member_email1"
                 w={"225px"}
                 h={"50px"}
-                borderRadius={"0"}
                 value={email1}
                 onChange={(e) => {
                   setEmail1(e.target.value);
@@ -146,10 +169,10 @@ export function MemberFindPassword() {
                 @
               </Box>
               <Input
+                {...inputStyle}
                 id="member_email2"
                 w={"225px"}
                 h={"50px"}
-                borderRadius={"0"}
                 value={email2}
                 onChange={(e) => {
                   setEmail2(e.target.value);
@@ -162,14 +185,9 @@ export function MemberFindPassword() {
         <Flex justifyContent={"center"} pt={"0px"} mb={"20px"}>
           <CardFooter>
             <Button
+              {...buttonStyle}
               w={"250px"}
               h={"50px"}
-              style={{
-                backgroundColor: "black",
-                color: "whitesmoke",
-                fontSize: "1.1rem",
-                fontWeight: "900",
-              }}
               onClick={handleFindPasswordClick}
             >
               비밀번호 찾기
