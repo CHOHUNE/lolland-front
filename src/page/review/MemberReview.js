@@ -8,6 +8,7 @@ import {
   CardHeader,
   Center,
   Checkbox,
+  Flex,
   Heading,
   Table,
   TableContainer,
@@ -101,6 +102,7 @@ export function MemberReview() {
   const navigate = useNavigate();
   const [pageInfo, setPageInfo] = useState(null);
   const location = useLocation();
+  const [selectedReviews, setSelectedReviews] = useState([]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -158,6 +160,103 @@ export function MemberReview() {
     return <>{stars}</>;
   }
 
+  function handleSelectAllReviews(checked) {
+    if (checked) {
+      setSelectedReviews(reviewList.map((review) => review.review_id));
+    } else {
+      setSelectedReviews([]);
+    }
+  }
+
+  function handleCheckBoxChange(review) {
+    const reviewIdentifier = review.review_id;
+
+    setSelectedReviews((prevSelectedReviews) =>
+      prevSelectedReviews.includes(reviewIdentifier)
+        ? prevSelectedReviews.filter((id) => id !== reviewIdentifier)
+        : [...prevSelectedReviews, reviewIdentifier],
+    );
+  }
+
+  const buttonStyles = {
+    variant: "outline",
+    border: "1px solid black",
+    _hover: { bgColor: "black", color: "white" },
+    borderRadius: 0,
+  };
+
+  function handleDelete(selectedReviews) {
+    axios
+      .delete("/api/review/delete/selected", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: selectedReviews,
+      })
+      .then(() => {
+        toast({
+          description: "선택한 리뷰들을 삭제하였습니다",
+          status: "success",
+        });
+        setSelectedReviews([]);
+        navigate("/memberPage/review");
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          toast({
+            title: "선택한 리뷰들을 삭제하는데 실패하였습니다",
+            description: "백엔드 로그를 확인해보세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "선택한 리뷰를 삭제하는데 실패하였습니다",
+            description: "다시 한번 시도해보시거나, 관리자에게 문의하세요",
+            status: "error",
+          });
+        }
+      });
+  }
+
+  function handleDeleteAll() {
+    axios
+      .delete("/api/review/delete/all")
+      .then(() => {
+        toast({
+          description: "모든 리뷰를 삭제하였습니다",
+          status: "success",
+        });
+        navigate("/memberPage/review");
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          toast({
+            title: "리뷰 전체 삭제에 실패하였습니다",
+            description: "백엔드 코드를 확인해보세요",
+            status: "error",
+          });
+        } else if (error.response.status === 400) {
+          toast({
+            title: "Bad Request - 요청이 잘못되었습니다",
+            description: "백엔드와 프론트엔드 코드 연동을 확인해보세요",
+            status: "error",
+          });
+        } else if (error.response.status === 401) {
+          toast({
+            title: "접근 권한이 없습니다",
+            description: "로그인 해주세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "리뷰 전체 삭제에 실패하였습니다",
+            description: "다시 시도하시거나 관리자에게 문의하세요",
+            status: "error",
+          });
+        }
+      });
+  }
+
   return (
     <VStack w="full" mr={5} spacing={5}>
       <Card w="full">
@@ -165,6 +264,31 @@ export function MemberReview() {
           <Heading>리뷰 목록</Heading>
         </CardHeader>
         <CardBody>
+          <Flex justifyContent="space-between" mx={10} mb={5}>
+            <Checkbox
+              py={2}
+              px={3}
+              colorScheme="orange"
+              isChecked={
+                reviewList?.length > 0 &&
+                selectedReviews?.length === reviewList?.length
+              }
+              onChange={(e) => handleSelectAllReviews(e.target.checked)}
+            >
+              전체 선택
+            </Checkbox>
+            <ButtonGroup>
+              <Button
+                {...buttonStyles}
+                onClick={() => handleDelete(selectedReviews)}
+              >
+                선택 삭제
+              </Button>
+              <Button {...buttonStyles} onClick={() => handleDeleteAll()}>
+                전체 삭제
+              </Button>
+            </ButtonGroup>
+          </Flex>
           <TableContainer>
             <Table>
               <Thead>
@@ -177,7 +301,7 @@ export function MemberReview() {
                 </Tr>
               </Thead>
               <Tbody>
-                {reviewList && reviewList.length > 0 ? (
+                {reviewList && reviewList?.length > 0 ? (
                   reviewList.map((review) => (
                     <Tr
                       key={review.review_id}
@@ -194,7 +318,13 @@ export function MemberReview() {
                         textAlign="center"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <Checkbox colorScheme="orange" />
+                        <Checkbox
+                          colorScheme="orange"
+                          isChecked={selectedReviews.includes(review.review_id)}
+                          onChange={() => {
+                            handleCheckBoxChange(review);
+                          }}
+                        />
                       </Td>
                       <Td textAlign="center">{review.product_name}</Td>
                       <Td textAlign="center">{review.review_content}</Td>
@@ -210,7 +340,7 @@ export function MemberReview() {
                   ))
                 ) : (
                   <Tr>
-                    <Td colSpan={3} h={5} textAlign="center">
+                    <Td colSpan={5} h={5} textAlign="center">
                       아직 등록된 리뷰가 없습니다
                     </Td>
                   </Tr>
