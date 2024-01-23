@@ -237,7 +237,6 @@ export function MemberAddress() {
             </Thead>
 
             <>
-              {/* TODO : map 으로 주소 목록 읽어 들이자 */}
               {memberAddress != null &&
                 memberAddress.map((address) => (
                   <Tbody key={address.id}>
