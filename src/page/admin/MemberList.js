@@ -25,7 +25,11 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCaretLeft,
+  faCaretRight,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 function Pagination({ pageInfo }) {
@@ -37,9 +41,13 @@ function Pagination({ pageInfo }) {
     pageNumbers.push(i);
   }
 
-  console.log(pageNumbers);
   return (
     <Box>
+      {pageInfo.prevPageNumber && (
+        <Button onClick={() => navigate("?page=" + pageInfo.prevPageNumber)}>
+          <FontAwesomeIcon icon={faCaretLeft} />
+        </Button>
+      )}
       {pageNumbers.map((pageNumber) => (
         <Button
           key={pageNumber}
@@ -48,6 +56,11 @@ function Pagination({ pageInfo }) {
           {pageNumber}
         </Button>
       ))}
+      {pageInfo.nextPageNumber && (
+        <Button onClick={() => navigate("?page=" + pageInfo.nextPageNumber)}>
+          <FontAwesomeIcon icon={faCaretRight} />
+        </Button>
+      )}
     </Box>
   );
 }
@@ -97,7 +110,6 @@ export function MemberList() {
 
   // 모달내 삭제 버튼 클릭시 실제 삭제
   const handleModalDeleteClick = (e) => {
-    console.log(e.id);
     axios
       .delete("/api/member/DeleteMember/" + e.id)
       .then(() => {
@@ -122,7 +134,9 @@ export function MemberList() {
   return (
     <Center>
       <Card>
-        <CardHeader>회원 목록 입니다.</CardHeader>
+        <CardHeader fontSize={"1.6rem"} fontWeight="bold" mt={4}>
+          회원 목록
+        </CardHeader>
         <CardBody>
           <Table textAlign={"center"}>
             <Thead>
@@ -209,11 +223,13 @@ export function MemberList() {
                 <Button mr={3} onClick={onClose}>
                   Close
                 </Button>
-                <Button colorScheme={"red"}>
-                  <FontAwesomeIcon
-                    icon={faTrashCan}
-                    onClick={() => handleModalDeleteClick(selectMember)}
-                  />
+                <Button
+                  colorScheme={"red"}
+                  onClick={() => {
+                    handleModalDeleteClick(selectMember);
+                  }}
+                >
+                  <FontAwesomeIcon icon={faTrashCan} />
                 </Button>
               </ModalFooter>
             </ModalContent>
