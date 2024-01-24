@@ -16,6 +16,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import * as PropTypes from "prop-types";
+import { Recent } from "../../component/RecentViewed";
 
 function PageButton({ variant, pageNumber, children }) {
   const [params] = useSearchParams();
@@ -174,6 +175,20 @@ export function ProductList() {
           justifyContent={"center"}
           alignItems={"center"}
         >
+          <Box
+            position="fixed" // 절대 위치를 사용해 오버레이 설정
+            top="300" // 배너의 상단에서 시작
+            right="2" // 배너의 우측에서 시작
+            zIndex="10" // 다른 요소보다 위에 오도록 z-index 설정
+            p="4" // 패딩 값
+            bg="rgba(255, 255, 255, 0.1)" // 배경색
+            boxShadow="lg" // 그림자 효과
+            maxW="sm" // 최대 너비 설정
+            overflow="hidden" // 내용이 넘치면 숨김
+            borderRadius="15px"
+          >
+            <Recent />
+          </Box>
           <SimpleGrid h={"100%"} w={"100%"} columns={4} spacing={9} m={10}>
             {productList.map((product, index) => (
               <Box
