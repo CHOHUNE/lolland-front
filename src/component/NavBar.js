@@ -131,6 +131,10 @@ export function NavBar() {
               alignItems="center"
               justifyContent="center"
               textAlign="center"
+              onClick={() => navigate("/")}
+              _hover={{
+                cursor: "pointer",
+              }}
             >
               <Image src="/logo.png" boxSize="100%" objectFit="fit" />
             </Box>
