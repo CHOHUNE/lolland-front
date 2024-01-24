@@ -114,6 +114,16 @@ export function NavBar() {
           backgroundColor="white"
         >
           <Flex>
+            <ButtonGroup variant="undefined" size="md" alignItems={"center"}>
+              <Button onClick={() => navigate("/")}>HOME</Button>
+              <Button>신상품</Button>
+              <Button>인기글</Button>
+              <Button>이벤트</Button>
+            </ButtonGroup>
+          </Flex>
+
+          <Box ml={"-20px"}>
+            {/* --------- 로고 --------- */}
             <Box
               w="100px"
               // border="1px dashed black"
@@ -124,14 +134,9 @@ export function NavBar() {
             >
               <Image src="/logo.png" boxSize="100%" objectFit="fit" />
             </Box>
-            <ButtonGroup variant="undefined" size="lg">
-              <Button onClick={() => navigate("/")}>HOME</Button>
-              <Button>신상품</Button>
-              <Button>인기글</Button>
-              <Button>이벤트</Button>
-            </ButtonGroup>
-          </Flex>
-          <ButtonGroup variant="undefined" size="lg">
+          </Box>
+
+          <ButtonGroup variant="undefined" size="lg" alignItems={"center"}>
             <IconButton icon={<FontAwesomeIcon icon={faMagnifyingGlass} />} />
             <IconButton
               icon={<FontAwesomeIcon icon={faBagShopping} />}
@@ -192,12 +197,17 @@ export function NavBar() {
             )}
           </ButtonGroup>
         </Flex>
+
         {/* ------------------- 하단 네브바 ------------------- */}
         <Tabs
           index={index}
           variant="soft-rounded"
           colorScheme="blackAlpha"
-          mt="90px"
+          mt="100px"
+          justifyContent={"center"}
+          display={"flex"}
+          alignItems={"center"}
+          background={"white"}
         >
           <TabList px={10} py={3}>
             <HStack spacing={2}>
@@ -242,7 +252,8 @@ export function NavBar() {
             position="absolute"
           >
             <TabPanel
-              p={10}
+              py={10}
+              px={"23%"}
               fontSize="sm"
               onMouseEnter={() => {
                 setIndex(0);
@@ -264,7 +275,8 @@ export function NavBar() {
               <TabPanel
                 key={category.category_id}
                 display="flex"
-                p={10}
+                py={10}
+                px={"23%"}
                 onMouseEnter={() => {
                   setIndex(category.category_id);
                   setOverlayVisible(true);

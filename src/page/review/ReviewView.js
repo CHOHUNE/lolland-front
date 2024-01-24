@@ -106,7 +106,7 @@ const Star = ({ initialRate, onRateChange, isEditing }) => {
   return <HStack spacing={1}>{stars}</HStack>;
 };
 
-export const ReviewView = ({ product_id }) => {
+export const ReviewView = ({ product_id, renderProductDetailsImages }) => {
   const [rate, setRate] = useState(0);
   const [review, setReview] = useState("");
   const { hasAccess, isAdmin, isAuthenticated } = useContext(LoginContext);
@@ -318,11 +318,7 @@ export const ReviewView = ({ product_id }) => {
         <TabIndicator mt="-1.5px" height="2px" bg="black" borderRadius="1px" />
         <TabPanels px={10}>
           {/* -------------------------- 상품 설명 -------------------------- */}
-          <TabPanel>
-            <Text size="md">
-              {"{"} product.product.content {"}"}
-            </Text>
-          </TabPanel>
+          <TabPanel>{renderProductDetailsImages()}</TabPanel>
 
           {/* -------------------------- 리뷰 & 댓글 -------------------------- */}
           <TabPanel>

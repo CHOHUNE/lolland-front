@@ -43,12 +43,13 @@ import { MemberReview } from "./page/review/MemberReview";
 import { MemberAnswer } from "./page/qna/MemberAnswer";
 import { AdminIndex } from "./page/admin/AdminIndex";
 import { MemberBoardLike } from "./page/member/MemberViewPage/MemberBoardLike";
+import { HomeBody } from "./component/HomeBody";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<HomeLayout />}>
       {/* 메인페이지 */}
-
+      <Route index element={<HomeBody />} />
       {/* 상품관련 */}
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
