@@ -25,7 +25,7 @@ import { useDaumPostcodePopup } from "react-daum-postcode";
 export function MemberEdit() {
   // 인풋 css
   const inputStyle = {
-    shadow: "1px 1px 3px 1px #dadce0 inset",
+    shadow: "1px 1px 3px 1px #dadce0 inset !important",
   };
 
   // 버튼 css
@@ -362,10 +362,14 @@ export function MemberEdit() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 이 름
               </FormLabel>
-              <Input
-                {...inputStyle}
-                w={"500px"}
-                h={"50px"}
+              <input
+                style={{
+                  boxShadow: "1px 1px 3px 1px #dadce0 inset",
+                  width: "500px",
+                  height: "50px",
+                  borderRadius: "6px",
+                  textIndent: "15px",
+                }}
                 readOnly
                 value={member_name}
               />
