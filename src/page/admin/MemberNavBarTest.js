@@ -9,6 +9,8 @@ import {
 } from "@chakra-ui/react";
 import {
   faAddressBook,
+  faCircleQuestion,
+  faComments,
   faCreditCard,
   faHeart,
   faThumbsUp,
@@ -32,16 +34,14 @@ export function MemberNavBarTest() {
   return (
     <Flex
       flexDir="column"
-      ml={5}
+      mx={5}
       my={5}
       px={2}
       py={5}
       justifyContent="center"
       borderRadius={20}
       textAlign="center"
-      // bgColor="#F4F4F4"
       bgColor="#FFF"
-      // boxShadow="5px 0px 5px -5px rgba(0, 0, 0, 0.1)"
       shadow="md"
     >
       <VStack spacing={10}>
@@ -50,14 +50,14 @@ export function MemberNavBarTest() {
             {...buttonStyle}
             aria-label={"memberInfo"}
             icon={<FontAwesomeIcon icon={faUser} />}
-            onClick={() => navigate("/memberPage/memberInfo")}
+            onClick={() => navigate("memberInfo")}
           />
         </Tooltip>
         <Tooltip hasArrow label="내 주소록 관리" placement="right">
           <IconButton
             {...buttonStyle}
             icon={<FontAwesomeIcon icon={faAddressBook} />}
-            onClick={() => navigate("/memberPage/addressInfo")}
+            onClick={() => navigate("addressInfo")}
           />
         </Tooltip>
         <Tooltip hasArrow label="결제 내역" placement="right">
@@ -71,14 +71,28 @@ export function MemberNavBarTest() {
           <IconButton
             {...buttonStyle}
             icon={<FontAwesomeIcon icon={faHeart} />}
-            onClick={() => navigate("/memberPage/productLike")}
+            onClick={() => navigate("productLike")}
+          />
+        </Tooltip>
+        <Tooltip hasArrow label="내 문의 보기" placement="right">
+          <IconButton
+            {...buttonStyle}
+            icon={<FontAwesomeIcon icon={faCircleQuestion} />}
+            onClick={() => navigate("qna")}
+          />
+        </Tooltip>
+        <Tooltip hasArrow label="내가 남긴 리뷰 보기" placement="right">
+          <IconButton
+            {...buttonStyle}
+            icon={<FontAwesomeIcon icon={faComments} />}
+            onClick={() => navigate("review")}
           />
         </Tooltip>
         <Tooltip hasArrow label="추천한 게시물 보기" placement="right">
           <IconButton
             {...buttonStyle}
             icon={<FontAwesomeIcon icon={faThumbsUp} />}
-            onClick={() => console.log("추천한 게시물 보기 페이지 이동")}
+            onClick={() => navigate("boardLike")}
           />
         </Tooltip>
       </VStack>

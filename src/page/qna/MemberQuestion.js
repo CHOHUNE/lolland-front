@@ -7,19 +7,21 @@ import {
   CardFooter,
   CardHeader,
   Center,
+  Checkbox,
   Heading,
+  IconButton,
   Table,
   TableContainer,
+  Tag,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Outlet,
   useLocation,
@@ -27,7 +29,14 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAngleLeft,
+  faAngleRight,
+  faPenToSquare,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 function PageButton({ variant, pageNumber, children }) {
   const [params] = useSearchParams();
@@ -89,19 +98,20 @@ function Pagination({ pageInfo }) {
   );
 }
 
-export function QnaAnswer() {
+export function MemberQuestion() {
   const [questionList, setQuestionList] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
   const [pageInfo, setPageInfo] = useState(null);
   const location = useLocation();
+  const [params1] = useSearchParams();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     console.log(params);
 
     axios
-      .get("/api/qna/view?" + params)
+      .get("/api/qna/my?" + params)
       .then((response) => {
         setQuestionList(response.data.questionList);
         setPageInfo(response.data.pageInfo);
@@ -140,19 +150,21 @@ export function QnaAnswer() {
   };
 
   return (
-    <VStack spacing={5} w="full" my={10}>
-      <Card w="full" px="3%">
+    <VStack w="full" mr={5} spacing={5}>
+      <Card w="full">
         <CardHeader>
-          <Heading size="lg">문의 목록</Heading>
+          <Heading>문의 목록</Heading>
         </CardHeader>
         <CardBody>
           <TableContainer>
             <Table>
               <Thead>
                 <Tr>
+                  <Th textAlign="center">선택</Th>
                   <Th textAlign="center">상품명</Th>
                   <Th textAlign="center">문의 제목</Th>
-                  <Th textAlign="center">문의 등록일자</Th>
+                  <Th textAlign="center">답변 상태</Th>
+                  <Th textAlign="center">등록일자</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -161,18 +173,38 @@ export function QnaAnswer() {
                     <Tr
                       key={q.question_id}
                       onClick={() => {
-                        navigate(`write/${q.question_id}`);
+                        navigate(`answer/${q.question_id}?` + params1);
                         const targetElement =
-                          document.getElementById("answerSection");
+                          document.getElementById("detailSection");
                         if (targetElement) {
                           targetElement.scrollIntoView({ behavior: "smooth" });
                         }
                       }}
                     >
+                      <Td
+                        textAlign="center"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Checkbox colorScheme="orange" />
+                      </Td>
                       <Td textAlign="center">{q.product_name}</Td>
                       <Td textAlign="center">{q.question_title}</Td>
                       <Td textAlign="center">
-                        {formattedDate(q.question_reg_time)}
+                        <Tag
+                          size="sm"
+                          variant="outline"
+                          colorScheme={
+                            !q.answer_content ? "orange" : "blackAlpha"
+                          }
+                          p={2}
+                        >
+                          {!q.answer_id ? "답변 대기중" : "답변 완료"}
+                        </Tag>
+                      </Td>
+                      <Td textAlign="center">
+                        <Text fontSize="xs" opacity="0.5">
+                          {formattedDate(q.question_reg_time)}
+                        </Text>
                       </Td>
                     </Tr>
                   ))
@@ -187,7 +219,7 @@ export function QnaAnswer() {
             </Table>
           </TableContainer>
         </CardBody>
-        <CardFooter display="flex" justifyContent="center">
+        <CardFooter display="flex" justifyContent="center" id="detailSection">
           <Pagination pageInfo={pageInfo} />
         </CardFooter>
       </Card>

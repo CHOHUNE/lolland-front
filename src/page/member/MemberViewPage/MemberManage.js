@@ -37,6 +37,20 @@ export function MemberManage() {
 
   const navigate = useNavigate();
 
+  // 버튼 css
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
   useEffect(() => {
     axios.get("/api/member/memberInfo").then((response) => {
       setMember(response.data);
@@ -66,7 +80,19 @@ export function MemberManage() {
   return (
     <Center>
       <Card w={"700px"}>
-        <CardHeader>{member.member_name}_님 정보 입니다.</CardHeader>
+        <CardHeader
+          textAlign={"left"}
+          lineHeight={"70px"}
+          fontSize={"1.7rem"}
+          fontWeight={"bold"}
+        >
+          <Flex>
+            <Box fontSize={"1.8rem"} color={"#E87F06"}>
+              {member.member_name}
+            </Box>
+            <Box>님 정보 입니다.</Box>
+          </Flex>
+        </CardHeader>
         <CardBody>
           {/* 프로필 사진 */}
           <FormControl mt={4}>
@@ -109,7 +135,7 @@ export function MemberManage() {
               <Input
                 maxLength={3}
                 h={"50px"}
-                borderRadius={"0"}
+                readOnly
                 value={member.member_phone_number}
               />
             </Flex>
@@ -157,26 +183,49 @@ export function MemberManage() {
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>자기소개</FormLabel>
-              <Textarea h={"150px"} readOnly value={member.member_introduce} />
+              {member.member_introduce.length !== 0 ? (
+                <Textarea
+                  h={"150px"}
+                  readOnly
+                  value={member.member_introduce}
+                />
+              ) : (
+                <Textarea
+                  h={"150px"}
+                  readOnly
+                  style={{ color: "gray" }}
+                  value={"자기 소개를 작성해 주세요."}
+                />
+              )}
             </Flex>
-          </FormControl>
-
-          {/* 내 주소록 조회 버튼 */}
-          <FormControl mt={4}>
-            <Button onClick={() => navigate("/memberPage/addressInfo")}>
-              내 주소록 조회 하기
-            </Button>
           </FormControl>
         </CardBody>
 
         <CardFooter>
-          <Flex gap={4}>
-            <Button onClick={() => navigate("/memberPage/memberEdit")}>
-              수정하기
+          <Flex gap={60}>
+            {/* 내 주소록 조회 버튼 */}
+            <Button
+              bg={"none"}
+              shadow={"3px 3px 3px 3px #f5f6f6"}
+              w={"180px"}
+              {...buttonStyle}
+              onClick={() => navigate("/memberPage/addressInfo")}
+            >
+              내 주소록 조회 하기
             </Button>
-            <Button colorScheme={"red"} onClick={onOpen}>
-              회원 탈퇴
-            </Button>
+            <Flex gap={2}>
+              <Button
+                bg={"none"}
+                w={"100px"}
+                {...buttonStyle}
+                onClick={() => navigate("/memberPage/memberEdit")}
+              >
+                수정하기
+              </Button>
+              <Button {...buttonStyle} w={"100px"} bg={"red"} onClick={onOpen}>
+                회원 탈퇴
+              </Button>
+            </Flex>
           </Flex>
         </CardFooter>
       </Card>

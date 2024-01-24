@@ -35,6 +35,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 export function MemberAddress() {
+  // 버튼 css
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
   const [memberAddress, setMemberAddress] = useState([]);
   const [member, setMember] = useState("");
 
@@ -203,13 +217,22 @@ export function MemberAddress() {
 
   return (
     <Center>
-      <Card w={"1200px"}>
+      <Card w={"1200px"} shadow={"1px 1px 3px 1px #dadce0"}>
         <CardHeader mt={4}>
           <Flex gap={4} alignItems={"flex-end"}>
-            <Box fontSize={"1.4rem"} fontWeight={"900"}>
+            <Box
+              mt={4}
+              textAlign={"center"}
+              fontSize={"2rem"}
+              fontWeight={"bold"}
+              alignItems={"center"}
+              color={"orange"}
+            >
               {member.member_name}
             </Box>
-            <Box>_님의 주소 목록 입니다.</Box>
+            <Box fontWeight={"bold"} fontSize={"1.2rem"}>
+              님의 주소 목록 입니다.
+            </Box>
           </Flex>
         </CardHeader>
         <CardBody>
@@ -237,7 +260,6 @@ export function MemberAddress() {
             </Thead>
 
             <>
-              {/* TODO : map 으로 주소 목록 읽어 들이자 */}
               {memberAddress != null &&
                 memberAddress.map((address) => (
                   <Tbody key={address.id}>
@@ -258,14 +280,26 @@ export function MemberAddress() {
                         )}
                       </Td>
                       <Td>
-                        <Button onClick={() => openEditModal(address)}>
+                        <Button
+                          {...buttonStyle}
+                          onClick={() => openEditModal(address)}
+                        >
                           수정
                         </Button>
                       </Td>
                       <Td>
                         <Button
-                          colorScheme={"yellow"}
                           onClick={() => openDeleteModal(address)}
+                          backgroundColor={"orange"}
+                          color={"whitesmoke"}
+                          shadow="1px 1px 3px 1px #dadce0"
+                          _hover={{
+                            backgroundColor: "whitesmoke",
+                            color: "black",
+                            transition:
+                              "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+                            shadow: "1px 1px 3px 1px #dadce0 inset",
+                          }}
                         >
                           <FontAwesomeIcon icon={faTrash} />
                         </Button>
@@ -278,7 +312,10 @@ export function MemberAddress() {
         </CardBody>
 
         <CardFooter>
-          <Button onClick={() => navigate("/memberPage/addressWrite")}>
+          <Button
+            {...buttonStyle}
+            onClick={() => navigate("/memberPage/addressWrite")}
+          >
             <FontAwesomeIcon icon={faPlus} />
           </Button>
         </CardFooter>

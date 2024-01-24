@@ -7,19 +7,19 @@ import {
   CardFooter,
   CardHeader,
   Center,
+  Checkbox,
   Heading,
   Table,
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Outlet,
   useLocation,
@@ -27,7 +27,13 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAngleLeft,
+  faAngleRight,
+  faStar,
+} from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 function PageButton({ variant, pageNumber, children }) {
   const [params] = useSearchParams();
@@ -89,8 +95,8 @@ function Pagination({ pageInfo }) {
   );
 }
 
-export function QnaAnswer() {
-  const [questionList, setQuestionList] = useState(null);
+export function MemberReview() {
+  const [reviewList, setReviewList] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
   const [pageInfo, setPageInfo] = useState(null);
@@ -98,12 +104,10 @@ export function QnaAnswer() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    console.log(params);
-
     axios
-      .get("/api/qna/view?" + params)
+      .get("/api/review/my?" + params)
       .then((response) => {
-        setQuestionList(response.data.questionList);
+        setReviewList(response.data.reviewList);
         setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
@@ -123,7 +127,7 @@ export function QnaAnswer() {
         } else {
           toast({
             title: error.response.data,
-            description: "문의 불러오는 도중 에러 발생, 관리자에게 문의하세요",
+            description: "리뷰 불러오는 도중 에러 발생, 관리자에게 문의하세요",
             status: "error",
           });
         }
@@ -139,47 +143,75 @@ export function QnaAnswer() {
     return `${year}.${month}.${day}`;
   };
 
+  function StarRating({ rate }) {
+    const maxRating = 5;
+    const filledStars = rate || 0;
+
+    const stars = Array.from({ length: maxRating }, (_, index) => (
+      <FontAwesomeIcon
+        key={index}
+        icon={faStar}
+        style={{ color: index < filledStars ? "#FFE000" : "#EAEAE7" }}
+      />
+    ));
+
+    return <>{stars}</>;
+  }
+
   return (
-    <VStack spacing={5} w="full" my={10}>
-      <Card w="full" px="3%">
+    <VStack w="full" mr={5} spacing={5}>
+      <Card w="full">
         <CardHeader>
-          <Heading size="lg">문의 목록</Heading>
+          <Heading>리뷰 목록</Heading>
         </CardHeader>
         <CardBody>
           <TableContainer>
             <Table>
               <Thead>
                 <Tr>
+                  <Th textAlign="center">선택</Th>
                   <Th textAlign="center">상품명</Th>
-                  <Th textAlign="center">문의 제목</Th>
-                  <Th textAlign="center">문의 등록일자</Th>
+                  <Th textAlign="center">리뷰 내용</Th>
+                  <Th textAlign="center">별점</Th>
+                  <Th textAlign="center">등록일자</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {questionList && questionList.length > 0 ? (
-                  questionList.map((q) => (
+                {reviewList && reviewList.length > 0 ? (
+                  reviewList.map((review) => (
                     <Tr
-                      key={q.question_id}
+                      key={review.review_id}
                       onClick={() => {
-                        navigate(`write/${q.question_id}`);
+                        navigate(`/product/${review.product_id}`);
                         const targetElement =
-                          document.getElementById("answerSection");
+                          document.getElementById("reviewSection");
                         if (targetElement) {
                           targetElement.scrollIntoView({ behavior: "smooth" });
                         }
                       }}
                     >
-                      <Td textAlign="center">{q.product_name}</Td>
-                      <Td textAlign="center">{q.question_title}</Td>
+                      <Td
+                        textAlign="center"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Checkbox colorScheme="orange" />
+                      </Td>
+                      <Td textAlign="center">{review.product_name}</Td>
+                      <Td textAlign="center">{review.review_content}</Td>
                       <Td textAlign="center">
-                        {formattedDate(q.question_reg_time)}
+                        <StarRating rate={review.rate} />
+                      </Td>
+                      <Td textAlign="center">
+                        <Text fontSize="xs" opacity="0.5">
+                          {formattedDate(review.review_reg_time)}
+                        </Text>
                       </Td>
                     </Tr>
                   ))
                 ) : (
                   <Tr>
                     <Td colSpan={3} h={5} textAlign="center">
-                      아직 등록된 문의가 없습니다
+                      아직 등록된 리뷰가 없습니다
                     </Td>
                   </Tr>
                 )}
@@ -187,7 +219,7 @@ export function QnaAnswer() {
             </Table>
           </TableContainer>
         </CardBody>
-        <CardFooter display="flex" justifyContent="center">
+        <CardFooter display="flex" justifyContent="center" id="reviewSection">
           <Pagination pageInfo={pageInfo} />
         </CardFooter>
       </Card>

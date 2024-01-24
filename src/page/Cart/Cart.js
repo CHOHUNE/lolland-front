@@ -126,7 +126,9 @@ export function Cart() {
   }
 
   function handlePurchase(selectedProducts) {
+    localStorage.removeItem("purchaseInfo"); // 단일상품에선 로컬스토리지 사용으로 인해 상품저장된 내역있음, 장바구니에선 db로 결제내역을 옮기기때문에 이게 먼저 실행 되어야함
     // axios.post() TODO: 결제로 옮기기
+    // 여기부터 코드작성 해주세요
   }
 
   function handleDeleteAll() {
@@ -212,6 +214,7 @@ export function Cart() {
   }
 
   console.log("selectedProducts: " + selectedProducts);
+
   return (
     <>
       <Heading my={5} mx={10}>
@@ -224,7 +227,7 @@ export function Cart() {
       <TableContainer mx={10} mb={10}>
         <Flex justifyContent="space-between" mx={10} mb={5}>
           <Checkbox
-            colorScheme="gray"
+            colorScheme="orange"
             isChecked={
               productList.length > 0 &&
               selectedProducts.length === productList.length
@@ -274,7 +277,7 @@ export function Cart() {
                   >
                     <Td textAlign="center" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
-                        colorScheme="gray"
+                        colorScheme="orange"
                         isChecked={selectedProducts.includes(product.cart_id)}
                         onChange={() => {
                           handleCheckBoxChange(product);

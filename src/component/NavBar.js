@@ -230,18 +230,6 @@ export function NavBar() {
                   {category.category_name}
                 </Tab>
               ))}
-              <Tab
-                onMouseEnter={() => {
-                  setIndex(categories.length + 1);
-                  setOverlayVisible(true);
-                }}
-                onMouseLeave={() => {
-                  setIndex(null);
-                  setOverlayVisible(false);
-                }}
-              >
-                관리자
-              </Tab>
             </HStack>
           </TabList>
           <TabPanels
@@ -316,23 +304,6 @@ export function NavBar() {
                 )}
               </TabPanel>
             ))}
-            <TabPanel
-              p={10}
-              fontSize="sm"
-              onMouseEnter={() => {
-                setIndex(categories.length + 1);
-                setOverlayVisible(true);
-              }}
-              onMouseLeave={() => {
-                setIndex(null);
-                setOverlayVisible(false);
-              }}
-            >
-              <Text mb={2} onClick={() => navigate("product/write/")}>
-                상품등록
-              </Text>
-              <Text onClick={() => navigate("product/list/")}>상품리스트</Text>
-            </TabPanel>
           </TabPanels>
         </Tabs>
       </Box>

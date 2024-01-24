@@ -1,4 +1,5 @@
 import {
+  background,
   Box,
   Button,
   Card,
@@ -27,6 +28,23 @@ export function MemberLogin() {
 
   const toast = useToast();
 
+  const inputStyle = {
+    shadow: "1px 1px 3px 1px #dadce0 inset",
+  };
+
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
   // 로그인 버튼 클릭
   function handleLoginClick() {
     axios
@@ -53,8 +71,14 @@ export function MemberLogin() {
   };
   return (
     <Center mt={8} mb={20}>
-      <Card w={"1000px"}>
-        <CardHeader fontSize={"1.5rem"} color={"#5F625C"} textAlign={"center"}>
+      <Card w={"1000px"} shadow={"1px 1px 3px 1px #dadce0"}>
+        <CardHeader
+          mt={4}
+          textAlign={"center"}
+          fontSize={"2rem"}
+          fontWeight={"bold"}
+          alignItems={"center"}
+        >
           로그인
         </CardHeader>
 
@@ -65,10 +89,10 @@ export function MemberLogin() {
                 아이디
               </FormLabel>
               <Input
+                {...inputStyle}
                 value={member_login_id}
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
                 onChange={(e) => setMember_login_id(e.target.value)}
               />
             </Flex>
@@ -79,12 +103,12 @@ export function MemberLogin() {
                 비밀번호
               </FormLabel>
               <Input
+                {...inputStyle}
                 onKeyDown={handleKeyDown}
                 value={member_password}
                 type={"password"}
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
                 onChange={(e) => setMember_password(e.target.value)}
               />
             </Flex>
@@ -92,12 +116,9 @@ export function MemberLogin() {
           <FormControl mt={4}>
             <Flex justifyContent={"center"}>
               <Button
+                {...buttonStyle}
                 w={"600px"}
                 h={"50px"}
-                borderRadius={"0"}
-                color={"whitesmoke"}
-                bg={"black"}
-                _hover={{ backgroundColor: "whitesmoke", color: "black" }}
                 onClick={handleLoginClick}
               >
                 로그인
@@ -131,12 +152,18 @@ export function MemberLogin() {
           <FormControl mt={20} mb={10}>
             <Flex justifyContent={"center"}>
               <Button
+                {...buttonStyle}
                 w={"600px"}
                 h={"50px"}
-                borderRadius={"0"}
                 color={"black"}
                 bg={"whitesmoke"}
-                _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+                _hover={{
+                  backgroundColor: "black",
+                  color: "whitesmoke",
+                  transition:
+                    "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+                  shadow: "1px 1px 3px 1px #dadce0 inset",
+                }}
                 onClick={() => navigate("/signup")}
               >
                 회원 가입하기
