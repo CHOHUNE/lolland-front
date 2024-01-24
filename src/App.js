@@ -41,6 +41,7 @@ import { MemberQuestion } from "./page/qna/MemberQuestion";
 import { MemberReview } from "./page/review/MemberReview";
 import { MemberAnswer } from "./page/qna/MemberAnswer";
 import { AdminIndex } from "./page/admin/AdminIndex";
+import { MemberBoardLike } from "./page/member/MemberViewPage/MemberBoardLike";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -74,6 +75,7 @@ const routes = createBrowserRouter(
         <Route path="addressInfo" element={<MemberAddress />} />
         <Route path="addressWrite" element={<MemberAddressWrite />} />
         <Route path="passwordEdit" element={<PasswordEdit />} />
+        <Route path="boardLike" element={<MemberBoardLike />} />
         {/* 상품 찜하기 목록 - gns14585 - */}
         <Route path="productLike" element={<ProductLike />} />
         <Route path="qna" element={<MemberQuestion />}>
