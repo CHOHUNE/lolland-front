@@ -183,7 +183,7 @@ export function MemberManage() {
           <FormControl mt={4}>
             <Flex>
               <FormLabel w={"100px"}>자기소개</FormLabel>
-              {member.member_introduce === "" ? (
+              {member.member_introduce.length !== 0 ? (
                 <Textarea
                   h={"150px"}
                   readOnly
