@@ -121,6 +121,7 @@ export function GearView() {
         <br />
         <Flex justifyContent={"space-between"}>
           <Text>작성일 : {gearboard.gear_inserted}</Text>
+
           {/* 좋아요 표시*/}
           <LikeContainer like={like} onClick={handleLike} />
           <Button
