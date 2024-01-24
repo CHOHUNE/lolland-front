@@ -193,6 +193,7 @@ export function MemberManage() {
                 <Textarea
                   h={"150px"}
                   readOnly
+                  style={{ color: "gray" }}
                   value={"자기 소개를 작성해 주세요."}
                 />
               )}
