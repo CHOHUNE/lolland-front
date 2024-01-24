@@ -317,7 +317,7 @@ export const ReviewView = ({ product_id, productDetailImg }) => {
       <TabIndicator mt="-1.5px" height="2px" bg="black" borderRadius="1px" />
       <TabPanels px={10}>
         {/* -------------------------- 상품 설명 -------------------------- */}
-        <TabPanel>
+        <TabPanel display="flex" justifyContent="center">
           <Image
             src={productDetailImg ? productDetailImg : ""}
             alt={"제품 상세 이미지"}
