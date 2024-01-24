@@ -44,8 +44,8 @@ export function GearEdit() {
   function handleSave() {
     axios
       .putForm("/api/gearboard/saveup", {
-        uploadFiles,
         removeFileIds,
+        uploadFiles,
         gear_id: gearboard.gear_id,
         category: selectedCategory,
         gear_title: gearboard.gear_title,
@@ -56,14 +56,16 @@ export function GearEdit() {
         navigate("/gearlistlayout");
       });
   }
-  //e 이벤트 객체 받기
+
+  console.log(removeFileIds);
+
   function handleRemoveFileSwitch(e) {
     if (e.target.checked) {
-      // removefileid 에 추가
+      // removeFileIds 에 추가
       setRemoveFileIds([...removeFileIds, e.target.value]);
     } else {
-      // removeFileids에 삭제
-      setRemoveFileIds(removeFileIds.filter((item) => item !== e.target));
+      // removeFileIds 에서 삭제
+      setRemoveFileIds(removeFileIds.filter((item) => item !== e.target.value));
     }
   }
 
@@ -72,7 +74,6 @@ export function GearEdit() {
       <FormControl>
         <FormLabel> {gear_id}번 게시물</FormLabel>
       </FormControl>
-
       <VStack spacing={2} align="start">
         <FormControl>
           <FormLabel>카테고리</FormLabel>
@@ -88,7 +89,6 @@ export function GearEdit() {
           </Select>
         </FormControl>
       </VStack>
-
       <FormControl>
         <FormLabel>제목</FormLabel>
         <Input
@@ -110,38 +110,39 @@ export function GearEdit() {
             })
           }
         ></Textarea>
-      </FormControl>
+      </FormControl>{" "}
+      {/* 이미지 출력 */}
       {gearboard.files.length > 0 &&
         gearboard.files.map((file) => (
-          <Box key={file.id} my={"5px"}>
-            <FormControl display={"flex"} alignItems={"center"}>
+          <Box key={file.id} my="5px">
+            <FormControl display="flex" alignItems="center">
               <FormLabel>
-                <FontAwesomeIcon color={"orange"} icon={faTrashCan} />
+                <FontAwesomeIcon color="red" icon={faTrashCan} />
               </FormLabel>
               <Switch
-                vlaue={file.id}
-                colorScheme={"orange"}
+                value={file.id}
+                colorScheme="red"
                 onChange={handleRemoveFileSwitch}
               />
             </FormControl>
             <Box>
-              <Image src={file.url} alt={file.name} w={"100%"} />
+              <Image src={file.url} alt={file.name} width="100%" />
             </Box>
           </Box>
         ))}
+      {/* 추가할 파일 선택 */}
       <FormControl>
         <FormLabel>이미지</FormLabel>
         <Input
           type="file"
-          multiple // 글을 쓸때  여러개의 파일을 읽을 수 잇따 .
           accept="image/*"
+          multiple
           onChange={(e) => setUploadFiles(e.target.files)}
         />
         <FormHelperText>
-          한 개 파일은 1MB 이내, 총 용량으 10MB 이내로 첨부 하세요.
+          한 개 파일은 1MB 이내, 총 용량은 10MB 이내로 첨부하세요.
         </FormHelperText>
       </FormControl>
-
       <Button colorScheme={"blue"} onClick={handleSave}>
         저장
       </Button>

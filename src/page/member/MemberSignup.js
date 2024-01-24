@@ -612,9 +612,9 @@ export function MemberSignup() {
                 우편번호
               </FormLabel>
               <Input
-                boxShadow={"1px 1px 3px 1px #dadce0 inset"}
                 w={"350px"}
                 h={"50px"}
+                readOnly
                 defaultValue={member_post_code}
               />
               <Button
@@ -637,9 +637,11 @@ export function MemberSignup() {
                 주소
               </FormLabel>
               <Input
-                shadow={"1px 1px 3px 1px #dadce0 inset"}
+                textArea
+                boxShadow={"1px 1px 3px 1px #dadce0 inset"}
                 w={"500px"}
                 h={"50px"}
+                readOnly
                 defaultValue={member_address}
               />
             </Flex>
