@@ -36,7 +36,6 @@ export function GearListAll({ category }) {
             <Td>카테고리</Td>
             <Td>제목</Td>
             <Td>컨텐츠</Td>
-            <Td>조회수</Td>
             <Td>날짜</Td>
           </Tr>
         </Thead>
@@ -71,7 +70,6 @@ export function GearListAll({ category }) {
                   )}
                 </Td>
                 <Td>{item.gear_content}</Td>
-                <Td>{item.gear_views}</Td>
                 <Td>{item.gear_inserted}</Td>
               </Tr>
             ))
