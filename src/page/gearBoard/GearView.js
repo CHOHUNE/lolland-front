@@ -37,18 +37,21 @@ function LikeContainer({ like, onClick }) {
     return <Spinner />;
   }
   return (
-    <Button variant="ghost" size="xl" ml={"800px"} onClick={onClick}>
+    <Button variant="ghost" size="xl" onClick={onClick}>
       {/*<FontAwesomeIcon icon={faHeart} size="xl" />*/}
-      {like.gearLike && <FontAwesomeIcon icon={ful} size="xl" />}
-      {like.gearLike || <FontAwesomeIcon icon={em} size="xl" />}
-      <Text> {like.countLike}</Text>
+      <Flex gap={2}>
+        <Text> 게시물 추천</Text>
+        {like.gearLike && <FontAwesomeIcon icon={ful} size="xl" />}
+        {like.gearLike || <FontAwesomeIcon icon={em} size="xl" />}
+      </Flex>
+      {/*{like.countLike}*/}
     </Button>
   );
 }
 
 export function GearView() {
   const { gear_id } = useParams();
-  const [gearboard, updateGearboard] = useImmer(null);
+  const [gearboard, setGearboard] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
   const [like, setLike] = useState(null);
@@ -56,7 +59,7 @@ export function GearView() {
   useEffect(() => {
     axios
       .get("/api/gearboard/gear_id/" + gear_id)
-      .then((response) => updateGearboard(response.data));
+      .then((response) => setGearboard(response.data));
   }, []);
 
   useEffect(() => {
@@ -86,12 +89,7 @@ export function GearView() {
 
   return (
     <Box>
-      <Box
-        h={"596px"}
-        border={"1px solid black"}
-        w={"100vw"}
-        overflow={"hidden"}
-      >
+      <Box h={"596px"} w={"100vw"} overflow={"hidden"}>
         {gearboard.files.length > 0 && (
           <Box key={gearboard.files[0].id} my="5px">
             <Image
@@ -102,52 +100,41 @@ export function GearView() {
           </Box>
         )}
       </Box>
-      <Box w={"80%"} m={"0 auto"}>
-        <Flex justifyContent={"space-between"}>
-          <Heading size="lg" mt={"20px"}>
-            {gear_id}번 게시물
-          </Heading>
-          <LikeContainer like={like} onClick={handleLike} />
-          <br />
-        </Flex>
-        <FormControl>
-          <FormLabel>category</FormLabel>
-          <Input value={gearboard.category} />
-        </FormControl>
-        <FormControl>
-          <FormLabel>제목</FormLabel>
-          <Input value={gearboard.gear_title} />
-        </FormControl>
-        <FormControl>
-          <FormLabel>타이틀</FormLabel>
-          <Input value={gearboard.gear_content} />
-        </FormControl>
+      <br />
+      <br />
+      <Box w={"40%"} m={"0 auto"}>
+        <Heading size="lg" m={"10px"}>
+          {gearboard.gear_title}
+        </Heading>
+        <br />
+
+        {gearboard.gear_content}
+
         {/* 이미지 출력*/}
-        <FormLabel>이미지</FormLabel>
         {gearboard.files.map((file) => (
           <Box key={file.id} my="5px">
             <Image width="100%" src={file.url} alt={file.name} />
           </Box>
         ))}
 
-        <FormControl>
-          <FormLabel>작성일</FormLabel>
-          <Input value={gearboard.gear_inserted} />
-        </FormControl>
-
-        <Flex>
-          <FormControl>
-            <FormLabel>조회수</FormLabel>
-            <Input value={gearboard.gear_views} />
-          </FormControl>
-
-          <FormControl>
-            <FormLabel>추천수</FormLabel>
-            <Input value={gearboard.gear_recommand} />
-          </FormControl>
-        </Flex>
-
         <br />
+        <br />
+        <Flex justifyContent={"space-between"}>
+          <Text>작성일 : {gearboard.gear_inserted}</Text>
+          {/* 좋아요 표시*/}
+          <LikeContainer like={like} onClick={handleLike} />
+          <Button
+            colorScheme={"orange"}
+            onClick={() => navigate("/gearlist/edit/" + gear_id)}
+          >
+            수정
+          </Button>
+          <Button colorScheme={"red"} onClick={handleRemove}>
+            삭제
+          </Button>
+        </Flex>
+        <br />
+
         {/*  게시물 작성자  */}
         <Card
           w={"100%"}
@@ -225,15 +212,6 @@ export function GearView() {
           </Stack>
         </Card>
         <br />
-        <Button
-          colorScheme={"orange"}
-          onClick={() => navigate("/gearlist/edit/" + gear_id)}
-        >
-          수정
-        </Button>
-        <Button colorScheme={"red"} onClick={handleRemove}>
-          삭제
-        </Button>
 
         {/* 댓글 기능 추가 */}
         <GearCommentContainer />
