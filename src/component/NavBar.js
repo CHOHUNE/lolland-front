@@ -204,6 +204,7 @@ export function NavBar() {
 
         {/* ------------------- 하단 네브바 ------------------- */}
         <Tabs
+
           index={index}
           variant="soft-rounded"
           colorScheme="blackAlpha"
@@ -213,7 +214,7 @@ export function NavBar() {
           alignItems={"center"}
           background={"white"}
         >
-          <TabList px={10} py={3}>
+          <TabList  w={"900px"} py={3}>
             <HStack spacing={2}>
               <Tab
                 onClick={() => navigate("/gameboard/list")}
@@ -254,10 +255,13 @@ export function NavBar() {
             zIndex={100}
             backgroundColor="white"
             position="absolute"
+            justifyContent={"center"}
+            display={"flex"}
+            alignItems={"center"}
           >
             <TabPanel
               py={10}
-              px={"23%"}
+              w={"900px"}
               fontSize="sm"
               onMouseEnter={() => {
                 setIndex(0);
@@ -280,7 +284,7 @@ export function NavBar() {
                 key={category.category_id}
                 display="flex"
                 py={10}
-                px={"23%"}
+                w={"900px"}
                 onMouseEnter={() => {
                   setIndex(category.category_id);
                   setOverlayVisible(true);
