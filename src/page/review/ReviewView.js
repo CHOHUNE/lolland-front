@@ -7,6 +7,7 @@ import {
   Flex,
   HStack,
   IconButton,
+  Image,
   Tab,
   TabIndicator,
   TabList,
@@ -106,7 +107,7 @@ const Star = ({ initialRate, onRateChange, isEditing }) => {
   return <HStack spacing={1}>{stars}</HStack>;
 };
 
-export const ReviewView = ({ product_id }) => {
+export const ReviewView = ({ product_id, productDetailImg }) => {
   const [rate, setRate] = useState(0);
   const [review, setReview] = useState("");
   const { hasAccess, isAdmin, isAuthenticated } = useContext(LoginContext);
@@ -317,9 +318,11 @@ export const ReviewView = ({ product_id }) => {
       <TabPanels px={10}>
         {/* -------------------------- 상품 설명 -------------------------- */}
         <TabPanel>
-          <Text size="md">
-            {"{"} product.product.content {"}"}
-          </Text>
+          <Image
+            src={productDetailImg ? productDetailImg : ""}
+            alt={"제품 상세 이미지"}
+            objectFit="cover"
+          />
         </TabPanel>
 
         {/* -------------------------- 리뷰 & 댓글 -------------------------- */}

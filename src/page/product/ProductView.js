@@ -55,6 +55,7 @@ import { LoginContext } from "../../component/LoginProvider"; // 빈 하트
 export function ProductView() {
   const [product, setProduct] = useState(null);
   const [option, setOption] = useState([]);
+  const [productDetailImg, setProductDetailImg] = useState([]);
   const [selectedOption, setSelectedOption] = useState("");
   const [selectedOptionList, setSelectedOptionList] = useState([]);
 
@@ -77,9 +78,10 @@ export function ProductView() {
 
   // ---------------------------- 상품 렌더링 ----------------------------
   useEffect(() => {
-    axios
-      .get("/api/product/product_id/" + product_id)
-      .then((response) => setProduct(response.data));
+    axios.get("/api/product/product_id/" + product_id).then((response) => {
+      setProduct(response.data);
+      setProductDetailImg(response.data.productDetailsImgs[0].sub_img_uri);
+    });
   }, []);
 
   // ---------------------------- 상품 상세옵션 렌더링 ----------------------------
@@ -258,19 +260,19 @@ export function ProductView() {
   }
 
   // ----------------------------------- 상품 상세이미지 관련 로직 -----------------------------------
-  const renderProductDetailsImages = () => {
-    return product?.productDetailsImgs?.map((detailImg) => {
-      return (
-        <Image
-          key={detailImg.details_img_id}
-          src={detailImg.sub_img_uri}
-          alt={`Product Detail Image ${detailImg.details_img_id}`}
-          boxSize="100px"
-          objectFit="cover"
-        />
-      );
-    });
-  };
+  // const renderProductDetailsImages = () => {
+  //   return product?.productDetailsImgs?.map((detailImg) => {
+  //     return (
+  //       <Image
+  //         key={detailImg.details_img_id}
+  //         src={detailImg.sub_img_uri}
+  //         alt={`Product Detail Image ${detailImg.details_img_id}`}
+  //         boxSize="100px"
+  //         objectFit="cover"
+  //       />
+  //     );
+  //   });
+  // };
 
   // ----------------------------------- 찜하기 -----------------------------------
   const handleFavoriteClick = () => {
@@ -767,11 +769,11 @@ export function ProductView() {
         </ModalContent>
       </Modal>
 
-      <Box>
-        <Flex wrap="wrap" justify="center" gap={4}>
-          {renderProductDetailsImages()}
-        </Flex>
-      </Box>
+      {/*<Box>*/}
+      {/*  <Flex wrap="wrap" justify="center" gap={4}>*/}
+      {/*    {renderProductDetailsImages()}*/}
+      {/*  </Flex>*/}
+      {/*</Box>*/}
 
       {/*--------------- 상품 스탯 --------------- */}
       <ProductStats
@@ -783,6 +785,7 @@ export function ProductView() {
       <ReviewView
         product_id={product_id}
         product_content={product.product_content}
+        productDetailImg={productDetailImg}
       />
     </Box>
   );
