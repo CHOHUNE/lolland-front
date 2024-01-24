@@ -64,7 +64,7 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
     setIsSubmitting(true);
 
     axios
-      .post("/api/comment/add", {
+      .post("/api/comment/add/" + comment.game_board_id, {
         parent_id: comment.id,
         comment_content: replyComment,
         game_board_id: comment.game_board_id,
@@ -246,7 +246,7 @@ export function GameBoardCommentContainer() {
     setIsSubmitting(true);
 
     axios
-      .post("/api/comment/add", {
+      .post("/api/comment/add/" + id, {
         game_board_id: id,
         comment_content: comment.comment,
         parent_id: null,

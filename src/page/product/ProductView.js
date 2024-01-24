@@ -352,6 +352,7 @@ export function ProductView() {
   // ------------------------------ 구매하기 이동 로직 ------------------------------
   // ------------------------------ 로컬스토리지 이용 ------------------------------
   function handlePaymentClick() {
+    localStorage.removeItem("purchaseInfo");
     if (login !== "") {
       // 상세 옵션 선택 안하면 선택하라고 토스트 표시
       if (selectedOptionList.length === 0) {
@@ -396,6 +397,25 @@ export function ProductView() {
       });
     }
   }
+
+  // // --------------------- 최근 본 상품 ----------------------
+  // const saveTransToRecentViewed = (productData) => {
+  //   const recentViewed = JSON.parse(localStorage.getItem("recentViewed")) || [];
+  //   const mainImgUrl =
+  //     product.productImgs && product.productImgs.length > 0
+  //       ? product.productImgs[0].main_img_uri
+  //       : ""; // 메인 이미지 URL
+  //   const updatedRecentViewed = [mainImgUrl, ...recentViewed].slice(0, 5);
+  //   localStorage.setItem("recentViewed", JSON.stringify(updatedRecentViewed));
+  // };
+  //
+  // useEffect(() => {
+  //   axios.get("/api/product/product_id/" + product_id).then((response) => {
+  //     setProduct(response.data);
+  //     // --------------------- 최근 본 상품 ----------------------
+  //     saveTransToRecentViewed(response.data);
+  //   });
+  // }, [product_id]);
 
   return (
     <Box mx={"15%"} p={5}>

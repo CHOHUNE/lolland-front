@@ -1,26 +1,29 @@
 import {
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  Text,
-  TabPanel,
   Box,
-  Kbd,
-  Heading,
-  StackDivider,
-  Stack,
-  Image,
-  Card,
-  CardHeader,
-  CardBody,
-  Flex,
-  Divider,
   Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Divider,
+  Flex,
+  Heading,
+  Stack,
+  StackDivider,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
 } from "@chakra-ui/react";
 import { GearList } from "./GearList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GearListAll } from "./GearListAll";
+import axios from "axios";
+import { TodayBest } from "./TodayBest";
+import { FreeBest } from "./FreeBest";
+import { GearNews } from "./GearNews";
+import { GearNotice } from "./GearNotice";
 
 function Pageing() {
   return null;
@@ -29,6 +32,12 @@ function Pageing() {
 export function GearListlayout() {
   const [category, setCategory] = useState("전체");
   const navigate = useNavigate();
+  const [naver, setNaver] = useState(null);
+
+  useEffect(() => {
+    axios.get("/api/gear/naver").then((response) => setNaver(response.data));
+  }, []);
+
   return (
     <Box w={"80%"} margin={"15px auto"}>
       <Button onClick={() => navigate("/gearboard")}> 글쓰기</Button>
@@ -36,111 +45,27 @@ export function GearListlayout() {
         {/* 왼쪽 70%  오늘의 베스트 , 게시판 리스트 */}
         <Box w={"70%"} margin={"15px  auto"} mr={"20px"}>
           {/* 오늘의 베스트*/}
-          <Card>
-            <CardHeader>
-              <Heading size="md">오늘의 베스트</Heading>
-            </CardHeader>
-            <Divider orientation="horizontal" color={"orange"} />
-            <CardBody>
-              <Stack divider={<StackDivider />} spacing="3">
-                <Flex justify={"space-between"}>
-                  <Box pt="2" fontSize="sm">
-                    <Box>
-                      <Flex>
-                        <kbd> 1 </kbd>
-                        <Text>
-                          View a summary of all your clients over the last
-                          month.
-                        </Text>
-                      </Flex>
-                    </Box>
-                    <Box>
-                      <Flex>
-                        <Text> 2 </Text>
-                        <Text>
-                          Check out the overview of your clients. Check out the
-                          overview of your clients. Check out the overview of
-                          your clients.
-                        </Text>
-                      </Flex>
-                    </Box>
-                    <Box>
-                      <Flex>
-                        <Text> 3 </Text>
-                        <Text>
-                          See a detailed analysis of all your business clients.
-                        </Text>
-                      </Flex>
-                    </Box>
-                    <Box>
-                      <Flex>
-                        <Text> 4 </Text>
-                        <Text> 비즈니스 고객의 상세한 분석을 확인하세요</Text>
-                      </Flex>
-                    </Box>
-                    <Box>
-                      <Flex>
-                        <Text> 5 </Text>
-                        <Text>
-                          See a detailed analysis of all your business clients.
-                          See a detailed analysis of all your business clients.
-                        </Text>
-                      </Flex>
-                    </Box>
-                  </Box>
-                  <Box>
-                    <Box>
-                      <Heading size="xs" textTransform="uppercase">
-                        Summary
-                      </Heading>
-                      <Text pt="2" fontSize="sm">
-                        View a summary of all your clients over the last month.
-                      </Text>
-                    </Box>
-                    <Box>
-                      <Heading size="xs" textTransform="uppercase">
-                        Overview
-                      </Heading>
-                      <Text pt="2" fontSize="sm">
-                        Check out the overview of your clients. Check out the
-                        overview of your clients. overview of your clients.
-                      </Text>
-                    </Box>
-                    <Box>
-                      <Heading size="xs" textTransform="uppercase">
-                        Analysis
-                      </Heading>
-                      <Text pt="2" fontSize="sm">
-                        See a detailed analysis of all your business clients.
-                      </Text>
-                    </Box>
-                    <Box>
-                      <Heading size="xs" textTransform="uppercase">
-                        Analysis
-                      </Heading>
-                      <Text pt="2" fontSize="sm">
-                        See a detailed analysis of all your business clients.
-                      </Text>
-                    </Box>
-                    <Box>
-                      <Heading size="xs" textTransform="uppercase">
-                        Analysis
-                      </Heading>
-                      <Text pt="2" fontSize="sm">
-                        See a detailed analysis of all your business clients.
-                      </Text>
-                    </Box>
-                  </Box>
-                </Flex>
-              </Stack>
-            </CardBody>
-          </Card>
+          <Flex>
+            <Box w={"48%"} mr={"1%"}>
+              <FreeBest />
+            </Box>
+            <Box w={"50%"} ml={"1%"}>
+              <TodayBest />
+            </Box>
+          </Flex>
 
+          <br />
+          <br />
+          {/*공지사항*/}
+          <GearNotice />
+
+          <br />
+          <br />
           {/*게시판 리스트*/}
           <Tabs variant="unstyled">
             <TabList m={"20px"} mr={"20px"}>
               <Tab
-                _selected={{ color: "white", bg: "blue.500" }}
+                _selected={{ color: "white", bg: "orange.400" }}
                 onClick={(e) => setCategory("전체")}
               >
                 전체
@@ -182,10 +107,13 @@ export function GearListlayout() {
                 인사
               </Tab>
             </TabList>
+
+            <Divider orientation="horizontal" color={"orange"} />
+
             <TabPanels>
               {/* 전체 정보 */}
               <TabPanel>
-                <GearList category={category} />
+                <GearListAll category={category} />
               </TabPanel>
               {/* 잡담정보 */}
               <TabPanel>
@@ -216,115 +144,41 @@ export function GearListlayout() {
         </Box>
         {/* 오른쪽 30%  자유게시판BEST , 최신 공식기사 */}
         <Box w={"30%"} margin={"15px auto"}>
-          <Card>
-            <CardHeader>
-              <Heading size="md">자유게시판 BEST(추천순)</Heading>
-            </CardHeader>
-
-            <CardBody>
-              <Stack divider={<StackDivider />} spacing="4">
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Summary
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    View a summary of all your clients over the last month.
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Overview
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    Check out the overview of your clients.
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Analysis
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    See a detailed analysis of all your business clients.
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Analysis
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    See a detailed analysis of all your business clients.
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Analysis
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    See a detailed analysis of all your business clients.
-                  </Text>
-                </Box>
-              </Stack>
-            </CardBody>
-          </Card>
+          <GearNews />
           <br />
           <br />
           <br />
           <Box>
-            <Heading size="md">최신 공식 기사</Heading>
-            <br />
-            <Divider orientation="horizontal" color={"orange"} />
-            <Flex>
-              <Card maxW="sm">
-                <CardBody>
-                  <Image
-                    src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                    alt="Green double couch with wooden legs"
-                    borderRadius="lg"
-                  />
-                  <Stack mt="6" spacing="3">
-                    <Heading size="md">Living room Sofa</Heading>
-                  </Stack>
-                </CardBody>
-              </Card>
-              <Card maxW="sm">
-                <CardBody>
-                  <Image
-                    src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                    alt="Green double couch with wooden legs"
-                    borderRadius="lg"
-                  />
-                  <Stack mt="6" spacing="3">
-                    <Heading size="md">Living room Sofa</Heading>
-                  </Stack>
-                </CardBody>
-              </Card>
-            </Flex>
-            <Flex>
-              <Card maxW="sm">
-                <CardBody>
-                  <Image
-                    src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                    alt="Green double couch with wooden legs"
-                    borderRadius="lg"
-                  />
-                  <Stack mt="6" spacing="3">
-                    <Heading size="md">Living room Sofa</Heading>
-                  </Stack>
-                </CardBody>
-              </Card>
-              <Card maxW="sm">
-                <CardBody>
-                  <Image
-                    src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                    alt="Green double couch with wooden legs"
-                    borderRadius="lg"
-                  />
-                  <Stack mt="6" spacing="3">
-                    <Heading size="md">Living room Sofa</Heading>
-                  </Stack>
-                </CardBody>
-              </Card>
-            </Flex>
+            <Card>
+              <CardHeader>
+                <Heading size="md" color="orange">
+                  게임 관련 최신 기사
+                </Heading>
+              </CardHeader>
+              <Divider orientation="horizontal" color={"orange"} />
+
+              <CardBody>
+                <Stack divider={<StackDivider />} spacing="4">
+                  {naver &&
+                    naver.items !== null &&
+                    naver.items.map((news) => (
+                      <Box key={news.link}>
+                        <Heading
+                          size="xs"
+                          textTransform="uppercase"
+                          _hover={{ cursor: "pointer" }}
+                          onClick={() => window.open(news.link, "_blank")}
+                        >
+                          {news.title
+                            .replace(/&quot;/g, "") // &quot; 제거
+                            .replace(/<b>/g, "") // <b> 제거
+                            .replace(/<\/b>/g, "") + "..."}
+                        </Heading>
+                      </Box>
+                    ))}
+                </Stack>
+              </CardBody>
+            </Card>
           </Box>
         </Box>
       </Flex>

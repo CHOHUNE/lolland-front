@@ -18,6 +18,7 @@ import { ProductView } from "./page/product/ProductView";
 import { Cart } from "./page/Cart/Cart";
 import { GearBoard } from "./page/gearBoard/GearBoard";
 import { GearList } from "./page/gearBoard/GearList";
+import { GearListAll } from "./page/gearBoard/GearListAll";
 import { GearView } from "./page/gearBoard/GearView";
 import { GearEdit } from "./page/gearBoard/GearEdit";
 import { ProductEdit } from "./page/product/ProductEdit";
@@ -41,6 +42,8 @@ import { MemberQuestion } from "./page/qna/MemberQuestion";
 import { MemberReview } from "./page/review/MemberReview";
 import { MemberAnswer } from "./page/qna/MemberAnswer";
 import { AdminIndex } from "./page/admin/AdminIndex";
+import { MemberBoardLike } from "./page/member/MemberViewPage/MemberBoardLike";
+import { HomeBody } from "./component/HomeBody";
 import { ProductMainList } from "./page/product/ProductMainList";
 import { ProductSubList } from "./page/product/ProductSubList";
 
@@ -48,7 +51,7 @@ const routes = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<HomeLayout />}>
       {/* 메인페이지 */}
-
+      <Route index element={<HomeBody />} />
       {/* 상품관련 */}
       <Route path="/category/:category_id" element={<ProductMainList />} />
       <Route
@@ -82,6 +85,7 @@ const routes = createBrowserRouter(
         <Route path="addressInfo" element={<MemberAddress />} />
         <Route path="addressWrite" element={<MemberAddressWrite />} />
         <Route path="passwordEdit" element={<PasswordEdit />} />
+        <Route path="boardLike" element={<MemberBoardLike />} />
         {/* 상품 찜하기 목록 - gns14585 - */}
         <Route path="productLike" element={<ProductLike />} />
         <Route path="qna" element={<MemberQuestion />}>
@@ -99,6 +103,7 @@ const routes = createBrowserRouter(
       {/* 게임 장비 커뮤니티 */}
       <Route path="gearboard" element={<GearBoard />} />
       <Route path="gearlist" element={<GearList />} />
+      <Route path="gearlistall" element={<GearListAll />} />
       <Route path="gearlistlayout" element={<GearListlayout />} />
       <Route path="gearlist/gear_id/:gear_id" element={<GearView />} />
       <Route path="gearlist/edit/:gear_id" element={<GearEdit />} />

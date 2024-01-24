@@ -92,7 +92,7 @@ export function MemberNavBarTest() {
           <IconButton
             {...buttonStyle}
             icon={<FontAwesomeIcon icon={faThumbsUp} />}
-            onClick={() => console.log("추천한 게시물 보기 페이지 이동")}
+            onClick={() => navigate("boardLike")}
           />
         </Tooltip>
       </VStack>

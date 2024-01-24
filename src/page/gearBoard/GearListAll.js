@@ -16,14 +16,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faImage } from "@fortawesome/free-solid-svg-icons";
 import { faImages } from "@fortawesome/free-regular-svg-icons";
 
-export function GearList({ category }) {
+export function GearListAll({ category }) {
   const [gearboardList, setGearboardList] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     axios
-      .get("/api/gearboard/list?category=" + category)
+      .get("/api/gearboard/listAll")
       .then((response) => setGearboardList(response.data));
   }, [category]);
 
