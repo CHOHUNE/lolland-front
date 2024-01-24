@@ -18,6 +18,7 @@ import { ProductView } from "./page/product/ProductView";
 import { Cart } from "./page/Cart/Cart";
 import { GearBoard } from "./page/gearBoard/GearBoard";
 import { GearList } from "./page/gearBoard/GearList";
+import { GearListAll } from "./page/gearBoard/GearListAll";
 import { GearView } from "./page/gearBoard/GearView";
 import { GearEdit } from "./page/gearBoard/GearEdit";
 import { ProductEdit } from "./page/product/ProductEdit";
@@ -91,6 +92,7 @@ const routes = createBrowserRouter(
       {/* 게임 장비 커뮤니티 */}
       <Route path="gearboard" element={<GearBoard />} />
       <Route path="gearlist" element={<GearList />} />
+      <Route path="gearlistall" element={<GearListAll />} />
       <Route path="gearlistlayout" element={<GearListlayout />} />
       <Route path="gearlist/gear_id/:gear_id" element={<GearView />} />
       <Route path="gearlist/edit/:gear_id" element={<GearEdit />} />

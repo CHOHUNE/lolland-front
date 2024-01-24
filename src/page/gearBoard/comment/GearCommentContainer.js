@@ -5,8 +5,8 @@ import { CommentList } from "./CommentList";
 export function GearCommentContainer() {
   return (
     <Box>
-      <CommentList />
       <CommentForm />
+      <CommentList />
     </Box>
   );
 }

@@ -19,25 +19,50 @@ import {
   TabPanels,
   Tabs,
   Text,
+  Tooltip,
   useToast,
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useImmer } from "use-immer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import * as PropTypes from "prop-types";
 import { GearCommentContainer } from "./comment/GearCommentContainer";
+import { faHeart as em } from "@fortawesome/free-regular-svg-icons";
+import { faHeart as ful } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+function LikeContainer({ like, onClick }) {
+  if (like === null) {
+    return <Spinner />;
+  }
+  return (
+    <Button variant="ghost" size="xl" ml={"800px"} onClick={onClick}>
+      {/*<FontAwesomeIcon icon={faHeart} size="xl" />*/}
+      {like.gearLike && <FontAwesomeIcon icon={ful} size="xl" />}
+      {like.gearLike || <FontAwesomeIcon icon={em} size="xl" />}
+      <Text> {like.countLike}</Text>
+    </Button>
+  );
+}
 
 export function GearView() {
   const { gear_id } = useParams();
   const [gearboard, updateGearboard] = useImmer(null);
   const toast = useToast();
   const navigate = useNavigate();
+  const [like, setLike] = useState(null);
 
   useEffect(() => {
     axios
       .get("/api/gearboard/gear_id/" + gear_id)
       .then((response) => updateGearboard(response.data));
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get("/api/gearlike/board/" + gear_id)
+      .then((response) => setLike(response.data));
   }, []);
 
   if (gearboard == null) {
@@ -51,12 +76,23 @@ export function GearView() {
     });
   }
 
+  function handleLike() {
+    axios
+      .post("/api/gearlike", { gearboardId: gearboard.gear_id })
+      .then((response) => setLike(response.data))
+      .catch(() => console.log("bad"))
+      .finally(() => console.log("done"));
+  }
+
   return (
     <Box w={"80%"} m={"0 auto"}>
-      <Heading size="lg" mt={"20px"}>
-        {gear_id}번 게시물
-      </Heading>
-      <br />
+      <Flex justifyContent={"space-between"}>
+        <Heading size="lg" mt={"20px"}>
+          {gear_id}번 게시물
+        </Heading>
+        <LikeContainer like={like} onClick={handleLike} />
+        <br />
+      </Flex>
       <FormControl>
         <FormLabel>category</FormLabel>
         <Input value={gearboard.category} />
