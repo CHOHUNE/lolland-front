@@ -12,6 +12,7 @@ import {
   FormHelperText,
   FormLabel,
   Input,
+  Textarea,
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
@@ -48,6 +49,11 @@ export function MemberSignup() {
   const [member_email1, setMember_email1] = useState("");
   const [member_email2, setMember_email2] = useState("");
 
+  // 이메일 중복확인 버튼 상태 저장
+  const [emailAbleCheck, setEmailAbleCheck] = useState(false);
+  // 이메일 중복 확인
+  const [emailCheck, setEmailCheck] = useState(false);
+
   // 주소 --------------------------------------------------------------------------------------
   const [member_address, setMember_address] = useState("");
   const [member_detail_address, setMember_detail_address] = useState("");
@@ -81,6 +87,9 @@ export function MemberSignup() {
     setMember_address_name("기본주소1");
     setMember_address_type("main");
   };
+
+  // 맴버 자기소개 ----------------------------------------------------------------------------------
+  const [member_introduce, setMember_introduce] = useState("");
 
   // 맴버 가입시 타입을 유저로 --------------------------------------------------------------------------
   const [member_type, setMember_type] = useState("user");
@@ -175,6 +184,7 @@ export function MemberSignup() {
           member_phone_number,
           member_email,
           member_type,
+          member_introduce,
         },
 
         // 주소정보
@@ -264,10 +274,33 @@ export function MemberSignup() {
     }
   }
 
+  // 이메일 중복 확인
+  function handleEmailCheckClick() {
+    axios
+      .get("/api/memberEmail/emailCheck", {
+        params: {
+          member_email,
+        },
+      })
+      .then(() =>
+        toast({ description: "사용 가능한 이메일 입니다.", status: "success" }),
+      )
+      .then(() => setEmailCheck(true))
+      .catch(() => {
+        toast({ description: "이미 사용중인 이메일 입니다.", status: "error" });
+      });
+  }
+
   return (
     <Center mt={8} mb={8}>
-      <Card w={"1000px"}>
-        <CardHeader fontSize={"1.5rem"} color={"#5F625C"} textAlign={"center"}>
+      <Card w={"1000px"} shadow={"1px 1px 3px 1px #dadce0"} fontWeight={"bold"}>
+        <CardHeader
+          mt={4}
+          textAlign={"center"}
+          fontSize={"2rem"}
+          fontWeight={"bold"}
+          alignItems={"center"}
+        >
           회원가입
         </CardHeader>
         <CardBody>
@@ -278,10 +311,10 @@ export function MemberSignup() {
                 이 름
               </FormLabel>
               <Input
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
                 value={member_name}
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
                 onChange={(e) => {
                   setMember_name(e.target.value);
                 }}
@@ -295,9 +328,9 @@ export function MemberSignup() {
                 아이디
               </FormLabel>
               <Input
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
                 w={"350px"}
                 h={"50px"}
-                borderRadius={"0"}
                 value={member_login_id}
                 onChange={(e) => {
                   setMember_login_id(e.target.value);
@@ -311,6 +344,16 @@ export function MemberSignup() {
                 ml={"10px"}
                 onClick={handleIdCheckButton}
                 isDisabled={!checkIdButtonState}
+                bg={"black"}
+                color={"whitesmoke"}
+                shadow={"1px 1px 3px 1px #dadce0"}
+                _hover={{
+                  backgroundColor: "whitesmoke",
+                  color: "black",
+                  transition:
+                    "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+                  shadow: "1px 1px 3px 1px #dadce0 inset",
+                }}
               >
                 중복확인
               </Button>
@@ -339,10 +382,10 @@ export function MemberSignup() {
                 비밀번호
               </FormLabel>
               <Input
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
                 type={"password"}
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
                 value={member_password}
                 onChange={(e) => setMember_password(e.target.value)}
               />
@@ -358,11 +401,11 @@ export function MemberSignup() {
                 비밀번호 확인
               </FormLabel>
               <Input
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
                 value={member_password_checked}
                 type={"password"}
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
                 onChange={(e) => setMember_password_checked(e.target.value)}
               />
             </Flex>
@@ -384,13 +427,13 @@ export function MemberSignup() {
                 휴대폰번호
               </FormLabel>
               <Input
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
                 type={"number"}
                 id="member_phone_number1"
                 value={member_phone_number1}
                 maxLength={3}
                 w={"140px"}
                 h={"50px"}
-                borderRadius={"0"}
                 onChange={handlePhoneInput1Change}
               />
               <Box
@@ -402,6 +445,7 @@ export function MemberSignup() {
                 -
               </Box>
               <Input
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
                 type={"number"}
                 id="member_phone_number2"
                 ref={phoneInput2Ref}
@@ -409,7 +453,6 @@ export function MemberSignup() {
                 maxLength={4}
                 w={"140px"}
                 h={"50px"}
-                borderRadius={"0"}
                 onChange={handlePhoneInput2Change}
               />
               <Box
@@ -421,6 +464,7 @@ export function MemberSignup() {
                 -
               </Box>
               <Input
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
                 type={"number"}
                 id="member_phone_number3"
                 ref={phoneInput3Ref}
@@ -428,7 +472,6 @@ export function MemberSignup() {
                 maxLength={4}
                 w={"140px"}
                 h={"50px"}
-                borderRadius={"0"}
                 onChange={(e) => {
                   setMember_phone_number3(e.target.value.slice(0, 4));
                 }}
@@ -442,15 +485,17 @@ export function MemberSignup() {
                 이메일
               </FormLabel>
               <Input
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
                 id="member_email1"
                 value={member_email1}
-                w={"175px"}
+                w={"150px"}
                 h={"50px"}
-                borderRadius={"0"}
                 onChange={(e) => {
                   setMember_email1(e.target.value);
                   setEmailCodeCheckedState(false);
-                  setSendNumber(true);
+                  setSendNumber(false);
+                  setEmailCheck(false);
+                  setEmailAbleCheck(true);
                 }}
               />
               <Box
@@ -462,27 +507,62 @@ export function MemberSignup() {
                 @
               </Box>
               <Input
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
                 id="member_email2"
                 value={member_email2}
-                w={"175px"}
+                w={"150px"}
                 h={"50px"}
-                borderRadius={"0"}
                 onChange={(e) => {
                   setMember_email2(e.target.value);
                   setEmailCodeCheckedState(false);
                   setSendNumber(false);
+                  setEmailCheck(false);
+                  setEmailAbleCheck(true);
                 }}
               />
+              {/* 이메일 중복 체크 */}
               <Button
-                w={"90px"}
+                bg={"black"}
+                color={"whitesmoke"}
+                isDisabled={!emailAbleCheck}
+                w={"140px"}
                 h={"50px"}
                 ml={"10px"}
-                fontSize={"0.8rem"}
-                onClick={handleEmailCodeClick}
+                onClick={handleEmailCheckClick}
+                shadow={"1px 1px 3px 1px #dadce0"}
+                _hover={{
+                  backgroundColor: "whitesmoke",
+                  color: "black",
+                  transition:
+                    "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+                  shadow: "1px 1px 3px 1px #dadce0 inset",
+                }}
               >
-                인증번호 발송
+                중복 확인
               </Button>
             </Flex>
+
+            {emailCheck && (
+              <Flex justifyContent={"center"} mt={2} mb={2}>
+                <Button
+                  w={"600px"}
+                  h={"50px"}
+                  onClick={handleEmailCodeClick}
+                  colorScheme={"orange"}
+                  color={"black"}
+                  shadow={"1px 1px 3px 1px #dadce0"}
+                  _hover={{
+                    backgroundColor: "whitesmoke",
+                    color: "black",
+                    transition:
+                      "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+                    shadow: "1px 1px 3px 1px #dadce0 inset",
+                  }}
+                >
+                  인증번호 발송
+                </Button>
+              </Flex>
+            )}
           </FormControl>
           {/* 인증번호 입력 */}
           {sendNumber && (
@@ -492,10 +572,10 @@ export function MemberSignup() {
                   인증번호 입력
                 </FormLabel>
                 <Input
+                  shadow={"1px 1px 3px 1px #dadce0 inset"}
                   placeholder={"메일로 전송된 인증번호를 입력해 주세요."}
                   w={"350px"}
                   h={"50px"}
-                  borderRadius={"0"}
                   type={"number"}
                   value={randomNumberCheck}
                   onChange={(e) => {
@@ -503,11 +583,21 @@ export function MemberSignup() {
                   }}
                 />
                 <Button
+                  bg={"black"}
+                  color={"whitesmoke"}
                   isDisabled={emailCodeCheckedState}
                   ml={"10px"}
                   w={"140px"}
                   h={"50px"}
                   onClick={handleCodeCheckClick}
+                  shadow={"1px 1px 3px 1px #dadce0"}
+                  _hover={{
+                    backgroundColor: "whitesmoke",
+                    color: "black",
+                    transition:
+                      "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+                    shadow: "1px 1px 3px 1px #dadce0 inset",
+                  }}
                 >
                   인증번호 확인
                 </Button>
@@ -522,17 +612,19 @@ export function MemberSignup() {
                 우편번호
               </FormLabel>
               <Input
+                boxShadow={"1px 1px 3px 1px #dadce0 inset"}
                 w={"350px"}
                 h={"50px"}
-                borderRadius={"0"}
-                readOnly
-                value={member_post_code}
+                defaultValue={member_post_code}
               />
               <Button
                 w={"140px"}
                 h={"50px"}
                 ml={"10px"}
                 onClick={handlePostCodeClick}
+                bg={"black"}
+                color={"whitesmoke"}
+                _hover={{ backgroundColor: "whitesmoke", color: "black" }}
               >
                 주소검색
               </Button>
@@ -545,11 +637,10 @@ export function MemberSignup() {
                 주소
               </FormLabel>
               <Input
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
-                value={member_address}
-                readOnly
+                defaultValue={member_address}
               />
             </Flex>
           </FormControl>
@@ -560,20 +651,50 @@ export function MemberSignup() {
                 상세주소
               </FormLabel>
               <Input
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
                 value={member_detail_address}
                 onChange={(e) => setMember_detail_address(e.target.value)}
+              />
+            </Flex>
+          </FormControl>
+
+          {/* 자기소개 */}
+          <FormControl mt={2}>
+            <Flex justifyContent={"center"}>
+              <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
+                자기소개
+              </FormLabel>
+              <Textarea
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
+                w={"500px"}
+                h={"50px"}
+                value={member_introduce}
+                onChange={(e) => setMember_introduce(e.target.value)}
               />
             </Flex>
           </FormControl>
         </CardBody>
 
         <Flex justifyContent={"center"}>
-          <CardFooter>
+          <CardFooter gap={"90px"} mb={10}>
             <FormControl>
-              <Button w={"250px"} h={"50px"} onClick={() => navigate(-1)}>
+              <Button
+                bg={"whitesmoke"}
+                color={"black"}
+                w={"250px"}
+                h={"50px"}
+                onClick={() => navigate(-1)}
+                shadow={"1px 1px 3px 1px #dadce0"}
+                _hover={{
+                  backgroundColor: "black",
+                  color: "whitesmoke",
+                  transition:
+                    "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+                  shadow: "1px 1px 3px 1px #dadce0 inset",
+                }}
+              >
                 취소하기
               </Button>
             </FormControl>
@@ -581,14 +702,18 @@ export function MemberSignup() {
               <Button
                 w={"250px"}
                 h={"50px"}
-                style={{
-                  backgroundColor: "black",
-                  color: "whitesmoke",
-                  fontSize: "1.1rem",
-                  fontWeight: "900",
-                }}
+                bg={"black"}
+                color={"whitesmoke"}
                 onClick={handleSingUpClick}
                 isDisabled={!signButtonState}
+                shadow={"1px 1px 3px 1px #dadce0"}
+                _hover={{
+                  backgroundColor: "whitesmoke",
+                  color: "black",
+                  transition:
+                    "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+                  shadow: "1px 1px 3px 1px #dadce0 inset",
+                }}
               >
                 가입하기
               </Button>

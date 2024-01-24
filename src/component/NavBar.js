@@ -225,22 +225,11 @@ export function NavBar() {
                     setIndex(null);
                     setOverlayVisible(false);
                   }}
+                  onClick={() => navigate(`/category/${category.category_id}`)}
                 >
                   {category.category_name}
                 </Tab>
               ))}
-              <Tab
-                onMouseEnter={() => {
-                  setIndex(categories.length + 1);
-                  setOverlayVisible(true);
-                }}
-                onMouseLeave={() => {
-                  setIndex(null);
-                  setOverlayVisible(false);
-                }}
-              >
-                관리자
-              </Tab>
             </HStack>
           </TabList>
           <TabPanels
@@ -295,7 +284,18 @@ export function NavBar() {
                       mr={10}
                     >
                       {subCategoryArray.map((subCategory) => (
-                        <Text key={subCategory.subcategory_id} fontSize="sm">
+                        <Text
+                          key={subCategory.subcategory_id}
+                          fontSize="sm"
+                          _hover={{
+                            cursor: "pointer",
+                          }}
+                          onClick={() =>
+                            navigate(
+                              `/category/${category.category_id}/${subCategory.subcategory_id}`,
+                            )
+                          }
+                        >
                           {subCategory.subcategory_name}
                         </Text>
                       ))}
@@ -304,23 +304,6 @@ export function NavBar() {
                 )}
               </TabPanel>
             ))}
-            <TabPanel
-              p={10}
-              fontSize="sm"
-              onMouseEnter={() => {
-                setIndex(categories.length + 1);
-                setOverlayVisible(true);
-              }}
-              onMouseLeave={() => {
-                setIndex(null);
-                setOverlayVisible(false);
-              }}
-            >
-              <Text mb={2} onClick={() => navigate("product/write/")}>
-                상품등록
-              </Text>
-              <Text onClick={() => navigate("product/list/")}>상품리스트</Text>
-            </TabPanel>
           </TabPanels>
         </Tabs>
       </Box>

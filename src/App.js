@@ -35,6 +35,13 @@ import { MemberFindPassword } from "./page/member/MemberFindPassword";
 import { PasswordEdit } from "./page/member/MemberViewPage/PasswordEdit";
 import { AdminView } from "./page/admin/AdminView";
 import { MemberList } from "./page/admin/MemberList";
+import { QnaAnswer } from "./page/qna/QnaAnswer";
+import { QnaWriteAnswer } from "./page/qna/QnaWriteAnswer";
+import { ProductPay } from "./ProductPay";
+import { MemberQuestion } from "./page/qna/MemberQuestion";
+import { MemberReview } from "./page/review/MemberReview";
+import { MemberAnswer } from "./page/qna/MemberAnswer";
+import { AdminIndex } from "./page/admin/AdminIndex";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -42,7 +49,6 @@ const routes = createBrowserRouter(
       {/* 메인페이지 */}
 
       {/* 상품관련 */}
-      <Route path="product/write/" element={<ProductWrite />} />
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
       <Route path="edit/:product_id" element={<ProductEdit />} />
@@ -55,6 +61,7 @@ const routes = createBrowserRouter(
       {/* Q&A */}
 
       {/* 결제 */}
+      <Route path="product/pay/:product_id" element={<ProductPay />} />
 
       {/* 회원관련 */}
       <Route path="signup" element={<MemberSignup />} />
@@ -70,6 +77,10 @@ const routes = createBrowserRouter(
         <Route path="passwordEdit" element={<PasswordEdit />} />
         {/* 상품 찜하기 목록 - gns14585 - */}
         <Route path="productLike" element={<ProductLike />} />
+        <Route path="qna" element={<MemberQuestion />}>
+          <Route path="answer/:question_id" element={<MemberAnswer />} />
+        </Route>
+        <Route path="review" element={<MemberReview />} />
       </Route>
 
       {/* 게시판관련 */}
@@ -88,7 +99,12 @@ const routes = createBrowserRouter(
 
       {/* 관리자 페이지 */}
       <Route path="adminPage" element={<AdminView />}>
+        <Route index element={<AdminIndex />} />
+        <Route path="product/write/" element={<ProductWrite />} />
         <Route path="memberList" element={<MemberList />} />
+        <Route path="qna" element={<QnaAnswer />}>
+          <Route path="write/:question_id" element={<QnaWriteAnswer />} />
+        </Route>
       </Route>
     </Route>,
   ),

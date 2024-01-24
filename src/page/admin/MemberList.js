@@ -6,6 +6,11 @@ import {
   CardHeader,
   Center,
   Flex,
+  Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -25,10 +30,134 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCaretLeft,
+  faCaretRight,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { ChevronDownIcon } from "@chakra-ui/icons";
+
+// 페이지 버튼
+function Pagination({ pageInfo }) {
+  const navigate = useNavigate();
+
+  const [params] = useSearchParams();
+  const listPage = params.get("page");
+
+  const pageNumbers = [];
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <Box mt={10} mb={10}>
+      {pageInfo.prevPageNumber && (
+        <Button
+          bg={"white"}
+          color={"black"}
+          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+          onClick={() => navigate("?page=" + pageInfo.prevPageNumber)}
+        >
+          <FontAwesomeIcon icon={faCaretLeft} />
+        </Button>
+      )}
+      {pageNumbers.map((pageNumber) => (
+        <Button
+          bg={listPage === pageNumber.toString() ? "black" : "white"}
+          color={listPage === pageNumber.toString() ? "white" : "black"}
+          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+          ml={2}
+          key={pageNumber}
+          onClick={() => {
+            navigate("?page=" + pageNumber);
+          }}
+        >
+          {pageNumber}
+        </Button>
+      ))}
+      {pageInfo.nextPageNumber && (
+        <Button
+          bg={"white"}
+          color={"black"}
+          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+          ml={2}
+          onClick={() => navigate("?page=" + pageInfo.nextPageNumber)}
+        >
+          <FontAwesomeIcon icon={faCaretRight} />
+        </Button>
+      )}
+    </Box>
+  );
+}
+
+// 회원 이름으로 찾기 버튼
+function SearchMember() {
+  const [keyword, setKeyword] = useState("");
+  const [findType, setFindType] = useState("id");
+
+  const navigate = useNavigate();
+
+  // 회원명 검색 클릭
+  function handleSearch() {
+    const params = new URLSearchParams();
+    params.set(findType, keyword);
+
+    navigate("/adminPage/memberList?" + params);
+  }
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  return (
+    <Flex justifyContent={"center"} mt={10} gap={2}>
+      <Menu>
+        <MenuButton
+          as={Button}
+          rightIcon={<ChevronDownIcon />}
+          w={"130px"}
+          h={"50px"}
+          bg={"white"}
+          border={"1px solid black"}
+        >
+          {findType === "id" && "아이디"}
+          {findType === "name" && "이름"}
+        </MenuButton>
+        <MenuList>
+          <MenuItem onClick={() => setFindType("id")}>아이디</MenuItem>
+          <MenuItem onClick={() => setFindType("name")}>이름</MenuItem>
+        </MenuList>
+      </Menu>
+      <Input
+        border={"1px solid black"}
+        w={"300px"}
+        h={"50px"}
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+        placeholder={"검색어를 입력해 주세요."}
+        onKeyDown={handleKeyDown}
+      />
+      <Button
+        bg={"black"}
+        color={"whitesmoke"}
+        _hover={{ backgroundColor: "white", color: "black" }}
+        w={"100px"}
+        h={"50px"}
+        onClick={handleSearch}
+      >
+        검색
+      </Button>
+    </Flex>
+  );
+}
 
 export function MemberList() {
   const [memberList, setMemberList] = useState([]);
+  const [pageInfo, setPageInfo] = useState("");
   const [selectMember, setSelectMember] = useState("");
 
   // 회원 탈퇴 처리 인식
@@ -38,11 +167,18 @@ export function MemberList() {
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
+  const [params] = useSearchParams();
+
+  const navigate = useNavigate();
+
+  const location = useLocation();
+
   useEffect(() => {
     axios
-      .get("/api/member/listAll")
+      .get("/api/member/listAll?" + params)
       .then((response) => {
-        setMemberList(response.data);
+        setMemberList(response.data.allMember);
+        setPageInfo(response.data.pageInfo);
       })
       .catch(() => {
         toast({
@@ -53,17 +189,17 @@ export function MemberList() {
       .finally(() => {
         setCheckMember(false);
       });
-  }, [checkMember]);
+  }, [checkMember, location]);
 
   // 삭제 버튼 클릭시 동작
   const handleMemberDeleteClick = (e) => {
+    console.log(e);
     setSelectMember(e);
     onOpen();
   };
 
   // 모달내 삭제 버튼 클릭시 실제 삭제
   const handleModalDeleteClick = (e) => {
-    console.log(e.id);
     axios
       .delete("/api/member/DeleteMember/" + e.id)
       .then(() => {
@@ -88,7 +224,9 @@ export function MemberList() {
   return (
     <Center>
       <Card>
-        <CardHeader>회원 목록 입니다.</CardHeader>
+        <CardHeader fontSize={"1.6rem"} fontWeight="bold" mt={4}>
+          회원 목록
+        </CardHeader>
         <CardBody>
           <Table textAlign={"center"}>
             <Thead>
@@ -145,6 +283,9 @@ export function MemberList() {
               })}
             </Tbody>
           </Table>
+
+          <SearchMember />
+          <Pagination pageInfo={pageInfo} />
         </CardBody>
 
         {/* 탈퇴 모달 */}
@@ -173,11 +314,13 @@ export function MemberList() {
                 <Button mr={3} onClick={onClose}>
                   Close
                 </Button>
-                <Button colorScheme={"red"}>
-                  <FontAwesomeIcon
-                    icon={faTrashCan}
-                    onClick={() => handleModalDeleteClick(selectMember)}
-                  />
+                <Button
+                  colorScheme={"red"}
+                  onClick={() => {
+                    handleModalDeleteClick(selectMember);
+                  }}
+                >
+                  <FontAwesomeIcon icon={faTrashCan} />
                 </Button>
               </ModalFooter>
             </ModalContent>

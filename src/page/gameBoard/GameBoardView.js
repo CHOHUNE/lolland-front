@@ -33,6 +33,7 @@ import {
   Tbody,
   Td,
   TableContainer,
+  Textarea,
 } from "@chakra-ui/react";
 import GameBoardCommentContainer from "./GameBoardCommentContainer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -41,6 +42,8 @@ import {
   faComments,
   faEye,
   faHeart as fullHeart,
+  faThumbsDown,
+  faThumbsUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { LoginContext } from "../../component/LoginProvider";
 import { useNavigate, useParams } from "react-router-dom";
@@ -98,13 +101,14 @@ function LikeContainer({ like, onClick }) {
         isDisabled={!isAuthenticated()}
       >
         {like.like ? (
-          <FontAwesomeIcon icon={fullHeart} />
+          <FontAwesomeIcon icon={faThumbsUp} />
         ) : (
-          <FontAwesomeIcon icon={emptyHeart} />
+          <FontAwesomeIcon icon={faThumbsDown} />
         )}
-        좋아요
+        {"  "}
+        추천 {"  "}
+        {like.countLike}
       </Button>
-      <Text fontSize="md">{like.countLike}</Text>
     </HStack>
   );
 }
@@ -247,27 +251,39 @@ export function GameBoardView() {
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              <Flex gap="20px" align="center">
-                <Image
-                  borderRadius="full"
-                  boxSize="100px"
-                  src="https://bit.ly/dan-abramov"
-                  alt="tempProfileImg"
-                />
+              {writerInfo && (
+                <Flex gap="20px" align="center">
+                  <Image
+                    borderRadius="full"
+                    boxSize="100px"
+                    src={writerInfo.file_url}
+                    alt="프로필 이미지"
+                  />
 
-                {writerInfo && (
-                  <div>
-                    <br />
-                    닉네임: {writerInfo.member_name}
-                    <br />
-                    이메일: {writerInfo.member_email}
-                    <br />
-                    연락처: {writerInfo.member_phone_number}
-                    <br />
-                    <br />
-                  </div>
-                )}
-              </Flex>
+                  <VStack align="start">
+                    <Text fontSize="lg" fontWeight="bold">
+                      {writerInfo.member_name}
+                    </Text>
+                    <Text fontSize="md">
+                      <strong>이메일:</strong> {writerInfo.member_email}
+                    </Text>
+                    <Text fontSize="md">
+                      <strong>연락처:</strong> {writerInfo.member_phone_number}
+                    </Text>
+                    <Box>
+                      <strong>자기소개:</strong>{" "}
+                      <Textarea
+                        value={writerInfo.member_introduce}
+                        isReadOnly
+                        size="sm"
+                        width="300px"
+                        fontSize={"1.1rem"}
+                        mb={"20px"}
+                      />
+                    </Box>
+                  </VStack>
+                </Flex>
+              )}
 
               <Tabs isFitted variant="enclosed">
                 <TabList mb="1em">
@@ -277,71 +293,78 @@ export function GameBoardView() {
                 <TabPanels>
                   <TabPanel>
                     {written && (
-                      <TableContainer>
-                        <Table variant="simple">
-                          <TableCaption></TableCaption>
-
-                          <Tbody>
-                            {written.map((posties) => (
-                              <Tr
-                                key={posties.id}
+                      <Table variant="simple">
+                        <TableCaption></TableCaption>
+                        <Tbody>
+                          {written.map((posties) => (
+                            <Tr
+                              key={posties.id}
+                              onClick={() => {
+                                navigate(`/gameboard/id/${posties.id}`);
+                                window.scrollTo(0, 0);
+                              }}
+                              _hover={{ cursor: "pointer" }}
+                            >
+                              <Box
+                                p={4}
+                                borderWidth="1px"
+                                borderRadius="md"
+                                boxShadow="sm"
                                 onClick={() => {
                                   navigate(`/gameboard/id/${posties.id}`);
                                   window.scrollTo(0, 0);
                                 }}
-                                _hover={{ cursor: "pointer" }}
+                                _hover={{ cursor: "pointer", bg: "gray.100" }}
                               >
-                                <TableCaption>{posties.title}</TableCaption>
-                                <Divider />
-                              </Tr>
-                            ))}
-                          </Tbody>
-                        </Table>
-                      </TableContainer>
+                                {posties.title}
+                              </Box>
+                            </Tr>
+                          ))}
+                        </Tbody>
+                      </Table>
                     )}
                   </TabPanel>
                   <TabPanel>
                     {writtenComment && (
-                      <TableContainer>
-                        <Table variant="simple">
-                          <TableCaption></TableCaption>
-                          {/* 해당 코멘트의 좌표로 이동하게끔 설정 */}
-                          <Tbody>
-                            {writtenComment.map((comment) => (
-                              <Tr
-                                key={comment.id}
+                      <Table variant="simple">
+                        <TableCaption></TableCaption>
+                        <Tbody>
+                          {writtenComment.map((comment) => (
+                            <Tr
+                              key={comment.id}
+                              onClick={() => {
+                                navigate(
+                                  `/gameboard/id/${comment.game_board_id}`,
+                                );
+                                window.scrollTo({
+                                  top: document.body.scrollHeight,
+                                  behavior: "smooth",
+                                });
+                              }}
+                              _hover={{ cursor: "pointer" }}
+                            >
+                              <Box
+                                p={4}
+                                borderWidth="1px"
+                                borderRadius="md"
+                                boxShadow="sm"
                                 onClick={() => {
                                   navigate(
                                     `/gameboard/id/${comment.game_board_id}`,
                                   );
-                                  const commentElement =
-                                    document.getElementById(
-                                      `comment-${comment.id}`,
-                                    );
-                                  if (commentElement) {
-                                    const yOffset = -100; // 추가적인 Y offset을 설정
-                                    const y =
-                                      commentElement.getBoundingClientRect()
-                                        .top +
-                                      window.pageYOffset +
-                                      yOffset;
-                                    window.scrollTo({
-                                      top: y,
-                                      behavior: "smooth",
-                                    });
-                                  }
+                                  window.scrollTo({
+                                    top: document.body.scrollHeight,
+                                    behavior: "smooth",
+                                  });
                                 }}
-                                _hover={{ cursor: "pointer" }}
+                                _hover={{ cursor: "pointer", bg: "gray.100" }}
                               >
-                                <TableCaption id={`comment-${comment.id}`}>
-                                  {comment.comment_content}
-                                </TableCaption>
-                                <Divider />
-                              </Tr>
-                            ))}
-                          </Tbody>
-                        </Table>
-                      </TableContainer>
+                                {comment.comment_content}
+                              </Box>
+                            </Tr>
+                          ))}
+                        </Tbody>
+                      </Table>
                     )}
                   </TabPanel>
                 </TabPanels>

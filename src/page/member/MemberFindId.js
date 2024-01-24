@@ -46,6 +46,23 @@ export function MemberFindId() {
 
   const navigate = useNavigate();
 
+  const inputStyle = {
+    shadow: "1px 1px 3px 1px #dadce0 inset",
+  };
+
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
   // email1 과 email2 인풋이 바뀔때 전체 이메일 값 변경 -------------------------
   useEffect(() => {
     setMember_email(email1 + "@" + email2);
@@ -91,8 +108,14 @@ export function MemberFindId() {
 
   return (
     <Center mt={8} mb={20}>
-      <Card w={"1000px"}>
-        <CardHeader fontSize={"1.5rem"} color={"#5F625C"} textAlign={"center"}>
+      <Card w={"1000px"} shadow={"1px 1px 3px 1px #dadce0"}>
+        <CardHeader
+          mt={4}
+          textAlign={"center"}
+          fontSize={"2rem"}
+          fontWeight={"bold"}
+          alignItems={"center"}
+        >
           아이디 찾기
         </CardHeader>
 
@@ -103,9 +126,9 @@ export function MemberFindId() {
                 이름
               </FormLabel>
               <Input
+                {...inputStyle}
                 w={"500px"}
                 h={"50px"}
-                borderRadius={"0"}
                 value={member_name}
                 onChange={(e) => setMember_name(e.target.value)}
               />
@@ -119,10 +142,10 @@ export function MemberFindId() {
                 이메일
               </FormLabel>
               <Input
+                {...inputStyle}
                 id="member_email1"
                 w={"225px"}
                 h={"50px"}
-                borderRadius={"0"}
                 value={email1}
                 onChange={(e) => {
                   setEmail1(e.target.value);
@@ -137,10 +160,10 @@ export function MemberFindId() {
                 @
               </Box>
               <Input
+                {...inputStyle}
                 id="member_email2"
                 w={"225px"}
                 h={"50px"}
-                borderRadius={"0"}
                 value={email2}
                 onChange={(e) => {
                   setEmail2(e.target.value);
@@ -153,14 +176,9 @@ export function MemberFindId() {
         <Flex justifyContent={"center"} pt={"0px"} mb={"20px"}>
           <CardFooter>
             <Button
+              {...buttonStyle}
               w={"250px"}
               h={"50px"}
-              style={{
-                backgroundColor: "black",
-                color: "whitesmoke",
-                fontSize: "1.1rem",
-                fontWeight: "900",
-              }}
               onClick={handleFindIdClick}
             >
               아이디 찾기

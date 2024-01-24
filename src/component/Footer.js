@@ -7,12 +7,14 @@ import {
   Divider,
   Flex,
   HStack,
+  Spacer,
   Text,
 } from "@chakra-ui/react";
 
 export function Footer() {
   return (
     <>
+      <Spacer h={5} />
       <Box bgColor="#F4F4F4" px={10} pt={5} pb={10}>
         <Flex justifyContent="flex-start" mx="3%" p={5}>
           <ButtonGroup size="sm" variant="undefined">
