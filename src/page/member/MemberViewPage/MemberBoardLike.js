@@ -14,6 +14,7 @@ import {
   Th,
   Thead,
   Tr,
+  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -36,11 +37,38 @@ export function MemberBoardLike() {
     },
   };
 
+  // 회원이 좋아요 한 게임 게시글 목록
   const [gameBoardList, setGameBoardList] = useState([]);
 
+  // 좋아요 삭제 인식
+  const [deletedLikeStatus, setDeletedLikeStatus] = useState(false);
+
+  const toast = useToast();
+
   useEffect(() => {
-    // axios.get("/api/");
-  }, []);
+    axios.get("/api/member/getGameBoardLike").then((response) => {
+      setGameBoardList(response.data);
+    });
+  }, [deletedLikeStatus]);
+
+  // 게임 좋아요 하나 삭제
+  const handleLikeDeleteClick = (gameBoardId) => {
+    axios
+      .delete("/api/member/deleteGameBoardLike", {
+        params: {
+          gameBoardId,
+        },
+      })
+      .then(() => {
+        setDeletedLikeStatus((prev) => !prev);
+      })
+      .catch(() => {
+        toast({
+          description: "좋아요 삭제중 문제가 발생했습니다.",
+          status: "error",
+        });
+      });
+  };
 
   return (
     <Center>
@@ -86,31 +114,16 @@ export function MemberBoardLike() {
                   <Td textAlign={"center"}>{gameBoard.category}</Td>
                   <Td textAlign={"center"}>{gameBoard.title}</Td>
                   <Td textAlign={"center"}>{gameBoard.board_content}</Td>
-                  <Td textAlign={"center"}>
+                  <Td textAlign={"center"} _hover={{ cursor: "pointer" }}>
                     <FontAwesomeIcon
                       icon={faXmark}
-                      fontSize={"1.4rem"}
+                      fontSize={"1.8rem"}
                       color={"gray"}
+                      onClick={() => handleLikeDeleteClick(gameBoard.id)}
                     />
                   </Td>
                 </Tr>
               ))}
-
-              <Tr key={1}>
-                <Td textAlign={"center"}>
-                  <Checkbox size={"lg"} colorScheme={"orange"}></Checkbox>
-                </Td>
-                <Td textAlign={"center"}>{"gameBoard.category"}</Td>
-                <Td textAlign={"center"}>{"gameBoard.title"}</Td>
-                <Td textAlign={"center"}>{"gameBoard.board_content"}</Td>
-                <Td textAlign={"center"}>
-                  <FontAwesomeIcon
-                    icon={faXmark}
-                    fontSize={"1.4rem"}
-                    color={"gray"}
-                  />
-                </Td>
-              </Tr>
             </Tbody>
           </Table>
           <Center mt={16} mb={20}>
