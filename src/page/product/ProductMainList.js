@@ -109,6 +109,7 @@ export function ProductMainList() {
               py={2}
               px={4}
               _hover={{
+                cursor: "pointer",
                 bgColor: "black",
                 color: "white",
                 transition: "0.4s all ease",

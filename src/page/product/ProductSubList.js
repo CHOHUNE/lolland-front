@@ -130,6 +130,7 @@ export function ProductSubList() {
                   <List spacing={3}>
                     {categoryList.map((category) => (
                       <ListItem
+                        _hover={{cursor: "pointer"}}
                         key={category.category_id}
                         onClick={() =>
                           navigate(`/category/${category.category_id}`)
@@ -155,7 +156,7 @@ export function ProductSubList() {
                 <AccordionPanel whiteSpace="pre-wrap" pb={4}>
                   <List spacing={3}>
                     {companyList.map((company) => (
-                      <ListItem key={company.company_id}>
+                      <ListItem _hover={{cursor: "pointer"}} key={company.company_id}>
                         {company.company_name}
                       </ListItem>
                     ))}

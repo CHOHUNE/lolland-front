@@ -4,6 +4,7 @@ import {
   Center,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   Select,
@@ -33,6 +34,7 @@ export function ProductWrite() {
   const [mainImg, setMainImg] = useState(null); // 메인이미지
   const [contentImg, setContentImg] = useState(null); // 설명 이미지
   const [options, setOptions] = useState([{ option_name: "", stock: 0 }]); // 초기값 수정
+  const [showAddOptionMessage, setShowAddOptionMessage] = useState(true);
 
   // ---------------------------------- 대분류,소분류 렌더링 로직 ----------------------------------
   useEffect(() => {
@@ -260,8 +262,21 @@ export function ProductWrite() {
                 </Button>
               </Flex>
             ))}
+            {showAddOptionMessage && (
+              <Text color={"red"} fontSize={"md"}>
+                옵션은 최소 1개 이상 작성해주세요.
+                <br />
+                ex) 옵션 : 기본제품 / 수량 : 5
+              </Text>
+            )}
             <Flex justifyContent="center" mt={4}>
-              <Button colorScheme="teal" onClick={handleAddOption}>
+              <Button
+                colorScheme="teal"
+                onClick={() => {
+                  handleAddOption();
+                  setShowAddOptionMessage(false); // Hide the message when the button is clicked
+                }}
+              >
                 상세 옵션 추가
               </Button>
             </Flex>

@@ -69,7 +69,7 @@ export function HomeBody() {
   };
 
   return (
-    <Box>
+    <Box minW={"1400px"}>
       {/* ------------------------ 상단 배너 슬라이드 ------------------------ */}
       <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
         <Box borderRadius={"20px"} background={"white"} w={"90%"} h={"100%"}>
@@ -171,6 +171,9 @@ export function HomeBody() {
 
               return (
                 <Box
+                  _hover={{
+                    cursor: "pointer",
+                  }}
                   {...categoryStyle}
                   key={category.category_id}
                   onClick={() => navigate(`/category/${category.category_id}`)}

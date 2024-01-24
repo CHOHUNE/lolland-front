@@ -100,20 +100,21 @@ export function NavBar() {
 
   return (
     <>
-      <Box>
+      <Box minW={"1400px"}>
         {/* ------------------- 상단 네브 바 ------------------- */}
         <Flex
           top={0}
           justifyContent="space-between"
           p={5}
           w="full"
-          px="3%"
+          minW={"1400px"}
+          // px="3%"
           shadow="sm"
           position="fixed"
           zIndex={100}
           backgroundColor="white"
         >
-          <Flex>
+          <Flex w={"400px"}>
             <ButtonGroup variant="undefined" size="md" alignItems={"center"}>
               <Button onClick={() => navigate("/")}>HOME</Button>
               <Button>신상품</Button>
@@ -122,25 +123,36 @@ export function NavBar() {
             </ButtonGroup>
           </Flex>
 
-          <Box ml={"-20px"}>
-            {/* --------- 로고 --------- */}
-            <Box
-              w="100px"
-              // border="1px dashed black"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              textAlign="center"
-              onClick={() => navigate("/")}
-              _hover={{
-                cursor: "pointer",
-              }}
-            >
-              <Image src="/logo.png" boxSize="100%" objectFit="fit" />
+          <Box
+            w={"100%"}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Box>
+              {/* --------- 로고 --------- */}
+              <Box
+                w="100px"
+                // border="1px dashed black"
+                textAlign="center"
+                onClick={() => navigate("/")}
+                _hover={{
+                  cursor: "pointer",
+                }}
+              >
+                <Image src="/logo.png" boxSize="100%" objectFit="fit" />
+              </Box>
             </Box>
           </Box>
 
-          <ButtonGroup variant="undefined" size="lg" alignItems={"center"}>
+          <ButtonGroup
+            w={"400px"}
+            variant="undefined"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            size="lg"
+          >
             <IconButton icon={<FontAwesomeIcon icon={faMagnifyingGlass} />} />
             <IconButton
               icon={<FontAwesomeIcon icon={faBagShopping} />}
@@ -204,7 +216,6 @@ export function NavBar() {
 
         {/* ------------------- 하단 네브바 ------------------- */}
         <Tabs
-
           index={index}
           variant="soft-rounded"
           colorScheme="blackAlpha"
@@ -214,7 +225,7 @@ export function NavBar() {
           alignItems={"center"}
           background={"white"}
         >
-          <TabList  w={"900px"} py={3}>
+          <TabList w={"900px"} py={3}>
             <HStack spacing={2}>
               <Tab
                 onClick={() => navigate("/gameboard/list")}
@@ -272,7 +283,11 @@ export function NavBar() {
                 setOverlayVisible(false);
               }}
             >
-              <VStack spacing={2} align="flex-start">
+              <VStack
+                _hover={{ cursor: "pointer" }}
+                spacing={2}
+                align="flex-start"
+              >
                 <Text>게임 커뮤니티</Text>
                 <Text onClick={() => navigate("/gearlistlayout")}>
                   게임 장비 커뮤니티
@@ -297,6 +312,9 @@ export function NavBar() {
                 {createSubcategoryArrays(category.subCategory).map(
                   (subCategoryArray, arrayIndex) => (
                     <VStack
+                      _hover={{
+                        cursor: "pointer",
+                      }}
                       key={arrayIndex}
                       align="start"
                       spacing={2}

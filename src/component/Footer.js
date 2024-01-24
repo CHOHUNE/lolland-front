@@ -15,7 +15,7 @@ export function Footer() {
   return (
     <>
       <Spacer h={5} />
-      <Box bgColor="#F4F4F4" px={10} pt={5} pb={10}>
+      <Box bgColor="#F4F4F4" px={10} pt={5} pb={10} minW={"1400px"}>
         <Flex justifyContent="flex-start" mx="3%" p={5}>
           <ButtonGroup size="sm" variant="undefined">
             <Button>회사소개</Button>
@@ -39,7 +39,7 @@ export function Footer() {
                 <Text fontSize="xs">LOLLAND (롤랜드)</Text>
               </HStack>
               <HStack>
-                <Text fontSize="xs">주장</Text>
+                <Text fontSize="xs">조장</Text>
                 <Text as="span" fontSize="xs" fontWeight="bold">
                   이승원
                 </Text>
