@@ -44,6 +44,8 @@ import { MemberAnswer } from "./page/qna/MemberAnswer";
 import { AdminIndex } from "./page/admin/AdminIndex";
 import { MemberBoardLike } from "./page/member/MemberViewPage/MemberBoardLike";
 import { HomeBody } from "./component/HomeBody";
+import { ProductMainList } from "./page/product/ProductMainList";
+import { ProductSubList } from "./page/product/ProductSubList";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -51,6 +53,12 @@ const routes = createBrowserRouter(
       {/* 메인페이지 */}
       <Route index element={<HomeBody />} />
       {/* 상품관련 */}
+      <Route path="/category/:category_id" element={<ProductMainList />} />
+      <Route
+        path="/category/:category_id/:subcategory_id"
+        element={<ProductSubList />}
+      />
+
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
       <Route path="edit/:product_id" element={<ProductEdit />} />

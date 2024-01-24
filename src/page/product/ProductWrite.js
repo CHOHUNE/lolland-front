@@ -37,7 +37,7 @@ export function ProductWrite() {
   // ---------------------------------- 대분류,소분류 렌더링 로직 ----------------------------------
   useEffect(() => {
     axios
-      .get("/api/product/write")
+      .get("/api/product/category")
       .then((response) => {
         //left join했기 때문에 자바스크립트 reduce 함수 이용해서 대분류 중복 제거한 데이터 리턴
         const uniqueCategories = response.data.reduce((acc, category) => {

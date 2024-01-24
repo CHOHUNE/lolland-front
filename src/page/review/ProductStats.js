@@ -1,16 +1,14 @@
-import {Box, Flex, Heading, Spinner, Text, VStack} from "@chakra-ui/react";
+import { Box, Flex, Heading, Spinner, Text, VStack } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import React from "react";
 import RatingChart from "./RatingChart";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
-import { faStar as farStar } from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar, faStarHalfAlt } from "@fortawesome/free-solid-svg-icons";
+import { faStar as farStar } from "@fortawesome/free-regular-svg-icons";
 
-
-export const ProductStats = ({ product_id }) => {
+export const ProductStats = ({ product_id, average_rate }) => {
   const [ratingDistribution, setRatingDistribution] = useState({});
-  const [product, setProduct] = useState(null);
 
   useEffect(() => {
     axios
@@ -23,12 +21,6 @@ export const ProductStats = ({ product_id }) => {
         console.error("별점 분포도 가져오는 도중 에러 발생:", error);
       });
   }, [product_id]);
-
-  useEffect(() => {
-    axios
-      .get("/api/product/product_id/" + product_id)
-      .then((response) => setProduct(response.data));
-  }, []);
 
   const renderStars = (rate) => {
     // 평점이 없거나 0인 경우 빈 별 5개로 출력
@@ -55,11 +47,6 @@ export const ProductStats = ({ product_id }) => {
     return stars;
   };
 
-  if (product === null) {
-    return <Spinner />
-  }
-
-
   return (
     <Flex
       border="1px dashed black"
@@ -74,14 +61,14 @@ export const ProductStats = ({ product_id }) => {
         alignItems="center"
         justifyContent="center"
         textAlign="center"
-        border="1px dashed red"
       >
         <Box>
           <Text>전체 만족도 평점</Text>
-          <Text fontSize={"2rem"} mt={5}>{renderStars(product.product.average_rate)}</Text>
-          <Text fontWeight={"bold"} fontSize={"2.7rem"} mt={2}>{product.product.average_rate !== null
-            ? product.product.average_rate.toFixed(1)
-            : "0"}
+          <Text fontSize={"2rem"} mt={5}>
+            {renderStars(average_rate)}
+          </Text>
+          <Text fontWeight={"bold"} fontSize={"2.7rem"} mt={2}>
+            {average_rate !== null ? average_rate.toFixed(1) : "0"}
           </Text>
         </Box>
       </Box>
@@ -92,7 +79,6 @@ export const ProductStats = ({ product_id }) => {
         alignItems="center"
         justifyContent="center"
         textAlign="center"
-        border="1px dashed gold"
       >
         <RatingChart
           ratingDistribution={ratingDistribution}

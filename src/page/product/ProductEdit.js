@@ -62,7 +62,7 @@ export function ProductEdit() {
 
     // -------------------------------- 대분류 / 소분류 렌더링 로직 --------------------------------
     axios
-      .get("/api/product/write")
+      .get("/api/product/category")
       .then((response) => {
         const uniqueCategories = response.data.reduce((acc, category) => {
           const existing = acc.find(
