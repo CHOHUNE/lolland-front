@@ -116,8 +116,8 @@ export function ProductSubList() {
       </Breadcrumb>
       <Divider border="1px solid black" my={5} />
       <Flex justifyContent="space-between">
-        <Accordion allowMultiple w="20%" defaultIndex={[0, 1]}>
-          <AccordionItem>
+        <Accordion id="myAccordian" allowMultiple w="20%" defaultIndex={[0, 1]}>
+          <AccordionItem className="accordianItem">
             {({ isExpanded }) => (
               <>
                 <AccordionButton>
@@ -149,7 +149,7 @@ export function ProductSubList() {
               </>
             )}
           </AccordionItem>
-          <AccordionItem>
+          <AccordionItem className="accordianItem">
             {({ isExpanded }) => (
               <>
                 <AccordionButton>

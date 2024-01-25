@@ -20,3 +20,8 @@ body {
     border-top-width: 0px;
     border-bottom-width: 0px;
 }
+
+.productImage {
+    padding-bottom: 100%;
+    object-fit: cover;
+}
