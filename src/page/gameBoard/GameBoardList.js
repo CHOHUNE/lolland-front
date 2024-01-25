@@ -33,6 +33,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   faAngleLeft,
   faAngleRight,
+  faCaretDown,
   faImage,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
@@ -360,6 +361,7 @@ function GameBoardList() {
                         }}
                       >
                         추천
+                        <FontAwesomeIcon icon={faCaretDown} />
                       </Th>
                       <Th w="5%" pl="0">
                         분류
@@ -377,6 +379,7 @@ function GameBoardList() {
                         }}
                       >
                         조회수
+                        <FontAwesomeIcon icon={faCaretDown} />
                       </Th>
                       <Th w="10%">작성자</Th>
                       <Th
@@ -389,6 +392,7 @@ function GameBoardList() {
                         }}
                       >
                         날짜
+                        <FontAwesomeIcon icon={faCaretDown} />
                       </Th>
                     </Tr>
                   </Thead>
