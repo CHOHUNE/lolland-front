@@ -25,10 +25,60 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight, faHouse } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAngleLeft,
+  faAngleRight,
+  faChevronRight,
+  faHouse,
+} from "@fortawesome/free-solid-svg-icons";
 
-function CategoryPagination() {
-  return null;
+function CategoryPagination({ pageInfo }) {
+  const pageNumbers = [];
+  const navigate = useNavigate();
+
+  if (!pageInfo) {
+    // pageInfo가 null이면 빈 배열을 반환하여 렌더링하지 않음
+    return null;
+  }
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+  console.log(pageNumbers);
+
+  return (
+    <Box mb={10} mt={10} display={"flex"} justifyContent={"center"}>
+      {pageInfo.prevPageNumber && (
+        <Button
+          variant={"ghost"}
+          onClick={() => navigate("?p=" + pageInfo.prevPageNumber)}
+        >
+          <FontAwesomeIcon icon={faAngleLeft} />
+        </Button>
+      )}
+
+      {pageNumbers.map((pageNumber) => (
+        <Button
+          key={pageNumber}
+          variant={
+            pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
+          }
+          onClick={() => navigate("?p=" + pageNumber)}
+        >
+          {pageNumber}
+        </Button>
+      ))}
+
+      {pageInfo.nextPageNumber && (
+        <Button
+          variant={"ghost"}
+          onClick={() => navigate("?p=" + pageInfo.nextPageNumber)}
+        >
+          <FontAwesomeIcon icon={faAngleRight} />
+        </Button>
+      )}
+    </Box>
+  );
 }
 
 export function ProductMainList() {
@@ -223,7 +273,7 @@ export function ProductMainList() {
         </SimpleGrid>
       </Flex>
 
-      <CategoryPagination />
+      <CategoryPagination pageInfo={pageInfo} />
     </>
   );
 }
