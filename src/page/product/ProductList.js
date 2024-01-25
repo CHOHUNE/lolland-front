@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Flex,
-  HStack,
   Image,
   Input,
   Select,
@@ -15,7 +14,6 @@ import {
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
-import * as PropTypes from "prop-types";
 import { Recent } from "../../component/RecentViewed";
 
 function PageButton({ variant, pageNumber, children }) {

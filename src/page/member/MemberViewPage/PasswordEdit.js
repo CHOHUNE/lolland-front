@@ -8,7 +8,6 @@ import {
   Flex,
   FormControl,
   FormErrorMessage,
-  FormHelperText,
   FormLabel,
   Input,
   useToast,
@@ -19,6 +18,42 @@ import axios from "axios";
 import { LoginContext } from "../../../component/LoginProvider";
 
 export function PasswordEdit() {
+  // 버튼 css
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
+  // 반대 버튼 css
+  const revButtonStyle = {
+    background: "whitesmoke",
+    color: "black",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "black",
+      color: "whitesmoke",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
+  // 인풋 css
+  const inputStyle = {
+    shadow: "1px 1px 3px 1px #dadce0 inset",
+    width: "350px",
+    height: "50px",
+    type: "password",
+  };
+
   const [member_password, setMember_password] = useState("");
   const [member_check_password, setMember_check_password] = useState("");
 
@@ -88,8 +123,14 @@ export function PasswordEdit() {
 
   return (
     <Center>
-      <Card>
-        <CardHeader fontSize={"1.2rem"} fontWeight={"900"} textAlign={"center"}>
+      <Card shadow={"1px 1px 3px 1px #dadce0"}>
+        <CardHeader
+          mt={4}
+          textAlign={"center"}
+          fontSize={"2rem"}
+          fontWeight={"bold"}
+          alignItems={"center"}
+        >
           비밀번호 수정
         </CardHeader>
         <CardBody>
@@ -99,8 +140,7 @@ export function PasswordEdit() {
                 새 비밀번호
               </FormLabel>
               <Input
-                w={"350px"}
-                h={"50px"}
+                {...inputStyle}
                 value={member_password}
                 onChange={(e) => {
                   setMember_password(e.target.value);
@@ -115,8 +155,7 @@ export function PasswordEdit() {
                 비밀번호 다시 입력
               </FormLabel>
               <Input
-                w={"350px"}
-                h={"50px"}
+                {...inputStyle}
                 value={member_check_password}
                 onChange={(e) => {
                   setMember_check_password(e.target.value);
@@ -139,6 +178,7 @@ export function PasswordEdit() {
         <CardFooter>
           <Flex gap={10}>
             <Button
+              {...revButtonStyle}
               w="250px"
               style={{ fontSize: "1.1rem", fontWeight: "900" }}
               onClick={() => navigate(-1)}
@@ -146,13 +186,8 @@ export function PasswordEdit() {
               취소 하기
             </Button>
             <Button
+              {...buttonStyle}
               w={"250px"}
-              style={{
-                color: "whitesmoke",
-                backgroundColor: "black",
-                fontSize: "1.1rem",
-                fontWeight: "900",
-              }}
               onClick={handleEditClick}
               isDisabled={editChangeCheck}
             >

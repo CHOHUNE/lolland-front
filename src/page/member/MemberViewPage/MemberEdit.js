@@ -42,6 +42,18 @@ export function MemberEdit() {
     },
   };
 
+  // readonly input 스타일
+  const readOnlyStyle = {
+    style: {
+      boxShadow: "1px 1px 3px 2px #dadce0 inset",
+      width: "500px",
+      height: "50px",
+      borderRadius: "6px",
+      textIndent: "15px",
+      fontSize: "16px",
+    },
+  };
+
   const fileInputRef = useRef();
 
   // 맴버 고유 id --------------------------------------------------------------------------------
@@ -126,6 +138,23 @@ export function MemberEdit() {
   // 이미지 업로드창 가능 불가능 하게 바꾸기
   const [fileInputStatus, setFileInputStatus] = useState(false);
 
+  // 이메일 수정 중복 확인 번호 상태 (처음은 true -> 이메일이 변경 되면 false) -> true 상태여야 수정 하기가 활성화
+  const [emailOverlapStatus, setEmailOverlapStatus] = useState(true);
+
+  // 인증번호 발송 보일지 안보일지 상태
+  const [sendCodeStatus, setSendCodeStatus] = useState(false);
+
+  // 인증번호 입력 칸이 보일지 안보일지 상태
+  const [inputRandomStatus, setInputRandomStatus] = useState(false);
+
+  // 인증번호 생성
+  const [randomNumber, setRandomNumber] = useState("");
+  // 생성된 인증번호 비교군
+  const [randomNumberCheck, setRandomNumberCheck] = useState("");
+
+  // 인증 번호 확인 상태 값
+  const [emailCodeCheckedState, setEmailCodeCheckedState] = useState(true);
+
   useEffect(() => {
     axios.get("/api/member/memberInfo").then((response) => {
       setId(response.data.id);
@@ -185,19 +214,34 @@ export function MemberEdit() {
 
   // 핸드폰 인풋 1 ---------------------------------------------------------------------------------------
   const handlePhoneInput1Change = (e) => {
-    setEditChangeCheck(false);
-    setMember_phone_number1(e.target.value);
-    if (e.target.value.length === 3) {
-      phoneInput2Ref.current.focus();
+    const inputValue = e.target.value;
+    if (inputValue.length <= 3) {
+      setMember_phone_number1(inputValue);
+      setEditChangeCheck(false);
+      if (inputValue.length === 3) {
+        phoneInput2Ref.current.focus();
+      }
     }
   };
 
   // 핸드폰 인풋 2 ---------------------------------------------------------------------------------------
   const handlePhoneInput2Change = (e) => {
-    setEditChangeCheck(false);
-    setMember_phone_number2(e.target.value);
-    if (e.target.value.length === 4) {
-      phoneInput3Ref.current.focus();
+    const inputValue = e.target.value;
+    if (inputValue.length <= 4) {
+      setMember_phone_number2(inputValue);
+      setEditChangeCheck(false);
+      if (inputValue.length === 4) {
+        phoneInput3Ref.current.focus();
+      }
+    }
+  };
+
+  // 핸드폰 인풋 3 ---------------------------------------------------------------------------------------
+  const handlePhoneInput3Change = (e) => {
+    const inputValue = e.target.value;
+    if (inputValue.length <= 4) {
+      setMember_phone_number3(inputValue);
+      setEditChangeCheck(false);
     }
   };
 
@@ -261,6 +305,63 @@ export function MemberEdit() {
     }
   }
 
+  // 이메일 중복 확인 클릭시 로직
+  function handleEmailCheckClick() {
+    axios
+      .get("/api/memberEmail/emailCheck", {
+        params: {
+          member_email,
+        },
+      })
+      .then(() => {
+        toast({ description: "사용 가능한 이메일 입니다.", status: "success" });
+      })
+      .then(() => {
+        setSendCodeStatus(true);
+        setEmailOverlapStatus(true);
+      })
+      .catch(() => {
+        toast({ description: "이미 사용중인 이메일 입니다.", status: "error" });
+      });
+  }
+
+  // 인증번호 발송 클릭
+  function handleSendEmailCodeClick() {
+    setRandomNumberCheck("");
+    const newRandomNumber = Math.floor(Math.random() * 100000); // 새로운 난수 생성
+    setRandomNumber(newRandomNumber);
+    setInputRandomStatus(true);
+
+    axios
+      .post("/api/memberEmail/sendCodeMail", {
+        member_email,
+        message: newRandomNumber,
+      })
+      .then(() => {
+        toast({
+          description: "인증번호를 입력해주세요.",
+          status: "success",
+        });
+      })
+      .catch(() => {
+        toast({
+          description: "인증번호 발송중 문제가 발생하였습니다.",
+          status: "error",
+        });
+      });
+  }
+
+  // 인증 번호 확인 클릭
+  function handleCodeCheckClick() {
+    if (randomNumberCheck === randomNumber.toString()) {
+      toast({ description: "인증번호가 맞았습니다.", status: "success" });
+      setEmailCodeCheckedState(true);
+    } else {
+      toast({ description: "인증번호가 틀렸습니다.", status: "error" });
+      setEmailCodeCheckedState(false);
+    }
+  }
+
   return (
     <Center>
       <Card w={"700px"}>
@@ -281,10 +382,13 @@ export function MemberEdit() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 프로필 사진
               </FormLabel>
-              <Image
-                borderRadius="full"
-                boxSize="200px"
+              <img
                 src={file_url}
+                style={{
+                  borderRadius: "100%",
+                  blockSize: "200px",
+                  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.5)",
+                }}
                 alt={file_name}
               />
               <Checkbox
@@ -362,17 +466,7 @@ export function MemberEdit() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 이 름
               </FormLabel>
-              <input
-                style={{
-                  boxShadow: "1px 1px 3px 1px #dadce0 inset",
-                  width: "500px",
-                  height: "50px",
-                  borderRadius: "6px",
-                  textIndent: "15px",
-                }}
-                readOnly
-                value={member_name}
-              />
+              <input {...readOnlyStyle} readOnly value={member_name} />
             </Flex>
           </FormControl>
 
@@ -382,14 +476,7 @@ export function MemberEdit() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 아이디
               </FormLabel>
-              <Input
-                {...inputStyle}
-                w={"500px"}
-                h={"50px"}
-                borderRadius={"0"}
-                readOnly
-                value={member_login_id}
-              />
+              <input {...readOnlyStyle} readOnly value={member_login_id} />
             </Flex>
             <Center mb={4}>
               <FormHelperText fontSize={"1.1rem"}>
@@ -471,10 +558,7 @@ export function MemberEdit() {
                 h={"50px"}
                 {...inputStyle}
                 value={member_phone_number3}
-                onChange={(e) => {
-                  setMember_phone_number3(e.target.value);
-                  setEditChangeCheck(false);
-                }}
+                onChange={handlePhoneInput3Change}
               />
             </Flex>
           </FormControl>
@@ -487,12 +571,15 @@ export function MemberEdit() {
               </FormLabel>
               <Input
                 id="member_email1"
-                w={"225px"}
+                w={"150px"}
                 h={"50px"}
                 {...inputStyle}
                 value={member_email1}
                 onChange={(e) => {
                   setMember_email1(e.target.value);
+                  setEmailOverlapStatus(false);
+                  setSendCodeStatus(false);
+                  setEmailCodeCheckedState(false);
                   setEditChangeCheck(false);
                 }}
               />
@@ -506,17 +593,93 @@ export function MemberEdit() {
               </Box>
               <Input
                 id="member_email2"
-                w={"225px"}
+                w={"150px"}
                 h={"50px"}
                 {...inputStyle}
                 value={member_email2}
                 onChange={(e) => {
                   setMember_email2(e.target.value);
+                  setEmailOverlapStatus(false);
+                  setSendCodeStatus(false);
                   setEditChangeCheck(false);
                 }}
               />
+              <Button
+                {...buttonStyle}
+                isDisabled={emailOverlapStatus}
+                w={"140px"}
+                h={"50px"}
+                ml={"10px"}
+                onClick={handleEmailCheckClick}
+              >
+                중복확인
+              </Button>
             </Flex>
+
+            {/* 인증번호 발송 버튼 */}
+            {sendCodeStatus && (
+              <Flex justifyContent={"center"} mt={2} mb={4}>
+                <Button
+                  w={"600px"}
+                  h={"50px"}
+                  colorScheme={"orange"}
+                  color={"black"}
+                  shadow={"1px 1px 3px 1px #dadce0"}
+                  _hover={{
+                    backgroundColor: "whitesmoke",
+                    color: "black",
+                    transition:
+                      "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+                    shadow: "1px 1px 3px 1px #dadce0 inset",
+                  }}
+                  onClick={handleSendEmailCodeClick}
+                >
+                  인증번호 발송
+                </Button>
+              </Flex>
+            )}
           </FormControl>
+
+          {/* 인증번호 입력 */}
+          {inputRandomStatus && (
+            <FormControl mt={2}>
+              <Flex justifyContent={"center"}>
+                <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
+                  인증번호 입력
+                </FormLabel>
+                <Input
+                  shadow={"1px 1px 3px 1px #dadce0 inset"}
+                  placeholder={"메일로 전송된 인증번호를 입력해 주세요."}
+                  w={"350px"}
+                  h={"50px"}
+                  type={"number"}
+                  value={randomNumberCheck}
+                  onChange={(e) => {
+                    setRandomNumberCheck(e.target.value);
+                  }}
+                />
+                <Button
+                  bg={"black"}
+                  color={"whitesmoke"}
+                  isDisabled={emailCodeCheckedState}
+                  ml={"10px"}
+                  w={"140px"}
+                  h={"50px"}
+                  onClick={handleCodeCheckClick}
+                  shadow={"1px 1px 3px 1px #dadce0"}
+                  _hover={{
+                    backgroundColor: "whitesmoke",
+                    color: "black",
+                    transition:
+                      "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+                    shadow: "1px 1px 3px 1px #dadce0 inset",
+                  }}
+                >
+                  인증번호 확인
+                </Button>
+              </Flex>
+            </FormControl>
+          )}
 
           {/* 우편번호 */}
           <FormControl mt={2}>
@@ -524,11 +687,17 @@ export function MemberEdit() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 우편번호
               </FormLabel>
-              <Input
-                w={"350px"}
-                h={"50px"}
+              <input
+                style={{
+                  boxShadow: "1px 1px 3px 2px #dadce0 inset",
+                  width: "350px",
+                  height: "50px",
+                  borderRadius: "6px",
+                  textIndent: "15px",
+                  fontSize: "16px",
+                }}
                 readOnly
-                defaultValue={member_post_code}
+                value={member_post_code}
               />
               <Button
                 w={"140px"}
@@ -548,12 +717,7 @@ export function MemberEdit() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 주소
               </FormLabel>
-              <Input
-                w={"500px"}
-                h={"50px"}
-                readOnly
-                defaultValue={member_address}
-              />
+              <input {...readOnlyStyle} readOnly value={member_address} />
             </Flex>
           </FormControl>
           {/* 상세주소 */}
@@ -625,7 +789,9 @@ export function MemberEdit() {
                 fontWeight: "900",
               }}
               onClick={handleEditClick}
-              isDisabled={editChangeCheck}
+              isDisabled={
+                editChangeCheck || !emailOverlapStatus || !emailCodeCheckedState
+              }
             >
               수정 하기
             </Button>
