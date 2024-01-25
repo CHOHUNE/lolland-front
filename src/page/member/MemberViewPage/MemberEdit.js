@@ -42,6 +42,18 @@ export function MemberEdit() {
     },
   };
 
+  // readonly input 스타일
+  const readOnlyStyle = {
+    style: {
+      boxShadow: "1px 1px 3px 2px #dadce0 inset",
+      width: "500px",
+      height: "50px",
+      borderRadius: "6px",
+      textIndent: "15px",
+      fontSize: "16px",
+    },
+  };
+
   const fileInputRef = useRef();
 
   // 맴버 고유 id --------------------------------------------------------------------------------
@@ -281,10 +293,13 @@ export function MemberEdit() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 프로필 사진
               </FormLabel>
-              <Image
-                borderRadius="full"
-                boxSize="200px"
+              <img
                 src={file_url}
+                style={{
+                  borderRadius: "100%",
+                  blockSize: "200px",
+                  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.5)",
+                }}
                 alt={file_name}
               />
               <Checkbox
@@ -362,17 +377,7 @@ export function MemberEdit() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 이 름
               </FormLabel>
-              <input
-                style={{
-                  boxShadow: "1px 1px 3px 1px #dadce0 inset",
-                  width: "500px",
-                  height: "50px",
-                  borderRadius: "6px",
-                  textIndent: "15px",
-                }}
-                readOnly
-                value={member_name}
-              />
+              <input {...readOnlyStyle} readOnly value={member_name} />
             </Flex>
           </FormControl>
 
@@ -382,14 +387,7 @@ export function MemberEdit() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 아이디
               </FormLabel>
-              <Input
-                {...inputStyle}
-                w={"500px"}
-                h={"50px"}
-                borderRadius={"0"}
-                readOnly
-                value={member_login_id}
-              />
+              <input {...readOnlyStyle} readOnly value={member_login_id} />
             </Flex>
             <Center mb={4}>
               <FormHelperText fontSize={"1.1rem"}>
@@ -524,11 +522,17 @@ export function MemberEdit() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 우편번호
               </FormLabel>
-              <Input
-                w={"350px"}
-                h={"50px"}
+              <input
+                style={{
+                  boxShadow: "1px 1px 3px 2px #dadce0 inset",
+                  width: "350px",
+                  height: "50px",
+                  borderRadius: "6px",
+                  textIndent: "15px",
+                  fontSize: "16px",
+                }}
                 readOnly
-                defaultValue={member_post_code}
+                value={member_post_code}
               />
               <Button
                 w={"140px"}
@@ -548,12 +552,7 @@ export function MemberEdit() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 주소
               </FormLabel>
-              <Input
-                w={"500px"}
-                h={"50px"}
-                readOnly
-                defaultValue={member_address}
-              />
+              <input {...readOnlyStyle} readOnly value={member_address} />
             </Flex>
           </FormControl>
           {/* 상세주소 */}
