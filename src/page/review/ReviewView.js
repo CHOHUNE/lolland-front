@@ -72,17 +72,12 @@ const Star = ({ initialRate, onRateChange, isEditing }) => {
   // 만약 사용자가 새로운 rate로 변경하면 onClick을 통해 currentRate 수정
   // 만약 사용자가 같은 rate를 반복해서 누르면 (currentRate === ratingValue) 0으로 변경
   const handleClick = (ratingValue) => {
-    console.log("===================");
-    console.log("ratingValue: " + ratingValue);
-    console.log("currentRate: " + currentRate);
     if (isEditing) {
       const newRating = currentRate === ratingValue ? 0 : ratingValue;
-      console.log("newRating: " + newRating);
       // currentRate = newRating;
       setCurrentRate(newRating);
       onRateChange(newRating);
     }
-    console.log("new Current rate: " + currentRate);
   };
 
   const realRate = isEditing ? currentRate : initialRate;
@@ -130,7 +125,6 @@ export const ReviewView = ({ product_id, productDetailImg }) => {
   }, [page]);
 
   function fetchReview() {
-    console.log("fetchReview Triggered");
     axios
       .get("/api/review/fetch", {
         params: { product_id: product_id, page: page },
@@ -218,7 +212,6 @@ export const ReviewView = ({ product_id, productDetailImg }) => {
 
   // 수정된 리뷰 전송
   function updateReview(editedReview) {
-    console.log(editedReview);
     axios
       .put("/api/review/update", {
         review_id: editedReview.review_id,

@@ -5,14 +5,23 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  border,
   Box,
   Button,
   Flex,
+  Heading,
   Image,
   Input,
   InputGroup,
   InputLeftElement,
   InputRightElement,
+  List,
+  ListItem,
   Select,
   SimpleGrid,
   Spinner,
@@ -183,98 +192,127 @@ export function CompanyList() {
   };
 
   return (
-    <Box mt={5} border="1px dashed red">
-      <SearchComponent />
-      <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
-        <Flex
-          w="80%"
-          display={"flex"}
-          justifyContent={"center"}
-          alignItems={"center"}
-        >
-          <Box
-            position="fixed"
-            top="300"
-            right="2"
-            zIndex="10"
-            p="4"
-            bg="rgba(255, 255, 255, 0.1)"
-            boxShadow="lg"
-            maxW="sm"
-            overflow="hidden"
-            borderRadius="15px"
-          >
-            <Recent />
-          </Box>
-          <SimpleGrid h={"100%"} w={"100%"} columns={4} spacing={9} m={10}>
-            {productList.map((product, index) => (
-              <Box
-                key={index}
-                onMouseEnter={() => {
-                  if (product.mainImgs && product.mainImgs.length > 1) {
-                    setHoveredBoardId(product.product_id);
-                  }
-                }}
-                onMouseLeave={() => setHoveredBoardId(null)}
-                borderRadius="10px"
-                boxShadow="md"
-                _hover={{
-                  cursor: "pointer",
-                }}
-                overflow="hidden"
-                onClick={() => navigate("/product/" + product.product_id)}
-                border={"1px solid gray"}
-                alignItems={"center"}
-                h={"100%"}
-              >
-                <Box
-                  position="relative"
-                  p={5}
-                  height="200px"
-                  width="100%"
-                  bg="white"
-                  display={"flex"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                >
-                  {/* 기본 이미지 */}
-                  <Image
-                    position="absolute"
-                    src={product.mainImgs[0]?.main_img_uri}
-                    alt="Board Image"
-                    width="100%"
-                    height="100%"
-                    zIndex={1}
-                    transition="opacity 0.5s ease-in-out"
-                    opacity={product.id === hoveredBoardId ? 0 : 1}
-                  />
-                  {/* 호버 시 이미지 */}
-                  <Image
-                    position="absolute"
-                    src={product.mainImgs[1]?.main_img_uri}
-                    alt="Hover Image"
-                    width="100%"
-                    height="100%"
-                    zIndex={2}
-                    transition="opacity 0.5s ease-in-out"
-                    opacity={product.product_id === hoveredBoardId ? 1 : 0}
-                  />
-                </Box>
+    <>
+      <Flex w="25%" flexDir="column">
+        <Heading size="lg">company_name</Heading>
+        <Heading size="xs" mt={3} mb={5}>
+          별별별별 회사 상품 별점 평균(총 별점 갯수)
+        </Heading>
+        <Accordion allowMultiple defaultIndex={[0]} id="myAccordian">
+          <AccordionItem className="accordianItem">
+            {({ isExpanded }) => (
+              <>
+                <AccordionButton>
+                  <Box as="span" flex="1" textAlign="left" fontWeight="bold">
+                    회사가 파는 대분류
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel whiteSpace="pre-wrap" pb={4}>
+                  <List spacing={3}>
+                    <ListItem>해당 대분류의 소분류</ListItem>
+                    <ListItem>해당 대분류의 소분류</ListItem>
+                  </List>
+                </AccordionPanel>
+              </>
+            )}
+          </AccordionItem>
+        </Accordion>
+      </Flex>
 
-                <Flex direction="column" p={4} justifyContent={"center"}>
-                  <Text>
-                    [{product.company_name}] {product.product_name}
-                  </Text>
-                  <Text mt={2} fontWeight={"bold"} fontSize={"1.2rem"}>
-                    {formatPrice(product.product_price)}원
-                  </Text>
-                </Flex>
-              </Box>
-            ))}
-          </SimpleGrid>
-        </Flex>
+      <Box mt={5} border="1px dashed red">
+        <SearchComponent />
+        <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
+          <Flex
+            w="80%"
+            display={"flex"}
+            justifyContent={"center"}
+            alignItems={"center"}
+          >
+            <Box
+              position="fixed"
+              top="300"
+              right="2"
+              zIndex="10"
+              p="4"
+              bg="rgba(255, 255, 255, 0.1)"
+              boxShadow="lg"
+              maxW="sm"
+              overflow="hidden"
+              borderRadius="15px"
+            >
+              <Recent />
+            </Box>
+            <SimpleGrid h={"100%"} w={"100%"} columns={4} spacing={9} m={10}>
+              {productList.map((product, index) => (
+                <Box
+                  key={index}
+                  onMouseEnter={() => {
+                    if (product.mainImgs && product.mainImgs.length > 1) {
+                      setHoveredBoardId(product.product_id);
+                    }
+                  }}
+                  onMouseLeave={() => setHoveredBoardId(null)}
+                  borderRadius={0}
+                  boxShadow="md"
+                  _hover={{
+                    cursor: "pointer",
+                  }}
+                  overflow="hidden"
+                  onClick={() => navigate("/product/" + product.product_id)}
+                  border={"1px solid #E8E8E8"}
+                  alignItems={"center"}
+                  h={"100%"}
+                >
+                  <Box
+                    position="relative"
+                    p={5}
+                    height="200px"
+                    width="100%"
+                    bg="white"
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                  >
+                    {/* 기본 이미지 */}
+                    <Image
+                      position="absolute"
+                      src={product.mainImgs[0]?.main_img_uri}
+                      alt="Board Image"
+                      width="100%"
+                      height="100%"
+                      zIndex={1}
+                      transition="opacity 0.5s ease-in-out"
+                      opacity={product.id === hoveredBoardId ? 0 : 1}
+                    />
+                    {/* 호버 시 이미지 */}
+                    <Image
+                      position="absolute"
+                      src={product.mainImgs[1]?.main_img_uri}
+                      alt="Hover Image"
+                      width="100%"
+                      height="100%"
+                      zIndex={2}
+                      transition="opacity 0.5s ease-in-out"
+                      opacity={product.product_id === hoveredBoardId ? 1 : 0}
+                    />
+                  </Box>
+
+                  <Flex direction="column" p={4} justifyContent={"center"}>
+                    <Text>
+                      [{product.company_name}] {product.product_name}
+                    </Text>
+                    <Text mt={2} fontWeight={"bold"} fontSize={"1.2rem"}>
+                      {formatPrice(product.product_price)}원
+                    </Text>
+                  </Flex>
+                </Box>
+              ))}
+            </SimpleGrid>
+          </Flex>
+        </Box>
+        <Pagination pageInfo={pageInfo} />
       </Box>
-      <Pagination pageInfo={pageInfo} />
-    </Box>
+    </>
   );
 }

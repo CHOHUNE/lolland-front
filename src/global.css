@@ -15,3 +15,8 @@
 body {
     font-family: 'GmarketSansMedium', sans-serif;
 }
+
+#myAccordian .accordianItem {
+    border-top-width: 0px;
+    border-bottom-width: 0px;
+}
