@@ -22,7 +22,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp } from "@fortawesome/free-regular-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export function MemberBoardLike() {
   // 버튼 css
@@ -52,8 +52,10 @@ export function MemberBoardLike() {
 
   const navigate = useNavigate();
 
+  const [params] = useSearchParams();
+
   useEffect(() => {
-    axios.get("/api/member/getGameBoardLike").then((response) => {
+    axios.get("/api/member/getGameBoardLike?" + params).then((response) => {
       setGameBoardList(response.data);
     });
   }, [deletedLikeStatus]);
@@ -63,9 +65,6 @@ export function MemberBoardLike() {
     axios
       .delete("/api/member/deleteGameBoardLike", {
         data: [gameBoardId],
-        // headers: {
-        //   "Content-Type": "application/json",
-        // },
       })
       .then(() => {
         setDeletedLikeStatus((prev) => !prev);
