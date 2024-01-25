@@ -230,38 +230,38 @@ export function ProductPay() {
   }, []);
 
   // ------------------------------ 결제버튼 클릭시 서버로 전송되는 로직 ------------------------------
-  const handlePayment = async () => {
-    const orderData = {
-      productName: purchaseInfo.productName,
-      optionName: purchaseInfo.selectedOptions
-        .map((opt) => opt.option_name)
-        .join(", "),
-      price: purchaseInfo.totalOptionPrice,
-      quantity: purchaseInfo.selectedOptions
-        .map((opt) => opt.quantity)
-        .join(", "),
-      shippingFee: purchaseInfo.shippingFee,
-      receiver: userInfo.receiver,
-      contact: `${contactFirst}-${contactMiddle}-${contactLast}`,
-      postalCode: userInfo.postalCode,
-      basicAddress: userInfo.basicAddress,
-      detailAddress: userInfo.detailAddress,
-      deliveryMemo: userInfo.deliveryMemo, // 이 값을 state에서 가져오도록 수정해야 합니다.
-      ordererName: userInfo.receiver, // 주문자명이 userInfo.receiver와 같은지 확인하세요.
-      ordererContact: `${contactFirst}-${contactMiddle}-${contactLast}`, // 주문자 연락처가 이렇게 설정된 것이 맞는지 확인하세요.
-      email: userInfo.email,
-      productPrice: purchaseInfo.totalOptionPrice,
-      totalShippingFee: purchaseInfo.shippingFee,
-      finalPrice: purchaseInfo.totalOptionPrice + purchaseInfo.shippingFee,
-    };
-    try {
-      const response = await axios.post("/api/product/order", orderData);
-      // 성공적으로 전송된 후의 동작 작성. ex): 결제 성공 페이지로 navigate.
-      console.log(response.data); // 서버로부터의 응답 데이터 확인
-    } catch (error) {
-      console.error("에러메세지 :", error);
-    }
-  };
+  // const handlePayment = async () => {
+  //   const orderData = {
+  //     productName: purchaseInfo.productName,
+  //     optionName: purchaseInfo.selectedOptions
+  //       .map((opt) => opt.option_name)
+  //       .join(", "),
+  //     price: purchaseInfo.totalOptionPrice,
+  //     quantity: purchaseInfo.selectedOptions
+  //       .map((opt) => opt.quantity)
+  //       .join(", "),
+  //     shippingFee: purchaseInfo.shippingFee,
+  //     receiver: userInfo.receiver,
+  //     contact: `${contactFirst}-${contactMiddle}-${contactLast}`,
+  //     postalCode: userInfo.postalCode,
+  //     basicAddress: userInfo.basicAddress,
+  //     detailAddress: userInfo.detailAddress,
+  //     deliveryMemo: userInfo.deliveryMemo, // 이 값을 state에서 가져오도록 수정해야 합니다.
+  //     ordererName: userInfo.receiver, // 주문자명이 userInfo.receiver와 같은지 확인하세요.
+  //     ordererContact: `${contactFirst}-${contactMiddle}-${contactLast}`, // 주문자 연락처가 이렇게 설정된 것이 맞는지 확인하세요.
+  //     email: userInfo.email,
+  //     productPrice: purchaseInfo.totalOptionPrice,
+  //     totalShippingFee: purchaseInfo.shippingFee,
+  //     finalPrice: purchaseInfo.totalOptionPrice + purchaseInfo.shippingFee,
+  //   };
+  //   try {
+  //     const response = await axios.post("/api/product/order", orderData);
+  //     // 성공적으로 전송된 후의 동작 작성. ex): 결제 성공 페이지로 navigate.
+  //     console.log(response.data); // 서버로부터의 응답 데이터 확인
+  //   } catch (error) {
+  //     console.error("에러메세지 :", error);
+  //   }
+  // };
 
   return (
     <Box mt={10} mb={10}>
@@ -611,7 +611,7 @@ export function ProductPay() {
                 color={"white"}
                 size="lg"
                 _hover={{ color: "black", bg: "#eeeeee" }}
-                onClick={handlePayment}
+                // onClick={handlePayment}
               >
                 결제하기
               </Button>

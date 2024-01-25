@@ -14,6 +14,7 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
+  Button,
   Divider,
   Flex,
   Heading,
@@ -36,6 +37,10 @@ import {
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
+function SubCategoryPagination() {
+  return null;
+}
+
 export function ProductSubList() {
   const { category_id, subcategory_id } = useParams();
   const toast = useToast();
@@ -52,10 +57,10 @@ export function ProductSubList() {
 
   useEffect(() => {
     axios
-      .get(`/api/product/category/${category_id}/${subcategory_id}`)
+      .get(`/api/product/category/${category_id}/${subcategory_id}?` + params)
       .then((response) => {
-        setProductList(response.data); // response.data.products
-        // setPageInfo(response.data.pageInfo);
+        setProductList(response.data.products); // response.data.products
+        setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
         toast({
@@ -130,6 +135,7 @@ export function ProductSubList() {
                   <List spacing={3}>
                     {categoryList.map((category) => (
                       <ListItem
+                        _hover={{ cursor: "pointer" }}
                         key={category.category_id}
                         onClick={() =>
                           navigate(`/category/${category.category_id}`)
@@ -163,6 +169,7 @@ export function ProductSubList() {
                     {companyList.map((company) => (
                       <ListItem
                         key={company.company_id}
+                        _hover={{ cursor: "pointer" }}
                         onClick={() =>
                           navigate(`/company/${company.company_id}`)
                         }
@@ -241,8 +248,16 @@ export function ProductSubList() {
               </Flex>
             </Box>
           ))}
+          {/*@@*/}
+          <Box>
+            <Button onClick={() => navigate("?p=1")}>1</Button>
+            <Button onClick={() => navigate("?p=2")}>2</Button>
+            <Button onClick={() => navigate("?p=3")}>3</Button>
+          </Box>
         </SimpleGrid>
       </Flex>
+
+      <SubCategoryPagination />
     </Flex>
   );
 }

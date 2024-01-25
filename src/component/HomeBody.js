@@ -42,7 +42,7 @@ export function HomeBody() {
   // 카테고리 불러오기 TODO: 왜??? 서브 카테고리까지 불러와서 누산기 돌리는 건지 질문 카테고리만 가져오는 메소드 따로 있음
   useEffect(() => {
     axios
-      .get("/api/product/category")
+      .get("/api/product/mainCategory")
       .then((response) => {
         const uniqueCategories = response.data.reduce((acc, category) => {
           const existingCategory = acc.find(
@@ -68,24 +68,61 @@ export function HomeBody() {
     setShowAllCategories(!showAllCategories);
   };
 
+  // ------------------------------- 최근본상품 애니메이션 ----------------------------
+  const [scrollPosition, setScrollPosition] = useState(0);
+
+  // 메뉴가 고정될 기준 위치 (예를 들어 배너의 높이 + 상단 메뉴의 높이)
+  const fixedTopPosition = 650;
+
+  // 실제로 메뉴를 고정시킬 위치
+  const stickyTopPosition = 100;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentPosition = window.scrollY;
+      setScrollPosition(currentPosition);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const menuStyle = {
+    position: "fixed",
+    top:
+      scrollPosition > fixedTopPosition
+        ? `${stickyTopPosition}px`
+        : `${fixedTopPosition - scrollPosition}px`,
+    right: "2px",
+    zIndex: 10,
+    padding: "4px",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    boxShadow: "lg",
+    maxWidth: "sm",
+    overflow: "hidden",
+    borderRadius: "15px",
+    transition: "top 0.3s ease-in-out",
+  };
+
   return (
-    <Box>
+    <Box minW={"1400px"}>
       {/* ------------------------ 상단 배너 슬라이드 ------------------------ */}
       <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
         <Box borderRadius={"20px"} background={"white"} w={"90%"} h={"100%"}>
           <SwiperImg />
         </Box>
         <Box
-          position="fixed" // 절대 위치를 사용해 오버레이 설정
-          top="300" // 배너의 상단에서 시작
-          right="2" // 배너의 우측에서 시작
-          zIndex="10" // 다른 요소보다 위에 오도록 z-index 설정
-          p="4" // 패딩 값
-          bg="rgba(255, 255, 255, 0.1)" // 배경색
-          boxShadow="lg" // 그림자 효과
-          maxW="sm" // 최대 너비 설정
-          overflow="hidden" // 내용이 넘치면 숨김
-          borderRadius="15px"
+          // position="fixed" // 절대 위치를 사용해 오버레이 설정
+          // top="300" // 배너의 상단에서 시작
+          // right="2" // 배너의 우측에서 시작
+          // zIndex="10" // 다른 요소보다 위에 오도록 z-index 설정
+          // p="4" // 패딩 값
+          // bg="rgba(255, 255, 255, 0.1)" // 배경색
+          // boxShadow="lg" // 그림자 효과
+          // maxW="sm" // 최대 너비 설정
+          // overflow="hidden" // 내용이 넘치면 숨김
+          // borderRadius="15px"
+          style={menuStyle}
         >
           <Recent />
         </Box>
@@ -171,6 +208,9 @@ export function HomeBody() {
 
               return (
                 <Box
+                  _hover={{
+                    cursor: "pointer",
+                  }}
                   {...categoryStyle}
                   key={category.category_id}
                   onClick={() => navigate(`/category/${category.category_id}`)}

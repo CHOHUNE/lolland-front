@@ -11,6 +11,7 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
+  Button,
   Divider,
   Flex,
   Heading,
@@ -26,6 +27,10 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight, faHouse } from "@fortawesome/free-solid-svg-icons";
 
+function CategoryPagination() {
+  return null;
+}
+
 export function ProductMainList() {
   const { category_id } = useParams();
   const toast = useToast();
@@ -39,12 +44,13 @@ export function ProductMainList() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // @@
     axios
-      .get(`/api/product/category/${category_id}`)
+      .get(`/api/product/category/${category_id}?` + params)
       .then((response) => {
         //페이징 작업 시 list가 아니라 map으로 리턴되므로 해당 코드 변경하기
-        setProductList(response.data); //response.data.products
-        // setPageInfo(response.data.pageInfo);
+        setProductList(response.data.products); //response.data.products
+        setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
         toast({
@@ -109,6 +115,7 @@ export function ProductMainList() {
               py={2}
               px={4}
               _hover={{
+                cursor: "pointer",
                 bgColor: "black",
                 color: "white",
                 transition: "0.4s all ease",
@@ -215,6 +222,8 @@ export function ProductMainList() {
           ))}
         </SimpleGrid>
       </Flex>
+
+      <CategoryPagination />
     </>
   );
 }

@@ -40,7 +40,6 @@ function PageButton({ variant, pageNumber, children }) {
     </Button>
   );
 }
-
 function Pagination({ pageInfo }) {
   const navigate = useNavigate();
   const pageNumbers = [];
