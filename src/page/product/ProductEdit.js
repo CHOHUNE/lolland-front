@@ -194,7 +194,7 @@ export function ProductEdit() {
           description: product.product_name + "상품 변경 되었습니다.",
           status: "success",
         });
-        navigate("/product/list");
+        navigate(-1);
       })
       .catch(() => {
         toast({

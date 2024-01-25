@@ -11,6 +11,7 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
+  Button,
   Divider,
   Flex,
   Heading,
@@ -38,13 +39,16 @@ export function ProductMainList() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  console.log(params.toString());
+
   useEffect(() => {
+    // @@
     axios
-      .get(`/api/product/category/${category_id}`)
+      .get(`/api/product/category/${category_id}?` + params)
       .then((response) => {
         //페이징 작업 시 list가 아니라 map으로 리턴되므로 해당 코드 변경하기
-        setProductList(response.data); //response.data.products
-        // setPageInfo(response.data.pageInfo);
+        setProductList(response.data.products); //response.data.products
+        setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
         toast({
@@ -216,6 +220,12 @@ export function ProductMainList() {
           ))}
         </SimpleGrid>
       </Flex>
+      {/* @@ */}
+      <Box>
+        <Button onClick={() => navigate("?p=1")}>1</Button>
+        <Button onClick={() => navigate("?p=2")}>2</Button>
+        <Button onClick={() => navigate("?p=3")}>3</Button>
+      </Box>
     </>
   );
 }

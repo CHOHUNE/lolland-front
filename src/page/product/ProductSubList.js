@@ -14,6 +14,7 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
+  Button,
   Divider,
   Flex,
   Heading,
@@ -52,10 +53,10 @@ export function ProductSubList() {
 
   useEffect(() => {
     axios
-      .get(`/api/product/category/${category_id}/${subcategory_id}`)
+      .get(`/api/product/category/${category_id}/${subcategory_id}?` + params)
       .then((response) => {
-        setProductList(response.data); // response.data.products
-        // setPageInfo(response.data.pageInfo);
+        setProductList(response.data.products); // response.data.products
+        setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
         toast({
@@ -130,7 +131,7 @@ export function ProductSubList() {
                   <List spacing={3}>
                     {categoryList.map((category) => (
                       <ListItem
-                        _hover={{cursor: "pointer"}}
+                        _hover={{ cursor: "pointer" }}
                         key={category.category_id}
                         onClick={() =>
                           navigate(`/category/${category.category_id}`)
@@ -156,7 +157,10 @@ export function ProductSubList() {
                 <AccordionPanel whiteSpace="pre-wrap" pb={4}>
                   <List spacing={3}>
                     {companyList.map((company) => (
-                      <ListItem _hover={{cursor: "pointer"}} key={company.company_id}>
+                      <ListItem
+                        _hover={{ cursor: "pointer" }}
+                        key={company.company_id}
+                      >
                         {company.company_name}
                       </ListItem>
                     ))}
@@ -231,6 +235,12 @@ export function ProductSubList() {
               </Flex>
             </Box>
           ))}
+          {/*@@*/}
+          <Box>
+            <Button onClick={() => navigate("?p=1")}>1</Button>
+            <Button onClick={() => navigate("?p=2")}>2</Button>
+            <Button onClick={() => navigate("?p=3")}>3</Button>
+          </Box>
         </SimpleGrid>
       </Flex>
     </Flex>

@@ -1,10 +1,24 @@
-import React, { useState } from "react";
-import { Box, Flex, Heading, Image, Text, VStack } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Image,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
 export const Recent = () => {
   const navigate = useNavigate();
   const [recent, setRecent] = useState([]);
+
+  useEffect(() => {
+    // 로컬 스토리지에서 최근 본 상품 목록 로드
+    const loadedRecent = JSON.parse(localStorage.getItem("recent")) || [];
+    setRecent(loadedRecent);
+  }, []);
 
   const truncateText = (str, num) => {
     if (str && str.length > num) {
@@ -13,27 +27,14 @@ export const Recent = () => {
     return str;
   };
 
-  const handleNavigateToProduct = (e, item) => {
-    e.stopPropagation(); // 부모타입으로 이벤트를 안넘기는것
-    navigate(`/product/${item.product_id}`);
-    addRecentViewed(item);
+  const handleNavigateToProduct = (productId) => {
+    navigate(`/product/${productId}`);
   };
 
-  const addRecentViewed = (e, newItem) => {
-    setRecent((prevItems) => {
-      // 이미 목록에 있는 상품인지 확인
-      const isExist = prevItems.some(
-        (item) => item.hid === newItem.hid || item.tid === newItem.tid,
-      );
-
-      // 존재하지 않는 경우에만 목록에 추가
-      if (!isExist) {
-        const updatedItems = [newItem, ...prevItems];
-        localStorage.setItem("recent", JSON.stringify(updatedItems));
-        return updatedItems;
-      }
-
-      return prevItems;
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // 부드러운 스크롤 효과
     });
   };
 
@@ -45,27 +46,28 @@ export const Recent = () => {
       {recent.map((item, index) => (
         <Flex
           key={index}
-          align="center"
+          justifyContent={"center"}
           cursor="pointer"
-          onClick={(e) => handleNavigateToProduct(e, item)}
+          onClick={() => handleNavigateToProduct(item.product_id)}
           borderBottom={"1px solid gray"}
         >
           <VStack>
             <Image
-              src={item.mainImgUrl || "이미지 없음"}
-              alt={item.name}
+              src={item.mainImgUrl || "기본 이미지 URL"}
+              alt={"Product Image"}
               boxSize="50px"
               mb={1}
               mt={1}
             />
-            <Box ml="3">
-              <Text fontWeight="bold" noOfLines={1}>
-                {truncateText(item.product_name || item.product_name, 10)}
-              </Text>
-            </Box>
+            <Text fontWeight="bold" noOfLines={1}>
+              {truncateText(item.productName, 10)}
+            </Text>
           </VStack>
         </Flex>
       ))}
+      <Button w={"100%"} bg={"black"} color="white" onClick={scrollToTop}>
+        TOP
+      </Button>
     </Box>
   );
 };
