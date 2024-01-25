@@ -42,7 +42,7 @@ export function HomeBody() {
   // 카테고리 불러오기
   useEffect(() => {
     axios
-      .get("/api/product/category")
+      .get("/api/product/mainCategory")
       .then((response) => {
         const uniqueCategories = response.data.reduce((acc, category) => {
           const existingCategory = acc.find(
