@@ -21,12 +21,19 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCaretLeft,
+  faCaretRight,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp } from "@fortawesome/free-regular-svg-icons";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 function MemberBoardLikePagination({ pageInfo }) {
   const navigate = useNavigate();
+
+  const [params] = useSearchParams();
+  const listPage = params.get("page");
 
   const pageNumbers = [];
   for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
@@ -35,14 +42,41 @@ function MemberBoardLikePagination({ pageInfo }) {
 
   return (
     <Box>
+      {pageInfo.prvePageNumber && (
+        <Button
+          bg={"white"}
+          color={"black"}
+          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+          onClick={() => navigate("?page=" + pageInfo.prevPageNumber)}
+        >
+          <FontAwesomeIcon icon={faCaretLeft} />
+        </Button>
+      )}
+
       {pageNumbers.map((pageNumber) => (
         <Button
+          bg={listPage === pageNumber.toString() ? "black" : "white"}
+          color={listPage === pageNumber.toString() ? "white" : "black"}
+          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+          ml={2}
           key={pageNumber}
           onClick={() => navigate("?page=" + pageNumber)}
         >
           {pageNumber}
         </Button>
       ))}
+
+      {pageInfo.nextPageNumber && (
+        <Button
+          bg={"white"}
+          color={"black"}
+          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+          ml={2}
+          onClick={() => navigate("?page=" + pageInfo.nextPageNumber)}
+        >
+          <FontAwesomeIcon icon={faCaretRight} />
+        </Button>
+      )}
     </Box>
   );
 }
