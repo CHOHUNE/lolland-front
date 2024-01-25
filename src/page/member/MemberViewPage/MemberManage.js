@@ -24,7 +24,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -48,6 +48,27 @@ export function MemberManage() {
       transition:
         "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
       shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
+  // FormLabel 스타일
+  const formLabelStyle = {
+    width: "100px",
+    height: "50px",
+    lineHeight: "50px",
+    fontSize: "1.1rem",
+    fontWeight: "500",
+  };
+
+  // readonly input 스타일
+  const readOnlyStyle = {
+    style: {
+      boxShadow: "1px 1px 3px 2px #dadce0 inset",
+      width: "600px",
+      height: "50px",
+      borderRadius: "6px",
+      textIndent: "15px",
+      fontSize: "16px",
     },
   };
 
@@ -97,11 +118,15 @@ export function MemberManage() {
           {/* 프로필 사진 */}
           <FormControl mt={4}>
             <Flex>
-              <FormLabel w={"100px"}>프로필 사진</FormLabel>
-              <Image
-                borderRadius="full"
-                boxSize="150px"
+              <FormLabel {...formLabelStyle}>프로필 사진</FormLabel>
+
+              <img
                 src={member.memberImageDto.file_url}
+                style={{
+                  borderRadius: "100%",
+                  blockSize: "250px",
+                  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.5)",
+                }}
                 alt={member.memberImageDto.file_name}
               />
             </Flex>
@@ -113,28 +138,29 @@ export function MemberManage() {
           {/* 이름 */}
           <FormControl mt={6}>
             <Flex>
-              <FormLabel w={"100px"}>이름</FormLabel>
-              <Input readOnly value={member.member_name} />
+              <FormLabel {...formLabelStyle}>이름</FormLabel>
+              <input {...readOnlyStyle} readOnly value={member.member_name} />
             </Flex>
           </FormControl>
 
           {/* 아이디 */}
           <FormControl mt={4}>
             <Flex>
-              <FormLabel w={"100px"}>아이디</FormLabel>
-              <Input readOnly value={member.member_login_id} />
+              <FormLabel {...formLabelStyle}>아이디</FormLabel>
+              <input
+                {...readOnlyStyle}
+                readOnly
+                value={member.member_login_id}
+              />
             </Flex>
           </FormControl>
 
           {/* 휴대폰 번호 */}
           <FormControl mt={4}>
-            <Flex justifyContent={"center"}>
-              <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
-                휴대폰번호
-              </FormLabel>
-              <Input
-                maxLength={3}
-                h={"50px"}
+            <Flex>
+              <FormLabel {...formLabelStyle}>휴대폰번호</FormLabel>
+              <input
+                {...readOnlyStyle}
                 readOnly
                 value={member.member_phone_number}
               />
@@ -144,16 +170,17 @@ export function MemberManage() {
           {/* 이메일 */}
           <FormControl mt={4}>
             <Flex>
-              <FormLabel w={"100px"}>이메일</FormLabel>
-              <Input readOnly value={member.member_email} />
+              <FormLabel {...formLabelStyle}>이메일</FormLabel>
+              <input {...readOnlyStyle} readOnly value={member.member_email} />
             </Flex>
           </FormControl>
 
           {/* 우편번호 */}
           <FormControl mt={4}>
             <Flex>
-              <FormLabel w={"100px"}>우편번호</FormLabel>
-              <Input
+              <FormLabel {...formLabelStyle}>우편번호</FormLabel>
+              <input
+                {...readOnlyStyle}
                 readOnly
                 value={member.memberAddressDto.member_post_code}
               />
@@ -163,16 +190,21 @@ export function MemberManage() {
           {/* 주소 */}
           <FormControl mt={4}>
             <Flex>
-              <FormLabel w={"100px"}>주소</FormLabel>
-              <Input readOnly value={member.memberAddressDto.member_address} />
+              <FormLabel {...formLabelStyle}>주소</FormLabel>
+              <input
+                {...readOnlyStyle}
+                readOnly
+                value={member.memberAddressDto.member_address}
+              />
             </Flex>
           </FormControl>
 
           {/* 상세 주소 */}
           <FormControl mt={4}>
             <Flex>
-              <FormLabel w={"100px"}>상세주소</FormLabel>
-              <Input
+              <FormLabel {...formLabelStyle}>상세주소</FormLabel>
+              <input
+                {...readOnlyStyle}
                 readOnly
                 value={member.memberAddressDto.member_detail_address}
               />
@@ -182,18 +214,34 @@ export function MemberManage() {
           {/* 자기 소개 */}
           <FormControl mt={4}>
             <Flex>
-              <FormLabel w={"100px"}>자기소개</FormLabel>
+              <FormLabel {...formLabelStyle}>자기소개</FormLabel>
               {member.member_introduce.length !== 0 ? (
-                <Textarea
-                  h={"150px"}
+                <textarea
+                  style={{
+                    boxShadow: "1px 1px 3px 2px #dadce0 inset",
+                    width: "600px",
+                    height: "150px",
+                    borderRadius: "6px",
+                    textIndent: "15px",
+                    fontSize: "16px",
+                    paddingTop: "15px",
+                  }}
                   readOnly
                   value={member.member_introduce}
                 />
               ) : (
-                <Textarea
-                  h={"150px"}
+                <textarea
+                  style={{
+                    boxShadow: "1px 1px 3px 2px #dadce0 inset",
+                    width: "600px",
+                    height: "150px",
+                    borderRadius: "6px",
+                    textIndent: "15px",
+                    fontSize: "16px",
+                    paddingTop: "15px",
+                    color: "gray",
+                  }}
                   readOnly
-                  style={{ color: "gray" }}
                   value={"자기 소개를 작성해 주세요."}
                 />
               )}
