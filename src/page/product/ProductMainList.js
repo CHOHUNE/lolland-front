@@ -94,7 +94,6 @@ export function ProductMainList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // @@
     axios
       .get(`/api/product/category/${category_id}?` + params)
       .then((response) => {
