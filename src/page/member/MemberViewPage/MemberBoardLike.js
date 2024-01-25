@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardBody,
+  CardFooter,
   CardHeader,
   Center,
   Checkbox,
@@ -22,7 +23,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp } from "@fortawesome/free-regular-svg-icons";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 export function MemberBoardLike() {
   // 버튼 css
@@ -42,6 +43,9 @@ export function MemberBoardLike() {
   // 회원이 좋아요 한 게임 게시글 목록
   const [gameBoardList, setGameBoardList] = useState([]);
 
+  // 페이지 정보
+  const [pageInfo, setPageInfo] = useState("");
+
   // 좋아요 삭제 인식
   const [deletedLikeStatus, setDeletedLikeStatus] = useState(false);
 
@@ -54,11 +58,14 @@ export function MemberBoardLike() {
 
   const [params] = useSearchParams();
 
+  const location = useLocation();
+
   useEffect(() => {
     axios.get("/api/member/getGameBoardLike?" + params).then((response) => {
-      setGameBoardList(response.data);
+      setGameBoardList(response.data.gameBoardLikeList);
+      setPageInfo(response.data.pageInfo);
     });
-  }, [deletedLikeStatus]);
+  }, [deletedLikeStatus, location]);
 
   // 게임 좋아요 하나 삭제
   const handleLikeDeleteClick = (gameBoardId) => {
@@ -233,6 +240,13 @@ export function MemberBoardLike() {
             </Tbody>
           </Table>
         </CardBody>
+
+        <Center>
+          <CardFooter>
+            <Button onClick={() => navigate("?page=1")}>1</Button>
+            <Button onClick={() => navigate("?page=2")}>2</Button>
+          </CardFooter>
+        </Center>
       </Card>
     </Center>
   );
