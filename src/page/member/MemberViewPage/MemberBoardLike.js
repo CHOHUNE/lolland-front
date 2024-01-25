@@ -8,6 +8,11 @@ import {
   Center,
   Checkbox,
   Flex,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Select,
   Table,
   Tbody,
   Td,
@@ -28,6 +33,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp } from "@fortawesome/free-regular-svg-icons";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
 function MemberBoardLikePagination({ pageInfo }) {
   const navigate = useNavigate();
@@ -77,6 +83,22 @@ function MemberBoardLikePagination({ pageInfo }) {
           <FontAwesomeIcon icon={faCaretRight} />
         </Button>
       )}
+    </Box>
+  );
+}
+
+// 조회 타입
+function QueryCategory() {
+  return (
+    <Box>
+      <Select defaultValue={"전체"} w={"100px"} onChange={() => {}}>
+        <option value="전체">전체</option>
+        <option value="잡담">잡담</option>
+        <option value="질문">질문</option>
+        <option value="정보">정보</option>
+        <option value="공지">공지</option>
+        <option>본문</option>
+      </Select>
     </Box>
   );
 }
@@ -224,6 +246,10 @@ export function MemberBoardLike() {
             </Flex>
           </Center>
         </CardHeader>
+
+        <CardBody>
+          <QueryCategory />
+        </CardBody>
 
         <CardBody>
           <Table textAlign={"center"}>
