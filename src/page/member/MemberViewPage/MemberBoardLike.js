@@ -25,6 +25,28 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp } from "@fortawesome/free-regular-svg-icons";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
+function MemberBoardLikePagination({ pageInfo }) {
+  const navigate = useNavigate();
+
+  const pageNumbers = [];
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <Box>
+      {pageNumbers.map((pageNumber) => (
+        <Button
+          key={pageNumber}
+          onClick={() => navigate("?page=" + pageNumber)}
+        >
+          {pageNumber}
+        </Button>
+      ))}
+    </Box>
+  );
+}
+
 export function MemberBoardLike() {
   // 버튼 css
   const buttonStyle = {
@@ -243,8 +265,7 @@ export function MemberBoardLike() {
 
         <Center>
           <CardFooter>
-            <Button onClick={() => navigate("?page=1")}>1</Button>
-            <Button onClick={() => navigate("?page=2")}>2</Button>
+            <MemberBoardLikePagination pageInfo={pageInfo} />
           </CardFooter>
         </Center>
       </Card>
