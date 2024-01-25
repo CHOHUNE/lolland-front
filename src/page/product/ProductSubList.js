@@ -116,8 +116,8 @@ export function ProductSubList() {
       </Breadcrumb>
       <Divider border="1px solid black" my={5} />
       <Flex justifyContent="space-between">
-        <Accordion allowMultiple w="20%" defaultIndex={[0, 1]}>
-          <AccordionItem>
+        <Accordion id="myAccordian" allowMultiple w="20%" defaultIndex={[0, 1]}>
+          <AccordionItem className="accordianItem">
             {({ isExpanded }) => (
               <>
                 <AccordionButton>
@@ -134,6 +134,12 @@ export function ProductSubList() {
                         onClick={() =>
                           navigate(`/category/${category.category_id}`)
                         }
+                        opacity={category.category_id == category_id ? 1 : 0.5} //TODO: 왜 toString 아닐 때 적용 안 되는지 물어보기 (=== 세개는 타입까지 비교함, ==는 타입 비교 안함)
+                        fontWeight={
+                          category.category_id == category_id
+                            ? "bold"
+                            : "normal"
+                        }
                       >
                         {category.category_name}
                       </ListItem>
@@ -143,7 +149,7 @@ export function ProductSubList() {
               </>
             )}
           </AccordionItem>
-          <AccordionItem>
+          <AccordionItem className="accordianItem">
             {({ isExpanded }) => (
               <>
                 <AccordionButton>
@@ -155,7 +161,12 @@ export function ProductSubList() {
                 <AccordionPanel whiteSpace="pre-wrap" pb={4}>
                   <List spacing={3}>
                     {companyList.map((company) => (
-                      <ListItem key={company.company_id}>
+                      <ListItem
+                        key={company.company_id}
+                        onClick={() =>
+                          navigate(`/company/${company.company_id}`)
+                        }
+                      >
                         {company.company_name}
                       </ListItem>
                     ))}

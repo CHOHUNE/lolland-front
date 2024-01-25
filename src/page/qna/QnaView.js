@@ -45,7 +45,6 @@ function PageButton({ variant, pageNumber, children, product_id }) {
   function handleClick() {
     params.set("product_id", product_id);
     params.set("p", pageNumber);
-    console.log(params.get("p"));
     navigate("?" + params);
   }
 
@@ -142,17 +141,14 @@ export function QnaView({
   }, [location]);
 
   function fetchQna() {
-    console.log("location" + location);
     const params = new URLSearchParams(location.search);
     params.set("product_id", product_id);
     params.set("k", keyword);
     params.set("c", category);
-    console.log(params);
 
     axios
       .get("/api/qna/list?" + params)
       .then((response) => {
-        console.log(response);
         setQnaList(response.data.qnaList);
         setPageInfo(response.data.pageInfo);
       })
@@ -178,8 +174,6 @@ export function QnaView({
           });
         }
       });
-    console.log(qnaList);
-    console.log(pageInfo);
   }
 
   const handleToggle = (questionId) => {
@@ -202,7 +196,6 @@ export function QnaView({
         },
       })
       .then((response) => {
-        console.log(response.data);
         setQnaList(response.data);
       })
       .catch((error) => {

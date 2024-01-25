@@ -39,7 +39,7 @@ export function HomeBody() {
   const toast = useToast();
   const [showAllCategories, setShowAllCategories] = useState(false);
 
-  // 카테고리 불러오기
+  // 카테고리 불러오기 TODO: 왜??? 서브 카테고리까지 불러와서 누산기 돌리는 건지 질문 카테고리만 가져오는 메소드 따로 있음
   useEffect(() => {
     axios
       .get("/api/product/category")
