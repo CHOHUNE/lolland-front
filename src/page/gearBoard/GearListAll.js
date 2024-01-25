@@ -33,10 +33,10 @@ export function GearListAll({ category }) {
         <Thead>
           <Tr>
             <Td>추천</Td>
-            <Td>카테고리</Td>
+            {/*<Td>카테고리</Td>*/}
             <Td>제목</Td>
             <Td>컨텐츠</Td>
-            <Td>날짜</Td>
+            {/*<Td>날짜</Td>*/}
           </Tr>
         </Thead>
         <Tbody>
@@ -49,9 +49,9 @@ export function GearListAll({ category }) {
                 onClick={() => navigate("/gearlist/gear_id/" + item.gear_id)}
               >
                 <Td>{item.countLike}</Td>
-                <Td>{item.category}</Td>
+                {/*<Td>{item.category}</Td>*/}
                 <Td>
-                  {item.gear_title}
+                  {item.gear_title.slice(0, 30)}
                   {item.countFile > 0 && (
                     <Badge
                       style={{ backgroundColor: "white", color: "orange" }}
@@ -69,8 +69,10 @@ export function GearListAll({ category }) {
                     </Badge>
                   )}
                 </Td>
-                <Td>{item.gear_content}</Td>
-                <Td>{item.gear_inserted}</Td>
+                {/*<Td>{item.gear_content}</Td>*/}
+                <Td>{item.gear_content.slice(0, 90)}</Td>
+
+                {/*<Td>{item.gear_inserted}</Td>*/}
               </Tr>
             ))
           )}
