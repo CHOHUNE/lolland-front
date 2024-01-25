@@ -651,6 +651,7 @@ function GameBoardList() {
               </CardBody>
             </Card>
           </Box>
+          정
         </Box>
       </Flex>
     </Box>
