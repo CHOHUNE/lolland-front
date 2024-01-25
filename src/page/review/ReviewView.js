@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   ButtonGroup,
@@ -353,6 +354,7 @@ export const ReviewView = ({ product_id, productDetailImg }) => {
             reviewList.map((review, index) => (
               <Box key={review.review_id} mx="20%" my={5}>
                 <HStack spacing={5} mb={5}>
+                  <Avatar size="sm" src={review.file_url} />
                   <Text
                     color="white"
                     bgColor="black"

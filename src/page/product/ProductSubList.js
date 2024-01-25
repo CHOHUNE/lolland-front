@@ -134,15 +134,9 @@ export function ProductSubList() {
                         onClick={() =>
                           navigate(`/category/${category.category_id}`)
                         }
-                        opacity={
-                          category.category_id.toString() ===
-                          category_id.toString()
-                            ? 1
-                            : 0.5
-                        } //TODO: 왜 toString 아닐 때 적용 안 되는지 물어보기
+                        opacity={category.category_id == category_id ? 1 : 0.5} //TODO: 왜 toString 아닐 때 적용 안 되는지 물어보기 (=== 세개는 타입까지 비교함, ==는 타입 비교 안함)
                         fontWeight={
-                          category.category_id.toString() ===
-                          category_id.toString()
+                          category.category_id == category_id
                             ? "bold"
                             : "normal"
                         }

@@ -15,6 +15,7 @@ import {
   Button,
   Flex,
   Heading,
+  HStack,
   Image,
   Input,
   InputGroup,
@@ -32,6 +33,7 @@ import {
   faAngleLeft,
   faAngleRight,
   faMagnifyingGlass,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -98,41 +100,20 @@ function Pagination({ pageInfo }) {
 function SearchComponent() {
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
-  const [category, setCategory] = useState("all");
 
   function handleSearch() {
     const params = new URLSearchParams();
     params.set("k", keyword);
-    params.set("c", category);
 
     navigate("?" + params);
   }
 
   return (
-    <>
-      <InputGroup mx="30%" w="40%">
-        <InputLeftElement w="20%">
-          <Select
-            _focus={{
-              shadow: "none",
-              border: "1px solid black",
-            }}
-            _hover={{
-              border: "1px solid black",
-            }}
-            border="1px solid black"
-            borderRadius={0}
-            defaultValue="all"
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="all">전체</option>
-            <option value="product_name">상품명</option>
-          </Select>
-        </InputLeftElement>
+    <Box mt={5}>
+      <InputGroup>
         <Input
           borderRadius={0}
-          textIndent="20%"
-          placeholder="검색어를 입력해주세요"
+          placeholder="검색"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
         />
@@ -140,13 +121,15 @@ function SearchComponent() {
           <FontAwesomeIcon icon={faMagnifyingGlass} color="white" />
         </InputRightElement>
       </InputGroup>
-    </>
+    </Box>
   );
 }
 
 export function CompanyList() {
   const { company_id } = useParams();
   const [productList, setProductList] = useState([]);
+  const [categoryList, setCategoryList] = useState(null);
+  const [companyInfo, setCompanyInfo] = useState([]);
   const navigate = useNavigate();
   const [hoveredBoardId, setHoveredBoardId] = useState(null); // 메인이미지 변경 상태
   const [pageInfo, setPageInfo] = useState(null);
@@ -162,6 +145,20 @@ export function CompanyList() {
       setPageInfo(response.data.pageInfo);
     });
   }, [location]);
+
+  useEffect(() => {
+    axios
+      .get(`/api/product/company/detail/${company_id}`)
+      .then((response) => {
+        const { company_name, avg_rate, total_reviews, categories } =
+          response.data;
+        setCompanyInfo({ company_name, avg_rate, total_reviews });
+        setCategoryList(categories);
+      })
+      .catch((error) => {
+        console.log("실패...ㅠ");
+      });
+  }, [company_id]);
 
   // ---------------------------- 로딩로직 ----------------------------
   const FullPageSpinner = () => {
@@ -191,40 +188,127 @@ export function CompanyList() {
     return new Intl.NumberFormat("ko-KR", { style: "decimal" }).format(price);
   };
 
+  // ------------------------------ 별점 ------------------------------
+  function StarRating({ averageRate }) {
+    const maxRating = 5;
+    const filledStars = Math.floor(averageRate) || 0;
+
+    const stars = Array.from({ length: maxRating }, (_, index) => (
+      <FontAwesomeIcon
+        key={index}
+        icon={faStar}
+        style={{ color: index < filledStars ? "#FFE000" : "#EAEAE7" }}
+      />
+    ));
+
+    return <>{stars}</>;
+  }
+
+  // ------------------------------ 출력란 ------------------------------
+
+  function handleFilter(subcategoryId) {
+    const params = new URLSearchParams();
+    params.set("c", "subcategory");
+    params.set("k", subcategoryId);
+    navigate("?" + params);
+  }
+
   return (
     <>
-      <Flex w="25%" flexDir="column">
-        <Heading size="lg">company_name</Heading>
-        <Heading size="xs" mt={3} mb={5}>
-          별별별별 회사 상품 별점 평균(총 별점 갯수)
-        </Heading>
-        <Accordion allowMultiple defaultIndex={[0]} id="myAccordian">
-          <AccordionItem className="accordianItem">
-            {({ isExpanded }) => (
-              <>
-                <AccordionButton>
-                  <Box as="span" flex="1" textAlign="left" fontWeight="bold">
-                    회사가 파는 대분류
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-                <AccordionPanel whiteSpace="pre-wrap" pb={4}>
-                  <List spacing={3}>
-                    <ListItem>해당 대분류의 소분류</ListItem>
-                    <ListItem>해당 대분류의 소분류</ListItem>
-                  </List>
-                </AccordionPanel>
-              </>
-            )}
-          </AccordionItem>
-        </Accordion>
-      </Flex>
-
-      <Box mt={5} border="1px dashed red">
-        <SearchComponent />
-        <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
+      <Box mt={5} display="flex" justifyContent="space-between">
+        <Flex
+          flexDir="column"
+          w={{ base: "33%", md: "28%", lg: "23%", xl: "18%" }}
+          px={5}
+        >
+          <Box p={3}>
+            <Heading size="lg">
+              {companyInfo ? companyInfo.company_name : ""}
+            </Heading>
+            <HStack mt={3} mb={5}>
+              <Text mr={1}>
+                {companyInfo ? (
+                  companyInfo.avg_rate !== null ? (
+                    <StarRating averageRate={companyInfo.avg_rate} />
+                  ) : (
+                    <StarRating averageRate={0} />
+                  )
+                ) : (
+                  <StarRating averageRate={0} />
+                )}
+              </Text>
+              <Text opacity={0.5}>
+                {companyInfo
+                  ? companyInfo.avg_rate !== null
+                    ? companyInfo.avg_rate
+                    : 0
+                  : 0}
+              </Text>
+              <Text opacity={0.5}>
+                (
+                {companyInfo
+                  ? companyInfo.total_reviews !== null
+                    ? companyInfo.total_reviews
+                    : 0
+                  : 0}
+                )
+              </Text>
+            </HStack>
+          </Box>
+          {categoryList && (
+            <Accordion
+              w={"100%"}
+              allowMultiple
+              defaultIndex={
+                categoryList ? categoryList.map((_, index) => index) : []
+              }
+              id="myAccordian"
+            >
+              {categoryList.length > 0 &&
+                categoryList.map((category) => (
+                  <AccordionItem
+                    key={category.category_id}
+                    className="accordianItem"
+                  >
+                    <AccordionButton>
+                      <Box
+                        as="span"
+                        flex="1"
+                        textAlign="left"
+                        fontWeight="bold"
+                      >
+                        {category.category_name}
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel whiteSpace="pre-wrap" pb={4}>
+                      <List spacing={3}>
+                        {category.subCategory &&
+                          category.subCategory.map((subCategory) => (
+                            <ListItem
+                              key={subCategory.subcategory_id}
+                              onClick={() =>
+                                handleFilter(subCategory.subcategory_id)
+                              } //TODO: 상품 여러개 생긴 후 정상적으로 작동하는지 확인
+                            >
+                              {subCategory.subcategory_name}
+                            </ListItem>
+                          ))}
+                      </List>
+                    </AccordionPanel>
+                  </AccordionItem>
+                ))}
+            </Accordion>
+          )}
+          <SearchComponent />
+        </Flex>
+        <Box
+          w={{ base: "65%", md: "70%", lg: "75%", xl: "80%" }}
+          display={"flex"}
+          justifyContent={"center"}
+          alignItems={"center"}
+        >
           <Flex
-            w="80%"
             display={"flex"}
             justifyContent={"center"}
             alignItems={"center"}
@@ -243,7 +327,7 @@ export function CompanyList() {
             >
               <Recent />
             </Box>
-            <SimpleGrid h={"100%"} w={"100%"} columns={4} spacing={9} m={10}>
+            <SimpleGrid h={"100%"} w={"100%"} columns={4} spacing={5}>
               {productList.map((product, index) => (
                 <Box
                   key={index}
@@ -254,7 +338,6 @@ export function CompanyList() {
                   }}
                   onMouseLeave={() => setHoveredBoardId(null)}
                   borderRadius={0}
-                  boxShadow="md"
                   _hover={{
                     cursor: "pointer",
                   }}
@@ -263,6 +346,7 @@ export function CompanyList() {
                   border={"1px solid #E8E8E8"}
                   alignItems={"center"}
                   h={"100%"}
+                  p={2}
                 >
                   <Box
                     position="relative"
@@ -311,8 +395,8 @@ export function CompanyList() {
             </SimpleGrid>
           </Flex>
         </Box>
-        <Pagination pageInfo={pageInfo} />
       </Box>
+      <Pagination pageInfo={pageInfo} />
     </>
   );
 }
