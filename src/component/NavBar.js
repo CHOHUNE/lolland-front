@@ -117,7 +117,7 @@ export function NavBar() {
           <Flex w={"400px"}>
             <ButtonGroup variant="undefined" size="md" alignItems={"center"}>
               <Button onClick={() => navigate("/")}>HOME</Button>
-              <Button>신상품</Button>
+              <Button onClick={() => navigate("/product/list/")}>신상품</Button>
               <Button>인기글</Button>
               <Button>이벤트</Button>
             </ButtonGroup>

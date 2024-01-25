@@ -502,7 +502,11 @@ export function ProductView() {
 
             <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
               <HStack mt={3} mb={3}>
-                <FormLabel w={"100px"} fontWeight="bold">
+                <FormLabel
+                  w={"100px"}
+                  fontWeight="bold"
+                  onClick={() => navigate(`/company/${product.company_id}`)}
+                >
                   제조사
                 </FormLabel>
                 <Text fontWeight={400} mt={-2} border={"none"} flex={1}>
