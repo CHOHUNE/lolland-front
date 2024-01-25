@@ -37,6 +37,10 @@ import {
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
+function SubCategoryPagination() {
+  return null;
+}
+
 export function ProductSubList() {
   const { category_id, subcategory_id } = useParams();
   const toast = useToast();
@@ -243,6 +247,8 @@ export function ProductSubList() {
           </Box>
         </SimpleGrid>
       </Flex>
+
+      <SubCategoryPagination />
     </Flex>
   );
 }

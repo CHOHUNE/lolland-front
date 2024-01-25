@@ -27,6 +27,10 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight, faHouse } from "@fortawesome/free-solid-svg-icons";
 
+function CategoryPagination() {
+  return null;
+}
+
 export function ProductMainList() {
   const { category_id } = useParams();
   const toast = useToast();
@@ -38,8 +42,6 @@ export function ProductMainList() {
   const [params] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-
-  console.log(params.toString());
 
   useEffect(() => {
     // @@
@@ -220,12 +222,8 @@ export function ProductMainList() {
           ))}
         </SimpleGrid>
       </Flex>
-      {/* @@ */}
-      <Box>
-        <Button onClick={() => navigate("?p=1")}>1</Button>
-        <Button onClick={() => navigate("?p=2")}>2</Button>
-        <Button onClick={() => navigate("?p=3")}>3</Button>
-      </Box>
+
+      <CategoryPagination />
     </>
   );
 }
