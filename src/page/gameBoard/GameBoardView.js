@@ -177,7 +177,7 @@ export function GameBoardView() {
 
   return (
     <Center>
-      <VStack spacing={6} align="start" w="35%" px={4}>
+      <VStack spacing={6} align="start" w="50%" px={4}>
         <HStack spacing={2} w="100%" justify="space-between">
           <Button onClick={() => navigate(-1)}>이전</Button>
           <Spacer />
@@ -244,6 +244,8 @@ export function GameBoardView() {
                   width="100%"
                   paddingX={2}
                   paddingY={2}
+                  fontSize={"1.2rem"}
+                  fontWeight={"bold"}
                 >
                   {board.member_id}의 정보
                 </Box>
@@ -252,16 +254,20 @@ export function GameBoardView() {
             </h2>
             <AccordionPanel pb={4}>
               {writerInfo && (
-                <Flex gap="20px" align="center">
+                <Flex
+                  gap="20px"
+                  alignItems="center"
+                  justifyContent="space-evenly"
+                >
                   <Image
                     borderRadius="full"
-                    boxSize="100px"
+                    boxSize="200px"
                     src={writerInfo.file_url}
                     alt="프로필 이미지"
                   />
 
                   <VStack align="start">
-                    <Text fontSize="lg" fontWeight="bold">
+                    <Text fontSize="1.2rem" fontWeight="bold">
                       {writerInfo.member_name}
                     </Text>
                     <Text fontSize="md">
@@ -277,18 +283,18 @@ export function GameBoardView() {
                         isReadOnly
                         size="sm"
                         width="300px"
-                        fontSize={"1.1rem"}
-                        mb={"20px"}
+                        fontSize="1.1rem"
+                        mb="20px"
                       />
                     </Box>
                   </VStack>
                 </Flex>
               )}
 
-              <Tabs isFitted variant="enclosed">
+              <Tabs isFitted variant="enclosed" mt={"30px"}>
                 <TabList mb="1em">
-                  <Tab>최근 글</Tab>
-                  <Tab>최근 댓글</Tab>
+                  <Tab fontSize={"1.2rem"}>최근 글</Tab>
+                  <Tab fontSize={"1.2rem"}>최근 댓글</Tab>
                 </TabList>
                 <TabPanels>
                   <TabPanel>
@@ -298,6 +304,7 @@ export function GameBoardView() {
                         <Tbody>
                           {written.map((posties) => (
                             <Tr
+                              fontSize={"1.1rem"}
                               key={posties.id}
                               onClick={() => {
                                 navigate(`/gameboard/id/${posties.id}`);
@@ -331,6 +338,7 @@ export function GameBoardView() {
                         <Tbody>
                           {writtenComment.map((comment) => (
                             <Tr
+                              fontSize={"1.1rem"}
                               key={comment.id}
                               onClick={() => {
                                 navigate(

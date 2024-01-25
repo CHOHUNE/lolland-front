@@ -27,14 +27,14 @@ export function GameBoardWrite(props) {
   let navigate = useNavigate();
 
   function handleSubmit() {
-    // if (category === "공지" || isAdmin()) {
-    //   // '공지' 카테고리에서는 isAdmin이어야만 작성 가능
-    //   toast({
-    //     description: "공지는 관리자만 작성할 수 있습니다.",
-    //     status: "error",
-    //   });
-    //   return;
-    // }
+    // Check if uploadFiles is null
+    if (uploadFiles === null) {
+      toast({
+        description: "사진을 업로드해주세요.",
+        status: "error",
+      });
+      return; // Stop further execution if uploadFiles is null
+    }
 
     setIsSubmitting(true);
     axios
@@ -62,7 +62,7 @@ export function GameBoardWrite(props) {
 
   return (
     <Center>
-      <Box py={"200px"}>
+      <Box py={"100px"} w={"60%"}>
         <h1>게시물 작성</h1>
         <Box>
           <Select
@@ -85,6 +85,7 @@ export function GameBoardWrite(props) {
             <Textarea
               value={board_content}
               onChange={(e) => setBoard_content(e.target.value)}
+              style={{ height: "150px" }} // 높이 조절
             />
           </FormControl>
           <FormControl>
@@ -101,8 +102,10 @@ export function GameBoardWrite(props) {
           </FormControl>
           <Button
             onClick={handleSubmit}
-            colorScheme="blue"
+            colorScheme="whitesmoke"
             isDisabled={isSubmitting}
+            variant={"outline"}
+            mt={"10px"}
           >
             저장
           </Button>
