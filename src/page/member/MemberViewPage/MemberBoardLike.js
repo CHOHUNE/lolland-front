@@ -8,15 +8,10 @@ import {
   Center,
   Checkbox,
   Flex,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Select,
   Table,
   Tbody,
   Td,
-  Tfoot,
   Th,
   Thead,
   Tr,
@@ -33,7 +28,35 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp } from "@fortawesome/free-regular-svg-icons";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+
+// 회원 게임 게시물 좋아요의 페이지 버튼
+function MemberBoardLikePageButton({
+  pageBg,
+  pageColor,
+  pageHove,
+  pageNumber,
+  children,
+}) {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+
+  function handleClickButton() {
+    params.set("page", pageNumber);
+    navigate("?" + params);
+  }
+
+  return (
+    <Button
+      ml={2}
+      bg={pageBg}
+      color={pageColor}
+      _hover={pageHove}
+      onClick={handleClickButton}
+    >
+      {children}
+    </Button>
+  );
+}
 
 function MemberBoardLikePagination({ pageInfo }) {
   const navigate = useNavigate();
@@ -60,16 +83,16 @@ function MemberBoardLikePagination({ pageInfo }) {
       )}
 
       {pageNumbers.map((pageNumber) => (
-        <Button
-          bg={listPage === pageNumber.toString() ? "black" : "white"}
-          color={listPage === pageNumber.toString() ? "white" : "black"}
-          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+        <MemberBoardLikePageButton
+          pageBg={listPage === pageNumber.toString() ? "black" : "white"}
+          pageColor={listPage === pageNumber.toString() ? "white" : "black"}
+          pageHove={{ backgroundColor: "black", color: "whitesmoke" }}
           ml={2}
           key={pageNumber}
-          onClick={() => navigate("?page=" + pageNumber)}
+          pageNumber={pageNumber}
         >
           {pageNumber}
-        </Button>
+        </MemberBoardLikePageButton>
       ))}
 
       {pageInfo.nextPageNumber && (
@@ -83,22 +106,6 @@ function MemberBoardLikePagination({ pageInfo }) {
           <FontAwesomeIcon icon={faCaretRight} />
         </Button>
       )}
-    </Box>
-  );
-}
-
-// 조회 타입
-function QueryCategory() {
-  return (
-    <Box>
-      <Select defaultValue={"전체"} w={"100px"} onChange={() => {}}>
-        <option value="전체">전체</option>
-        <option value="잡담">잡담</option>
-        <option value="질문">질문</option>
-        <option value="정보">정보</option>
-        <option value="공지">공지</option>
-        <option>본문</option>
-      </Select>
     </Box>
   );
 }
@@ -130,6 +137,9 @@ export function MemberBoardLike() {
   // 체크 박스 에서 선택한 게임 게시글
   const [checkLikeGameBoard, setCheckLikeGameBoard] = useState([]);
 
+  // 카테고리 타입 변화 인식
+  const [categoryType, setCategoryType] = useState("전체");
+
   const toast = useToast();
 
   const navigate = useNavigate();
@@ -144,6 +154,14 @@ export function MemberBoardLike() {
       setPageInfo(response.data.pageInfo);
     });
   }, [deletedLikeStatus, location]);
+
+  // 카테고리 타입이 변할때에 사용하는 useEffect
+  useEffect(() => {
+    const params = new URLSearchParams();
+    params.set("categoryType", categoryType);
+
+    navigate("?" + params);
+  }, [categoryType]);
 
   // 게임 좋아요 하나 삭제
   const handleLikeDeleteClick = (gameBoardId) => {
@@ -201,6 +219,11 @@ export function MemberBoardLike() {
       });
   }
 
+  // 카테고리 변할때에 작동
+  function handleCategoryChange(e) {
+    setCategoryType(e.target.value);
+  }
+
   return (
     <Center>
       <Card shadow={"1px 1px 3px 1px #dadce0"}>
@@ -248,7 +271,20 @@ export function MemberBoardLike() {
         </CardHeader>
 
         <CardBody>
-          <QueryCategory />
+          <Box>
+            <Select
+              defaultValue={"전체"}
+              w={"100px"}
+              onChange={handleCategoryChange}
+            >
+              <option value="전체">전체</option>
+              <option value="잡담">잡담</option>
+              <option value="질문">질문</option>
+              <option value="정보">정보</option>
+              <option value="공지">공지</option>
+              <option>본문</option>
+            </Select>
+          </Box>
         </CardBody>
 
         <CardBody>
