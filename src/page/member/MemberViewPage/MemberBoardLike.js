@@ -22,9 +22,9 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import {
+  faBan,
   faCaretLeft,
   faCaretRight,
-  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp } from "@fortawesome/free-regular-svg-icons";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
@@ -113,11 +113,11 @@ function MemberBoardLikePagination({ pageInfo }) {
 export function MemberBoardLike() {
   // 버튼 css
   const buttonStyle = {
-    background: "black",
-    color: "whitesmoke",
+    background: "gray.100",
+    color: "black",
     shadow: "1px 1px 3px 1px #dadce0",
     _hover: {
-      backgroundColor: "whitesmoke",
+      backgroundColor: "orange",
       color: "black",
       transition:
         "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
@@ -345,13 +345,13 @@ export function MemberBoardLike() {
                       ? gameBoard.board_content.slice(0, 15) + "..."
                       : gameBoard.board_content}
                   </Td>
-                  <Td textAlign={"center"} _hover={{ cursor: "pointer" }}>
-                    <FontAwesomeIcon
-                      icon={faXmark}
-                      fontSize={"1.8rem"}
-                      color={"gray"}
+                  <Td textAlign={"center"}>
+                    <Button
+                      {...buttonStyle}
                       onClick={() => handleLikeDeleteClick(gameBoard.id)}
-                    />
+                    >
+                      <FontAwesomeIcon icon={faBan} fontSize={"2rem"} />
+                    </Button>
                   </Td>
                 </Tr>
               ))}
