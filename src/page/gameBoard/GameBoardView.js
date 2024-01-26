@@ -277,7 +277,9 @@ export function GameBoardView() {
                       <strong>연락처:</strong> {writerInfo.member_phone_number}
                     </Text>
                     <Box>
-                      <strong>자기소개:</strong>{" "}
+                      <Text fontSize="md">
+                        <strong>자기소개:</strong>
+                      </Text>
                       <Textarea
                         value={writerInfo.member_introduce}
                         isReadOnly
@@ -285,6 +287,7 @@ export function GameBoardView() {
                         width="300px"
                         fontSize="1.1rem"
                         mb="20px"
+                        h={"120px"}
                       />
                     </Box>
                   </VStack>
