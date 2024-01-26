@@ -105,10 +105,6 @@ export function MemberManage() {
     axios
       .post("/api/member/logout")
       .then(() => {
-        toast({
-          description: "로그 아웃 되었습니다.",
-          status: "success",
-        });
         navigate("/");
       })
       .catch(() => {
