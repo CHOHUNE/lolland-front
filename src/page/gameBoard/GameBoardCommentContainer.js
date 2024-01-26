@@ -48,6 +48,7 @@ function CommentForm({ isSubmitting, onSubmit }) {
         borderRadius="md"
         boxShadow="md"
         height="auto" // 자동으로 높이 조절
+        placeholder={"댓글을 입력 해주세요."}
       />
       <Tooltip isDisabled={!isAuthenticated()} hasArrow label="로그인 하세요">
         <Button
@@ -55,7 +56,7 @@ function CommentForm({ isSubmitting, onSubmit }) {
           onClick={handleSubmit}
           marginLeft={2}
           paddingX={4}
-          height="80px" // 자동으로 높이 조절
+          height="80px"
           width={"80px"}
         >
           쓰기
@@ -160,11 +161,13 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
                 <Textarea
                   value={replyComment}
                   onChange={(e) => setReplyComment(e.target.value)}
+                  placeholder={"댓글을 입력 해주세요."}
                 />
                 <Button
                   colorScheme="blue"
                   isDisabled={isSubmitting}
                   onClick={handleDuplicateSubmit}
+                  글
                 >
                   댓글-댓글 저장
                 </Button>
