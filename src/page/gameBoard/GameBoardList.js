@@ -37,13 +37,17 @@ import {
   faAngleLeft,
   faAngleRight,
   faCaretDown,
+  faEye,
   faImage,
   faSearch,
+  faThumbsUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { LoginContext } from "../../component/LoginProvider";
-import { AddIcon, ChatIcon } from "@chakra-ui/icons";
+import { AddIcon, ChatIcon, StarIcon } from "@chakra-ui/icons";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination as SwiperPagination } from "swiper/modules";
+import YouTube from "react-youtube";
 
 function PageButton({ variant, pageNumber, children }) {
   const [params] = useSearchParams();
@@ -117,14 +121,26 @@ function SearchComponent() {
     navigate("/gameboard/list?" + params); // 경로 수정
   }
 
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
   return (
-    <Flex>
+    <Flex mt={"10px"}>
       <Box>
         <Select
           defaultValue="default"
           w={"120px"}
           onChange={(e) => setSortBy(e.target.value)}
-          ml={4}
         >
           <option value="">최신순</option>
           <option value="count_like">추천순</option>
@@ -143,8 +159,14 @@ function SearchComponent() {
         </Select>
       </Box>
 
-      <Input value={keyword} onChange={(e) => setKeyword(e.target.value)} />
-      <Button onClick={handleSearch}>검색</Button>
+      <Input
+        ml={2}
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+      />
+      <Button onClick={handleSearch} {...buttonStyle}>
+        검색
+      </Button>
     </Flex>
   );
 }
@@ -165,6 +187,19 @@ function GameBoardList() {
   const toast = useToast();
 
   const [naver, setNaver] = useState(null);
+
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
 
   useEffect(() => {
     // params.set("s", sortBy);
@@ -204,6 +239,56 @@ function GameBoardList() {
     navigate("/gameboard/list?" + params);
   }, [sortBy]);
 
+  const opts = {
+    width: "250",
+    height: "150",
+    playerVars: {
+      autoplay: 0,
+    },
+  };
+
+  useEffect(() => {
+    const params = {
+      key: process.env.REACT_APP_YOUTUBE_API_KEY,
+      q: "게임 리뷰",
+      part: "snippet",
+      type: "video",
+      maxResults: 8,
+      fields: "items(id, snippet(title))",
+      videoEmbeddable: true,
+    };
+    const youtubeDatas = axios.get(
+      "https://www.googleapis.com/youtube/v3/search",
+      {
+        params,
+      },
+    );
+  }, []);
+
+  const searchedVideos = [];
+
+  const getSearchedVideos = async (youtubeDatas) => {
+    // 빈 배열 초기화
+
+    // YouTube API에서 받아온 데이터의 items 배열에 접근
+    const videoLists = youtubeDatas.data.items;
+
+    // 각 동영상에 대해 반복
+    videoLists.forEach((element) => {
+      // 동영상의 ID와 제목 추출
+      const videoId = element.id.videoId;
+      const title = element.snippet.title;
+
+      // 추출한 정보를 객체로 만들어 배열에 추가
+      searchedVideos.push({ videoId, title });
+    });
+
+    // 완성된 배열을 반환
+    return searchedVideos;
+  };
+
+  // 비동기 함수 getSearchedVideos 정의
+
   if (gameBoardList === null || pageInfo === null) {
     return <Spinner />;
   }
@@ -213,100 +298,157 @@ function GameBoardList() {
       <Flex>
         <Center w={"100%"}>
           <VStack w={"100%"} ml={"10%"}>
-            <Center>
-              <Heading as="h2" size="lg" my={"15px"}>
-                BEST 게시판
-              </Heading>
-            </Center>
-            <Center w={"75%"}>
-              <TableContainer w={"100%"}>
-                <Table size="sm" border={"1px solid whitesmoke"}>
-                  <Thead>
-                    <Tr>
-                      <Th w="5%" textAlign={"center"}>
-                        추천
-                      </Th>
-                      <Th w="5%" pl="0">
-                        분류
-                      </Th>
-                      <Th w="40%" colSpan={2} textAlign={"center"}>
-                        제목
-                      </Th>
-                      <Th w="10%">조회수</Th>
-                      <Th w="10%">작성자</Th>
-                      <Th w="10%">날짜</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {top &&
-                      top.map((topTen) => (
-                        <Tr key={topTen.id} borderRadius="10px">
-                          <Td w="10%" textAlign={"center"}>
+            <Heading as="h2" size="lg" my={"15px"}>
+              BEST 게시판
+            </Heading>
+            {/*추가 할 부분 */}
+
+            <SimpleGrid
+              columns={3}
+              spacing={4}
+              w={"80%"}
+              h={"800px"}
+              mb={"30px"}
+              ml={"2.5%"}
+            >
+              {top &&
+                top.map((topTen) => (
+                  <Box
+                    w="90%"
+                    h={"100%"}
+                    borderWidth="1px"
+                    borderRadius="lg"
+                    overflow="hidden"
+                    boxSizing="content-box"
+                    shadow={"1px 1px 3px 1px #dadce0"}
+                  >
+                    <Box
+                      position="relative"
+                      w={"100%"}
+                      h={"75%"}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <Swiper
+                        slidesPerView={1}
+                        pagination={{
+                          clickable: true,
+                        }}
+                        modules={[Navigation, SwiperPagination]}
+                        className="mySwiper"
+                      >
+                        {topTen.files.map((file) => (
+                          <SwiperSlide key={file.id}>
+                            <Image
+                              src={file.file_url}
+                              alt={file.file_name}
+                              objectFit={"cover"}
+                              boxSize={"100%"}
+                              css={{
+                                transition: "transform 0.3s ease-in-out", // 변환 애니메이션 적용
+                                "&:hover": {
+                                  transform: "scale(1.1)", // 확대 효과
+                                },
+                              }}
+                              onClick={() =>
+                                navigate("/gameboard/id/" + topTen.id)
+                              }
+                              _hover={{ cursor: "pointer" }}
+                            />
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                    </Box>
+
+                    <Box p="5">
+                      <Box display="flex" alignItems="baseline">
+                        <Badge
+                          borderRadius="full"
+                          style={{ fontSize: "1.2em" }}
+                          colorScheme="teal"
+                        >
+                          {topTen.category}
+                        </Badge>
+                        <Badge
+                          colorScheme="green"
+                          variant="outline"
+                          mx={"2px"} // Adjusted spacing around Badge
+                          fontWeight={"bold"}
+                          borderRadius={"full"}
+                          style={{ fontSize: "1.2em" }}
+                          bgColor={`rgba(0, 128, 0, ${topTen.count_like / 10})`}
+                        >
+                          {topTen.count_like}
+                          <FontAwesomeIcon icon={faThumbsUp} />
+                        </Badge>
+                        <Text color={"grey"} ml={"2%"}>
+                          {new Date(topTen.reg_time).toLocaleDateString(
+                            "ko-KR",
+                            {
+                              year: "2-digit",
+                              month: "2-digit",
+                              day: "2-digit",
+                            },
+                          )}
+                        </Text>
+                        <Spacer />
+                        <Box display="flex">
+                          {topTen.count_comment !== 0 && (
                             <Badge
-                              colorScheme="green"
+                              colorScheme={"green"}
                               variant="outline"
-                              mx={"2px"} // Adjusted spacing around Badge
-                              fontWeight={"bold"}
-                              bgColor={`rgba(0, 128, 0, ${
-                                topTen.count_like / 10
-                              })`}
+                              mx={"2%"}
+                              borderRadius={"full"}
+                              style={{ fontSize: "1.1em" }}
                             >
-                              {topTen.count_like}
+                              {topTen.count_comment}
+                              <ChatIcon />
                             </Badge>
-                          </Td>
+                          )}
 
-                          <Td w="5%" pl="0">
-                            {topTen.category}
-                          </Td>
-                          <Td
-                            w="40%"
-                            colSpan={2}
-                            textAlign={"center"}
-                            onClick={() =>
-                              navigate("/gameboard/id/" + topTen.id)
-                            }
-                            _hover={{ cursor: "pointer" }}
-                          >
-                            <span style={{ marginLeft: "+10%" }}>
-                              {topTen.title}
-                            </span>
+                          {topTen.countFile !== 0 && (
+                            <Badge
+                              mx={"2%"}
+                              borderRadius="full"
+                              style={{ fontSize: "1.1em" }}
+                            >
+                              {topTen.countFile}
+                              <FontAwesomeIcon icon={faImage} />
+                            </Badge>
+                          )}
+                          {topTen.countFile !== 0 && (
+                            <Badge
+                              mx={"2%"}
+                              borderRadius="full"
+                              style={{ fontSize: "1.1em" }}
+                            >
+                              {topTen.board_count}
+                              <FontAwesomeIcon icon={faEye} />
+                            </Badge>
+                          )}
+                        </Box>
+                      </Box>
 
-                            {topTen.count_comment !== 0 && (
-                              <Badge
-                                colorScheme={"green"}
-                                variant="outline"
-                                mx={"1%"}
-                              >
-                                {topTen.count_comment}
-                                <ChatIcon />
-                              </Badge>
-                            )}
+                      <Box
+                        mt="1"
+                        fontWeight="semibold"
+                        as="h4"
+                        lineHeight="tight"
+                        noOfLines={1}
+                        fontSize={"1.2rem"}
+                        display={"flex"}
+                        onClick={() => navigate("/gameboard/id/" + topTen.id)}
+                        _hover={{ cursor: "pointer" }}
+                      >
+                        {topTen.title}
+                        <Spacer />
+                        {topTen.member_id}
+                      </Box>
 
-                            {topTen.countFile !== 0 && (
-                              <Badge mx={"1%"}>
-                                {topTen.countFile}
-                                <FontAwesomeIcon icon={faImage} />
-                              </Badge>
-                            )}
-                          </Td>
-                          <Td w="10%">{topTen.board_count}</Td>
-                          <Td w="10%">{topTen.member_id}</Td>
-                          <Td w="10%">
-                            {new Date(topTen.reg_time).toLocaleDateString(
-                              "ko-KR",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              },
-                            )}
-                          </Td>
-                        </Tr>
-                      ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-            </Center>
+                      <Box display="flex" mt="2" alignItems="center"></Box>
+                    </Box>
+                  </Box>
+                ))}
+            </SimpleGrid>
 
             {/* 그 외의 게시물 게시판 */}
             <Center>
@@ -315,7 +457,7 @@ function GameBoardList() {
               </Heading>
             </Center>
 
-            <Flex w={"75%"}>
+            <Flex w={"80%"}>
               <ButtonGroup
                 variant={"ouline"}
                 spacing={"6"}
@@ -323,6 +465,7 @@ function GameBoardList() {
                 my={"1%"}
                 mt={"15px"}
                 w={"100%"}
+                shadow={"1px 1px 3px 1px #dadce0"}
               >
                 <Button
                   onClick={() => navigate("")}
@@ -397,7 +540,7 @@ function GameBoardList() {
             </Flex>
 
             <Center w={"100%"}>
-              <TableContainer w={"75%"}>
+              <TableContainer w={"80%"} shadow={"1px 1px 3px 1px #dadce0"}>
                 <Table size="sm" border={"1px solid whitesmoke"}>
                   <Thead>
                     <Tr>
@@ -593,7 +736,7 @@ function GameBoardList() {
         </Center>
 
         <Box w={"25%"} margin={"15px auto"} mr={"5%"}>
-          <Card>
+          <Card shadow={"1px 1px 3px 1px #dadce0"}>
             <CardHeader>
               <Heading size="md">오늘의 BEST</Heading>
             </CardHeader>
@@ -620,10 +763,35 @@ function GameBoardList() {
           </Card>
           <br />
           <br />
+          <Card>
+            <CardHeader size={"md"}>
+              <Heading>화제의 게임 동영상</Heading>
+            </CardHeader>
+            <CardBody>
+              <div
+                style={{
+                  margin: 20,
+                  display: "flex",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  width: "80%",
+                }}
+              >
+                {searchedVideos.map((item) => (
+                  <Box>
+                    <YouTube videoId={item.videoId} opts={opts} />
+                    <div style={{ width: 280 }}>
+                      {item.title.replace(/&QUOT;/gi, '"')}
+                    </div>
+                  </Box>
+                ))}
+              </div>
+            </CardBody>
+          </Card>
           <br />
           <Box>
             <Divider orientation="horizontal" color={"orange"} />
-            <Card>
+            <Card shadow={"1px 1px 3px 1px #dadce0"}>
               <CardHeader>
                 <Heading size="md">게임 관련 최신 기사</Heading>
               </CardHeader>
@@ -651,7 +819,6 @@ function GameBoardList() {
               </CardBody>
             </Card>
           </Box>
-          정
         </Box>
       </Flex>
     </Box>
