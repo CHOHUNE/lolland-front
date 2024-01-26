@@ -11,7 +11,7 @@ export function GearContentMain() {
 
   useEffect(() => {
     axios
-      .get("/api/gearboard/gear_id/" + 88)
+      .get("/api/gearboard/gear_id/" + 91)
       .then((response) => setGearboard(response.data));
   }, []);
 
@@ -58,7 +58,7 @@ export function GearContentMain() {
         onClick={handlePrevClick}
         display={gearboard && currentIndex > 0 ? "block" : "none"}
       >
-        <FontAwesomeIcon icon={faArrowLeft} size="2x" />
+        <FontAwesomeIcon icon={faArrowLeft} size="2x" color={"white"} />
       </Box>
       <Box
         position="absolute"
@@ -73,7 +73,7 @@ export function GearContentMain() {
             : "none"
         }
       >
-        <FontAwesomeIcon icon={faArrowRight} size="2x" />
+        <FontAwesomeIcon icon={faArrowRight} size="2x" color={"white"} />
       </Box>
       {/* 추가 이미지 및 텍스트 */}
       {gearboard && (
@@ -84,9 +84,9 @@ export function GearContentMain() {
           right={"-30px"}
           bottom="20px"
           width="100%"
-          color="black"
+          color="white"
         >
-          <Text fontSize="30px" fontWeight="bold">
+          <Text fontSize="30px" fontWeight="bold" color={"white"}>
             {gearboard.gear_title}
           </Text>
           <Flex gap={3} alignItems={"center"}>
