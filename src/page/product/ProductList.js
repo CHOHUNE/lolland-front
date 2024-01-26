@@ -230,6 +230,7 @@ export function ProductList() {
                 display="flex"
                 justifyContent="center"
                 alignItems="center"
+                border={"1px solid red"}
               >
                 {/* 마우스 호버 시 2번째 이미지로 변경 */}
                 {/* 기본 이미지 */}

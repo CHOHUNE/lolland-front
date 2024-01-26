@@ -129,6 +129,31 @@ export function HomeBody() {
     transition: "top 0.3s ease-in-out",
   };
 
+  const truncateText = (str, num) => {
+    if (str && str.length > num) {
+      return str.slice(0, num) + "...";
+    }
+    return str;
+  };
+
+  // ------------------------------ 가격 ex) 1,000 ,로 구분지어 보여지게 처리 ------------------------------
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("ko-KR", { style: "decimal" }).format(price);
+  };
+
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
   return (
     <Box minW={"1400px"}>
       {/* ------------------------ 상단 배너 슬라이드 ------------------------ */}
@@ -148,7 +173,7 @@ export function HomeBody() {
         <Box justifyContent="center" display="flex" minW={"1300px"} mt={"40px"}>
           {/* 큰 상품 박스 */}
           <Swiper
-            modules={[EffectFade, Pagination, Autoplay]}
+            modules={[EffectFade, Autoplay]}
             spaceBetween={50}
             slidesPerView={1}
             pagination={{ clickable: true }}
@@ -158,66 +183,102 @@ export function HomeBody() {
           >
             {mostReviewedProducts.map((product) => (
               <SwiperSlide key={product.product_id}>
-                <Box
-                  mr={2}
-                  mt={"40px"}
-                  border="1px solid black"
-                  w="600px"
-                  h="600px"
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="center"
-                  alignItems="center"
-                  position={"relative"}
-                >
-                  {product.productImgs && product.productImgs.length > 0 && (
+                {product.productImgs && product.productImgs.length > 0 && (
+                  <Box
+                    mr={2}
+                    mt={"40px"}
+                    border="1px solid #E5E5E5"
+                    w="600px"
+                    h="600px"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    position={"relative"}
+                  >
+                    {/* "현재 인기 상품" 텍스트 추가 */}
                     <Box
                       position="absolute"
-                      top={"0"}
-                      left={"0"}
-                      h={"350px"} // 높이를 고정값으로 설정
-                      w={"590px"} // 너비를 고정값으로 설정
-                      border={"1px solid red"}
+                      top="10px" // 원하는 위치로 조정하세요.
+                      left="10px" // 원하는 위치로 조정하세요.
+                      bg="white"
+                      p={2}
+                      borderRadius="4px"
+                      boxShadow="sm"
+                    >
+                      <Text fontSize={"1.7rem"} fontWeight={"bold"}>
+                        실시간 뜨고있는 상품
+                      </Text>
+                    </Box>
+
+                    <Box
+                      position="absolute"
+                      top="50px"
+                      w="350px" // 이미지의 너비를 350px로 고정
+                      h="350px" // 이미지의 높이를 350px로 고정
+                      p={5}
                       display="flex"
                       justifyContent="center"
                       alignItems="center"
-                      overflow="hidden"
                     >
                       <Image
+                        position="absolute"
                         src={product.productImgs[0].main_img_uri}
                         alt="Product Image"
-                        objectFit="contain"
-                        w={"100%"}
-                        h={"100%"}
+                        width="100%" // 이미지를 가득 채우도록 설정
+                        height="100%" // 이미지를 가득 채우도록 설정
                       />
                     </Box>
-                  )}
 
-                  <Text
-                    mt="200px"
-                    mb="20px"
-                    border={"1px solid red"}
-                    w={"100%"}
-                  >
-                    [{product.company_name}]
-                    <br />
-                    {product.product_name}
-                  </Text>
-                </Box>
+                    <Flex
+                      justifyContent={"flex-start"}
+                      alignItems="flex-start"
+                      direction="column"
+                      p={10}
+                      mt="390px"
+                      mb="20px"
+                      w={"100%"}
+                    >
+                      <Text>[{product.company_name}]</Text>
+                      <Text mt={2} fontSize={"1.2rem"}>
+                        {product.product_name}
+                      </Text>
+                      <Text mt={5} style={{ color: "gray" }}>
+                        {truncateText(product.product_content, 40)}
+                      </Text>
+                      <Flex mt={3} w={"100%"} justifyContent={"space-between"}>
+                        <Text mt={3} fontWeight={"bold"} fontSize={"1.4rem"}>
+                          {formatPrice(product.product_price)}원
+                        </Text>
+                        <Flex justifyContent="flex-end" alignItems="flex-end">
+                          <Button
+                            {...buttonStyle}
+                            mt={2}
+                            borderRadius={"20px"}
+                            onClick={() =>
+                              navigate("/product/" + product.product_id)
+                            }
+                          >
+                            상품 보러 가기
+                          </Button>
+                        </Flex>
+                      </Flex>
+                    </Flex>
+                  </Box>
+                )}
               </SwiperSlide>
             ))}
           </Swiper>
           {/* 작은 상품 박스들 */}
           <Box mt={"40px"} display="flex" flexDirection="column" gap="24px">
             <Flex gap={4}>
-              <Box border="1px solid black" w="350px" h="300px">
+              <Box border="1px solid #E5E5E5" w="350px" h="300px">
                 2
               </Box>
-              <Box border="1px solid black" w="350px" h="300px">
+              <Box border="1px solid #E5E5E5" w="350px" h="300px">
                 3
               </Box>
             </Flex>
-            <Box border="1px solid black" w="716px" h="275px">
+            <Box border="1px solid #E5E5E5" w="716px" h="275px">
               4
             </Box>
           </Box>
