@@ -23,7 +23,14 @@ export function GearBoard() {
   const toast = useToast();
   const navigate = useNavigate();
   const [uploadFiles, setUploadFiles] = useState(null);
-  const categories = ["전체", "잡담", "질문", "정보", "축하", "고민", "인사"];
+  const categories = [
+    "전체",
+    "모니터",
+    "키보드",
+    "마우스",
+    "오디오",
+    "최신기기",
+  ];
   const { isAuthenticated } = useContext(LoginContext);
 
   function handleSave() {
@@ -91,13 +98,6 @@ export function GearBoard() {
         </FormHelperText>
       </FormControl>
 
-      {/*<FormControl>*/}
-      {/*  <FormLabel>작성자</FormLabel>*/}
-      {/*  <Input*/}
-      {/*    value={member_name}*/}
-      {/*    onChange={(e) => setGear_title(e.target.value)}*/}
-      {/*  />*/}
-      {/*</FormControl>*/}
       <Button
         isDisabled={isSubmitting}
         onClick={handleSave}

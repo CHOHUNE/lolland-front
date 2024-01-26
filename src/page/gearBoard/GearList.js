@@ -27,12 +27,20 @@ export function GearList({ category }) {
       .then((response) => setGearboardList(response.data));
   }, [category]);
 
+  // Function to format the date in "YYYY년 M월 D일" format
+  const formatKoreanDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // Adding 1 because months are zero-indexed
+    const day = date.getDate();
+    return `${year}년 ${month}월 ${day}일`;
+  };
+
   return (
     <Box>
       <Table>
         <Thead>
           <Tr>
-            <Td>추천</Td>
             <Td>카테고리</Td>
             <Td>제목</Td>
             <Td>컨텐츠</Td>
@@ -48,10 +56,9 @@ export function GearList({ category }) {
                 key={item.gear_id}
                 onClick={() => navigate("/gearlist/gear_id/" + item.gear_id)}
               >
-                <Td>{item.countLike}</Td>
                 <Td>{item.category}</Td>
                 <Td>
-                  {item.gear_title}
+                  {item.gear_title.slice(0, 17)}
                   {item.countFile > 0 && (
                     <Badge
                       style={{ backgroundColor: "white", color: "orange" }}
@@ -69,8 +76,8 @@ export function GearList({ category }) {
                     </Badge>
                   )}
                 </Td>
-                <Td>{item.gear_content}</Td>
-                <Td>{item.gear_inserted}</Td>
+                <Td>{item.gear_content.slice(0, 80)}</Td>
+                <Td>{formatKoreanDate(item.gear_inserted)}</Td>
               </Tr>
             ))
           )}
