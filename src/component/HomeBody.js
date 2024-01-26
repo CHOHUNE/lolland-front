@@ -1,53 +1,102 @@
 import {
-  background,
   Box,
   Button,
   Flex,
   Heading,
   Image,
   Img,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+  Select,
   SimpleGrid,
   Spinner,
   Stack,
   StackDivider,
-  Tab,
   Text,
   useToast,
-  VStack,
 } from "@chakra-ui/react";
 import { Swiper } from "swiper/react";
-import { SwiperSlide, useSwiper } from "swiper/react";
+import { SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css";
 
 import "./swiper.css";
-import {
-  Autoplay,
-  EffectFade,
-  Grid,
-  Navigation,
-  Pagination,
-} from "swiper/modules";
+import { Autoplay, EffectFade } from "swiper/modules";
 import SwiperImg from "./SwiperImg";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Recent } from "./RecentViewed";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+
+function SearchComponent() {
+  const [keyword, setKeyword] = useState("");
+  const navigate = useNavigate();
+  const [category, setCategory] = useState("all");
+
+  function handleSearch() {
+    const params = new URLSearchParams();
+    params.set("k", keyword);
+    params.set("c", category);
+
+    navigate("?" + params);
+  }
+
+  return (
+    <Box mx="35%">
+      <InputGroup>
+        <InputLeftElement w="25%">
+          <Select
+            border="1px solid black"
+            borderRadius={0}
+            defaultValue="all"
+            _focus={{ border: "1px solid black", shadow: "none" }}
+            _hover={{ border: "1px solid black" }}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="all">전체</option>
+            <option value="product_name">상품명</option>
+            <option value="company_name">회사명</option>
+          </Select>
+        </InputLeftElement>
+        <Input
+          borderRadius={0}
+          textIndent="25%"
+          placeholder="검색어를 입력해주세요"
+          border="1px solid black"
+          _focus={{ border: "1px solid black", shadow: "none" }}
+          _hover={{ border: "1px solid black" }}
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+        />
+        <InputRightElement bgColor="black" onClick={handleSearch}>
+          <FontAwesomeIcon icon={faMagnifyingGlass} color="white" />
+        </InputRightElement>
+      </InputGroup>
+    </Box>
+  );
+}
 
 export function HomeBody() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const toast = useToast();
-  const [showAllCategories, setShowAllCategories] = useState(false);
 
+  const [productList, setProductList] = useState([]); // 상품 목록 상태
+
+  const [showAllCategories, setShowAllCategories] = useState(false); // 카테고리 상태
   const [mostReviewedProducts, setMostReviewedProducts] = useState([]); // 리뷰많은 3개 상품 상태
   const [boardList, setBoardList] = useState(null); // 게임장비커뮤니티 베스트게시물 상태
   const [top, setTop] = useState(null); // 게임커뮤니티 베스트게시물 상태
   const [naver, setNaver] = useState(null); // 뉴스기사 상태
+  const [categoryProducts, setCategoryProducts] = useState({}); // 카테고리별 상품 상태
 
   // -------------------------------- 리뷰많은 상품 3개 불러오기 --------------------------------
   useEffect(() => {
@@ -61,24 +110,25 @@ export function HomeBody() {
       });
   }, []);
 
-  // -------------------------------- 게임장비 커뮤니티 오늘의 베스트 가져오기 --------------------------------
-
+  // -------------------------------- 게임장비, 게임 커뮤니티 베스트게시물 가져오기 --------------------------------
   useEffect(() => {
-    axios
-      .get("api/gearboard/today")
-      .then((response) => setBoardList(response.data));
-  }, []);
-
-  const handleViewAllCategories = () => {
-    setShowAllCategories(!showAllCategories);
-  };
-
-  // -------------------------------- 게임커뮤니티 베스트게시물 가져오기 --------------------------------
-
-  useEffect(() => {
-    axios
-      .get("/api/gameboard/list/top")
-      .then((response) => setTop(response.data));
+    const fetchGameGearAndCommunity = async () => {
+      try {
+        const [gearResponse, communityResponse] = await Promise.all([
+          axios.get("/api/gearboard/today"),
+          axios.get("/api/gameboard/list/top"),
+        ]);
+        setBoardList(gearResponse.data);
+        setTop(communityResponse.data);
+      } catch (error) {
+        toast({
+          title: "데이터 불러오는 도중 에러 발생",
+          description: error.response.data,
+          status: "error",
+        });
+      }
+    };
+    fetchGameGearAndCommunity();
   }, []);
 
   // -------------------------------- 커뮤니티 뉴스API 가져오기 --------------------------------
@@ -88,46 +138,110 @@ export function HomeBody() {
     });
   }, []);
 
-  // -------------------------------- 카테고리 불러오기 --------------------------------
+  // -------------------------------- 카테고리 & 카테고리별 상품 불러오기 --------------------------------
+  // useEffect(() => {
+  //   let isCancelled = false;
+  //
+  //   async function fetchInitialData() {
+  //     try {
+  //       // 카테고리 데이터 가져오기
+  //       const categoryResponse = await axios.get("/api/product/mainCategory");
+  //       if (!isCancelled) {
+  //         setCategories(categoryResponse.data);
+  //
+  //         // 각 카테고리별 상품 데이터 가져오기
+  //         const categoryRequests = categoryResponse.data.map((category) =>
+  //           axios.get(
+  //             `/api/product/list?category=${category.category_id}&limit=8`,
+  //           ),
+  //         );
+  //         const productResponses = await axios.all(categoryRequests);
+  //         if (!isCancelled) {
+  //           const newCategoryProducts = productResponses.reduce(
+  //             (acc, response, index) => {
+  //               const categoryId = categoryResponse.data[index].category_id;
+  //               acc[categoryId] = response.data.product;
+  //               return acc;
+  //             },
+  //             {},
+  //           );
+  //           setCategoryProducts(newCategoryProducts);
+  //         }
+  //       }
+  //     } catch (error) {
+  //       if (!isCancelled) {
+  //         toast({
+  //           title: "데이터 불러오는 도중 에러 발생",
+  //           description: error.response.data,
+  //           status: "error",
+  //         });
+  //       }
+  //     }
+  //   }
+  //   fetchInitialData();
+  //   return () => {
+  //     isCancelled = true;
+  //   };
+  // }, []);
   useEffect(() => {
-    axios
-      .get("/api/product/mainCategory")
-      .then((response) => {
-        const uniqueCategories = response.data.reduce((acc, category) => {
-          const existingCategory = acc.find(
-            (c) => c.category_id === category.category_id,
-          );
-          if (!existingCategory) {
-            acc.push(category);
-          }
-          return acc;
-        }, []);
-        setCategories(uniqueCategories);
-      })
-      .catch((error) => {
-        toast({
-          title: "카테고리 불러오는 도중 에러 발생",
-          description: error.response.data,
-          status: "error",
+    let isCancelled = false;
+
+    const fetchAllCategoryProducts = async () => {
+      try {
+        // 카테고리 데이터를 먼저 가져옵니다.
+        const categoriesResponse = await axios.get("/api/product/mainCategory");
+        if (isCancelled) return;
+
+        // 모든 카테고리에 대한 상품 목록을 한 번에 요청합니다.
+        const allCategoriesId = categoriesResponse.data.map(
+          (category) => category.category_id,
+        );
+        const params = new URLSearchParams({
+          categories: allCategoriesId.join(","),
+          limit: 8,
         });
-      });
+
+        // 상품 목록 요청
+        const productsResponse = await axios.get(`/api/product/list?${params}`);
+        if (isCancelled) return;
+
+        // 상태 업데이트
+        setCategories(categoriesResponse.data);
+        setCategoryProducts(productsResponse.data); // 백엔드가 이 형식을 지원한다고 가정합니다.
+      } catch (error) {
+        if (!isCancelled) {
+          toast({
+            title: "데이터 불러오는 도중 에러 발생",
+            description: error.response.data,
+            status: "error",
+          });
+        }
+      }
+    };
+
+    fetchAllCategoryProducts();
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
+
+  const handleViewAllCategories = () => {
+    setShowAllCategories(!showAllCategories);
+  };
 
   // -------------------------------- 최근본상품 로컬스토리지 & 애니메이션 --------------------------------
   const [scrollPosition, setScrollPosition] = useState(0);
   const fixedTopPosition = 650;
   const stickyTopPosition = 100;
-
   useEffect(() => {
     const handleScroll = () => {
       const currentPosition = window.scrollY;
       setScrollPosition(currentPosition);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   const menuStyle = {
     position: "fixed",
     top:
@@ -189,6 +303,8 @@ export function HomeBody() {
   } else if (naver === null) {
     return <Spinner />;
   } else if (top === null) {
+    return <Spinner />;
+  } else if (productList === null) {
     return <Spinner />;
   }
 
@@ -542,18 +658,104 @@ export function HomeBody() {
         </Box>
       </Box>
 
-      {/* ------------------------- TODO : 하단 이미지배너 할지 상품목록 전체 리스트 뿌릴지 고민중  ------------------------- */}
+      {/* ------------------------- TODO : 하단 어떻게 할지 상품목록 전체 리스트 뿌릴지 고민중  ------------------------- */}
+      {/* ------------------------- TODO : 임시로 상품목록 뿌리기 ------------------------- */}
 
-      <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
+      <Box
+        borderTop={"1px solid #eeeeee"}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
+      >
         <Box
-          w={"90%"}
-          h={"400px"}
-          border={"1px solid black"}
-          borderRadius={"20px"}
+          mt={10}
+          mx="10%"
+          // display={"flex"}
+          // justifyContent={"center"}
+          // alignItems={"center"}
         >
-          배너
+          {categories.map((category) => (
+            <Box mt={10} key={category.category_id} mb="40px">
+              <Flex
+                justifyContent="space-between"
+                alignItems="center"
+                mb="20px"
+              >
+                <Heading size="xl">{category.category_name}</Heading>
+                <Button
+                  mb={-10}
+                  onClick={() => navigate(`/category/${category.category_id}`)}
+                  bg={"none"}
+                  fontSize={"12px"}
+                  color={"gray"}
+                  _hover={{ background: "none", color: "black" }}
+                >
+                  더보기
+                </Button>
+              </Flex>
+              <SimpleGrid columns={4} spacing={9}>
+                {categoryProducts[category.category_id]
+                  ?.slice(0, 8)
+                  .map((product) => (
+                    <Box
+                      key={product.product_id}
+                      borderWidth="1px"
+                      borderRadius="lg"
+                      overflow="hidden"
+                      h={"100%"}
+                      w={"100%"}
+                      display="flex"
+                      flexDirection="column"
+                    >
+                      {/* 이미지를 감싸는 Box에 중앙 정렬 스타일을 적용합니다. */}
+                      <Flex h={"250px"} align="center" justify="center">
+                        <Image
+                          src={
+                            product.mainImgs[0]?.main_img_uri ||
+                            "default-product-image.jpg"
+                          }
+                          alt={product.product_name}
+                          maxH="200px" // 이미지의 최대 높이를 지정하여 Box 크기를 넘지 않도록 합니다.
+                          objectFit="contain" // 이미지 비율을 유지하며 Box에 맞게 조절합니다.
+                        />
+                      </Flex>
+                      <Box p="6">
+                        <Box display="flex" alignItems="baseline">
+                          <Box
+                            color="gray.500"
+                            fontWeight="semibold"
+                            letterSpacing="wide"
+                            fontSize="xs"
+                            textTransform="uppercase"
+                            ml="2"
+                          >
+                            {product.subcategory_name}
+                          </Box>
+                        </Box>
+
+                        <Box
+                          mt="1"
+                          fontWeight="semibold"
+                          as="h4"
+                          lineHeight="tight"
+                          isTruncated
+                        >
+                          {product.product_name}
+                        </Box>
+
+                        <Box>
+                          {product.product_price.toLocaleString("ko-KR")}원
+                          <Box as="span" color="gray.600" fontSize="sm"></Box>
+                        </Box>
+                      </Box>
+                    </Box>
+                  ))}
+              </SimpleGrid>
+            </Box>
+          ))}
         </Box>
       </Box>
+      <SearchComponent />
     </Box>
   );
 }
