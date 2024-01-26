@@ -1,11 +1,15 @@
 import {
+  background,
   Box,
   Button,
   Flex,
+  Heading,
   Image,
   Img,
   SimpleGrid,
   Spinner,
+  Stack,
+  StackDivider,
   Tab,
   Text,
   useToast,
@@ -51,6 +55,8 @@ export function HomeBody() {
   const [showAllCategories, setShowAllCategories] = useState(false);
 
   const [mostReviewedProducts, setMostReviewedProducts] = useState([]);
+  const [boardList, setBoardList] = useState(null);
+  const [naver, setNaver] = useState(null);
 
   // 리뷰많은 상품 3개 불러오기
   useEffect(() => {
@@ -87,6 +93,21 @@ export function HomeBody() {
           status: "error",
         });
       });
+  }, []);
+
+  // ------------------------------ 커뮤니티 뉴스API 가져오기 ------------------------------
+  useEffect(() => {
+    axios.get("/api/gameboard/naver").then((response) => {
+      setNaver(response.data);
+    });
+  }, []);
+
+  // ------------------------------ 게임장비 커뮤니티 오늘의 베스트 가져오기 ------------------------------
+
+  useEffect(() => {
+    axios
+      .get("api/gearboard/today")
+      .then((response) => setBoardList(response.data));
   }, []);
 
   const handleViewAllCategories = () => {
@@ -141,6 +162,7 @@ export function HomeBody() {
     return new Intl.NumberFormat("ko-KR", { style: "decimal" }).format(price);
   };
 
+  // ------------------------------ 버튼 디자인 ------------------------------
   const buttonStyle = {
     background: "black",
     color: "whitesmoke",
@@ -153,6 +175,14 @@ export function HomeBody() {
       shadow: "1px 1px 3px 1px #dadce0 inset",
     },
   };
+
+  if (boardList === null) {
+    return <Spinner />;
+  }
+
+  if (naver === null) {
+    return <Spinner />;
+  }
 
   return (
     <Box minW={"1400px"}>
@@ -268,18 +298,97 @@ export function HomeBody() {
               </SwiperSlide>
             ))}
           </Swiper>
-          {/* 작은 상품 박스들 */}
+
+          {/* ------------------------ 작은 상품 박스들 ------------------------ */}
           <Box mt={"40px"} display="flex" flexDirection="column" gap="24px">
             <Flex gap={4}>
-              <Box border="1px solid #E5E5E5" w="350px" h="300px">
-                2
+              {/* ------------------------ 게임장비커뮤니티 게시글 ------------------------ */}
+              <Box p={2} border="1px solid #E5E5E5" w="350px" h="300px">
+                <Text color={"gray"}>게임장비커뮤니티</Text>
+                <Flex w={"100%"} justifyContent={"space-between"}>
+                  <Text fontSize={"1.5rem"} fontWeight={"bold"}>
+                    오늘의 베스트
+                  </Text>
+                  <Button
+                    bg={"none"}
+                    fontSize={"12px"}
+                    color={"gray"}
+                    _hover={{ background: "none", color: "black" }}
+                    onClick={() => navigate("/gearlistlayout")}
+                  >
+                    더보기
+                  </Button>
+                </Flex>
+                <Stack divider={<StackDivider />} spacing="3">
+                  {boardList.slice(0, 3).map((item) => (
+                    <Flex
+                      key={item.gear_id}
+                      justify="flex-start"
+                      alignItems="center" // 수직 정렬 중앙으로 조정
+                    >
+                      <Box mt={3}>
+                        <Heading
+                          _hover={{ cursor: "pointer" }}
+                          onClick={() =>
+                            navigate("/gearlist/gear_id/" + item.gear_id)
+                          }
+                          size="xs"
+                          textTransform="uppercase"
+                        >
+                          {item.gear_title}
+                          {/*{truncateText(product.product_content, 40)}*/}
+                        </Heading>
+                        <Text pt="2" fontSize="sm">
+                          {truncateText(item.gear_content, 30)}
+                        </Text>
+                      </Box>
+                    </Flex>
+                  ))}
+                </Stack>
               </Box>
+
+              {/* ------------------------ 게임커뮤니티 게시글 ------------------------ */}
               <Box border="1px solid #E5E5E5" w="350px" h="300px">
                 3
               </Box>
             </Flex>
-            <Box border="1px solid #E5E5E5" w="716px" h="275px">
-              4
+
+            {/* ------------------------ 최신뉴스기사??? ------------------------ */}
+            <Box p={2} border="1px solid #E5E5E5" w="716px" h="275px">
+              <Text color={"gray"}>리그오브레전드 관련</Text>
+              <Flex w={"100%"} justifyContent={"space-between"}>
+                <Text fontSize={"1.5rem"} fontWeight={"bold"}>
+                  최신 뉴스 기사
+                </Text>
+                <Button
+                  bg={"none"}
+                  fontSize={"12px"}
+                  color={"gray"}
+                  _hover={{ background: "none", color: "black" }}
+                  onClick={() => navigate("/gameboard/list?s=")}
+                >
+                  더보기
+                </Button>
+              </Flex>
+              <Stack mt={3} divider={<StackDivider />} spacing="4">
+                {naver &&
+                  naver.items !== null &&
+                  naver.items.slice(0, 4).map((news) => (
+                    <Box mt={1} key={news.link}>
+                      <Heading
+                        size="xs"
+                        textTransform="uppercase"
+                        _hover={{ cursor: "pointer" }}
+                        onClick={() => window.open(news.link, "_blank")}
+                      >
+                        {news.title
+                          .replace(/&quot;/g, "") // &quot; 제거
+                          .replace(/<b>/g, "") // <b> 제거
+                          .replace(/<\/b>/g, "")}
+                      </Heading>
+                    </Box>
+                  ))}
+              </Stack>
             </Box>
           </Box>
         </Box>
