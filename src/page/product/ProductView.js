@@ -393,7 +393,7 @@ export function ProductView() {
 
       try {
         localStorage.setItem("purchaseInfo", JSON.stringify(purchaseInfo));
-        navigate("/product/pay/" + product_id);
+        navigate("/pay/");
       } catch (error) {
         console.error("Error saving to localStorage", error);
         toast({

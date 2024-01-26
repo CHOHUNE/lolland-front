@@ -4,6 +4,7 @@ import {
   Card,
   CardBody,
   Center,
+  Divider,
   Flex,
   FormControl,
   FormLabel,
@@ -36,11 +37,15 @@ import { useDaumPostcodePopup } from "react-daum-postcode";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import React from "react";
+import { parse } from "@fortawesome/fontawesome-svg-core";
 
 export function ProductPay() {
   const [addressOption, setAddressOption] = useState("회원 정보와 동일");
   const [purchaseInfo, setPurchaseInfo] = useState(null);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [shippingFee, setShippingFee] = useState(3000);
   const navigate = useNavigate();
+  const [orderName, setOrderName] = useState();
 
   const [isModalOpen, setIsModalOpen] = useState(false); // 주소목록 모달창
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -222,115 +227,97 @@ export function ProductPay() {
   // ------------------------------ ProductView에 로컬스토리지 이용해서 상품정보 가져오는 로직 ------------------------------
   useEffect(() => {
     const storedPurchaseInfo = localStorage.getItem("purchaseInfo");
+
     if (storedPurchaseInfo) {
-      setPurchaseInfo(JSON.parse(storedPurchaseInfo));
+      const parsedPurchaseInfo = JSON.parse(storedPurchaseInfo);
+      setPurchaseInfo(parsedPurchaseInfo);
+      setTotalPrice(calculateTotalPrice(parsedPurchaseInfo));
+      // 주문 이름 생성
+      if (parsedPurchaseInfo.length > 1) {
+        // 여러 상품일 경우 : 첫 상품명 외 {나머지 상품 갯수} 건
+        const firstGroupProductName = parsedPurchaseInfo[0].productName;
+        const numOtherGroups = parsedPurchaseInfo.length - 1;
+        setOrderName(`${firstGroupProductName} 외 ${numOtherGroups}건`);
+      } else if (parsedPurchaseInfo.length === 1) {
+        // 한 상품일 경우 : 첫 상품명
+        setOrderName(parsedPurchaseInfo[0].productName);
+      } else {
+        // 없을 경우 : ""
+        setOrderName("");
+      }
     } else {
       console.log("No purchase info found in localStorage");
     }
   }, []);
 
-  // ------------------------------ 결제버튼 클릭시 서버로 전송되는 로직 ------------------------------
-  // const handlePayment = async () => {
-  //   const orderData = {
-  //     productName: purchaseInfo.productName,
-  //     optionName: purchaseInfo.selectedOptions
-  //       .map((opt) => opt.option_name)
-  //       .join(", "),
-  //     price: purchaseInfo.totalOptionPrice,
-  //     quantity: purchaseInfo.selectedOptions
-  //       .map((opt) => opt.quantity)
-  //       .join(", "),
-  //     shippingFee: purchaseInfo.shippingFee,
-  //     receiver: userInfo.receiver,
-  //     contact: `${contactFirst}-${contactMiddle}-${contactLast}`,
-  //     postalCode: userInfo.postalCode,
-  //     basicAddress: userInfo.basicAddress,
-  //     detailAddress: userInfo.detailAddress,
-  //     deliveryMemo: userInfo.deliveryMemo, // 이 값을 state에서 가져오도록 수정해야 합니다.
-  //     ordererName: userInfo.receiver, // 주문자명이 userInfo.receiver와 같은지 확인하세요.
-  //     ordererContact: `${contactFirst}-${contactMiddle}-${contactLast}`, // 주문자 연락처가 이렇게 설정된 것이 맞는지 확인하세요.
-  //     email: userInfo.email,
-  //     productPrice: purchaseInfo.totalOptionPrice,
-  //     totalShippingFee: purchaseInfo.shippingFee,
-  //     finalPrice: purchaseInfo.totalOptionPrice + purchaseInfo.shippingFee,
-  //   };
-  //   try {
-  //     const response = await axios.post("/api/product/order", orderData);
-  //     // 성공적으로 전송된 후의 동작 작성. ex): 결제 성공 페이지로 navigate.
-  //     console.log(response.data); // 서버로부터의 응답 데이터 확인
-  //   } catch (error) {
-  //     console.error("에러메세지 :", error);
-  //   }
-  // };
+  const calculateTotalPrice = (purchaseInfo) => {
+    return purchaseInfo.reduce((total, group) => {
+      const groupTotal = group.options.reduce(
+        (groupTotal, option) => groupTotal + option.price * option.quantity,
+        0,
+      );
+      return total + groupTotal;
+    }, 0);
+  };
 
   return (
     <Box mt={10} mb={10}>
       <Box justifyContent={"center"} display={"flex"} alignItems={"center"}>
         <FormControl w={"80%"}>
           <FormLabel fontSize={"1.5rem"} fontWeight={"bold"}>
-            주문결제
+            상품 결제 {purchaseInfo ? ": " + orderName : ""}
           </FormLabel>
           <Table>
             <Thead>
               <Tr>
+                <Th textAlign={"center"}>상품 이미지</Th>
                 <Th textAlign={"center"}>상품명</Th>
-                <Th>옵션명</Th>
-                <Th>가격</Th>
-                <Th>수량</Th>
-                <Th>배송비</Th>
+                <Th textAlign={"center"}>옵션명</Th>
+                <Th textAlign={"center"}>가격</Th>
+                <Th textAlign={"center"}>수량</Th>
               </Tr>
             </Thead>
-            {/* ------------------------------ 로컬스토리지 이용한 상품정보 가져오기 ------------------------------ */}
             <Tbody>
-              {purchaseInfo && (
-                <Tr>
-                  <Th>
-                    <Flex gap={4}>
-                      {purchaseInfo.mainImgUrl && (
+              {purchaseInfo &&
+                purchaseInfo.map((group, index) => (
+                  <Tr key={index}>
+                    <Th
+                      display="flex"
+                      justifyContent="center"
+                      onClick={() => navigate(`/product/${group.productId}`)}
+                    >
+                      {group.mainImgUrl && (
                         <Image
-                          src={purchaseInfo.mainImgUrl}
+                          src={group.mainImgUrl}
                           alt="상품 이미지"
-                          boxSize="150px" // 이미지 크기를 적당히 조정하세요.
+                          boxSize="150px"
                         />
                       )}
-                      <Text
-                        alignItems={"center"}
-                        display={"flex"}
-                        justifyContent={"center"}
-                        onClick={() =>
-                          navigate("/product/" + purchaseInfo.product_id)
-                        }
-                        _hover={{
-                          cursor: "pointer",
-                        }}
-                      >
-                        {purchaseInfo.productName}
-                      </Text>
-                    </Flex>
-                  </Th>
-                  {/* ---------------- 상세옵션선택 2개 이상일때 한줄씩 노출 ---------------- */}
-                  <Th>
-                    {purchaseInfo.selectedOptions.map((opt, index, array) => (
-                      <React.Fragment key={index}>
-                        {opt.option_name}
-                        {/* 마지막 옵션명 뒤에는 줄바꿈을 추가하지 않습니다. */}
-                        {index < array.length - 1 && <br />}
-                      </React.Fragment>
-                    ))}
-                  </Th>
-
-                  <Th>
-                    {purchaseInfo.totalOptionPrice.toLocaleString("ko-KR")}원
-                  </Th>
-                  <Th>
-                    {purchaseInfo.selectedOptions.reduce(
-                      (acc, opt) => acc + opt.quantity,
-                      0,
-                    )}
-                  </Th>
-                  <Th>{purchaseInfo.shippingFee.toLocaleString("ko-KR")}원</Th>
-                </Tr>
-              )}
+                    </Th>
+                    <Th textAlign="center" whiteSpace="pre-wrap">
+                      {group.productName}
+                    </Th>
+                    <Th textAlign="center">
+                      {group.options.map((option, optionIndex) => (
+                        <div key={optionIndex}>
+                          {option.optionName} ({option.quantity}개)
+                        </div>
+                      ))}
+                    </Th>
+                    <Th textAlign="center">
+                      {group.options
+                        .reduce((total, option) => total + option.price, 0)
+                        .toLocaleString("ko-KR")}{" "}
+                      원
+                    </Th>
+                    <Th textAlign="center">
+                      {group.options.reduce(
+                        (total, option) => total + option.quantity,
+                        0,
+                      )}
+                    </Th>
+                  </Tr>
+                ))}
             </Tbody>
           </Table>
         </FormControl>
@@ -345,7 +332,7 @@ export function ProductPay() {
       >
         {/* ------------------------------------- 배송정보 ------------------------------------- */}
         <Flex h={"100%"} w={"80%"} p={5} justifyContent={"space-evenly"}>
-          <Card w={"50%"} boxShadow={"2xl"}>
+          <Card w={"50%"} shadow="md">
             <VStack p={5} spacing={5} align="stretch">
               <Box>
                 <Heading size="lg" textAlign="center">
@@ -508,104 +495,70 @@ export function ProductPay() {
 
           {/* ------------------------------------- 주문자 정보 ------------------------------------- */}
           <Card h={"100%"} w={"30%"}>
-            <VStack boxShadow={"2xl"} p={5} spacing={5} align="stretch">
-              <Box>
-                <Heading size="lg" textAlign="center">
-                  주문자 정보
-                </Heading>
-              </Box>
+            <VStack shadow="md" p={5} spacing={5} align="stretch">
+              <Heading size="lg" textAlign="center">
+                주문자 정보
+              </Heading>
 
-              <FormControl mb={6}>
-                <Flex
-                  w={"100%"}
-                  justifyContent="space-between"
-                  alignItems="end"
-                >
-                  <FormLabel w={"100px"}>주문자명</FormLabel>
-                  <Box readOnly textAlign={"end"} border={"none"} flex="1">
+              <VStack spacing={2} my={3}>
+                <Flex w="full" justifyContent="space-between">
+                  <Text as="span" fontSize="md">
+                    주문자명
+                  </Text>
+                  <Text as="span" fontSize="md" textAlign={"flex-start"}>
                     {userInfo.receiver}
-                  </Box>
+                  </Text>
                 </Flex>
 
-                <Flex w={"100%"} alignItems="center" mt={4}>
-                  <FormLabel w={"100px"} alignItems={"end"}>
+                <Flex w="full" justifyContent="space-between">
+                  <Text as="span" fontSize="md">
                     연락처
-                  </FormLabel>
-                  <Flex gap={1} flex="1" justifyContent={"end"}>
-                    <Box type="tel" maxLength="3">
-                      {contactFirst}
-                    </Box>
-                    <Text>-</Text>
-                    <Box type="tel" maxLength="4">
-                      {contactMiddle}
-                    </Box>
-                    <Text>-</Text>
-                    <Box type="tel" maxLength="4">
-                      {contactLast}
-                    </Box>
-                  </Flex>
+                  </Text>
+                  <Text as="span" fontSize="md" textAlign={"flex-start"}>
+                    {contactFirst} - {contactMiddle} - {contactLast}
+                  </Text>
                 </Flex>
 
-                <Flex
-                  w={"100%"}
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mt={4}
-                >
-                  <FormLabel w={"100px"}>이메일</FormLabel>
-                  <Text flex="1" textAlign={"end"}>
+                <Flex w="full" justifyContent="space-between">
+                  <Text as="span" fontSize="md">
+                    이메일
+                  </Text>
+                  <Text as="span" fontSize="md" textAlign={"flex-start"}>
                     {userInfo.email || "이메일 주소를 입력해주세요."}
                   </Text>
                 </Flex>
-              </FormControl>
+              </VStack>
 
-              <Box borderTop={"2px dotted #eeeeee"}>
-                <Box mt={10}>
-                  <Heading size="lg" textAlign="center">
-                    결제 정보
-                  </Heading>
-                </Box>
-              </Box>
+              <Divider variant="dashed" color="#EEEEEE" borderWidth="1px" />
 
-              <FormControl>
-                <Flex justifyContent="space-between">
-                  <FormLabel>총 상품금액</FormLabel>
-                  <Box>
-                    {purchaseInfo
-                      ? purchaseInfo.totalOptionPrice.toLocaleString("ko-KR")
-                      : "0"}
-                    원
-                  </Box>
+              <Heading size="lg" textAlign="center">
+                결제 정보
+              </Heading>
+              <VStack spacing={2}>
+                <Flex w="full" justifyContent="space-between">
+                  <Text fontSize="md">총 상품금액</Text>
+                  <Text fontSize="md">
+                    {purchaseInfo ? totalPrice.toLocaleString("ko-KR") : "0"}원
+                  </Text>
                 </Flex>
-                <Flex justifyContent="space-between">
-                  <FormLabel>총 배송비</FormLabel>
-                  <Box>
-                    {purchaseInfo
-                      ? purchaseInfo.shippingFee.toLocaleString("ko-KR")
-                      : "0"}
-                    원
-                  </Box>
+                <Flex w="full" justifyContent="space-between">
+                  <Text fontSize="md">총 배송비</Text>
+                  <Text fontSize="md">
+                    {shippingFee.toLocaleString("kr-KR")}원
+                  </Text>
                 </Flex>
-              </FormControl>
+              </VStack>
 
-              <FormControl>
-                <Box borderTop={"2px dotted #eeeeee"}>
-                  <Flex mt={5} justifyContent={"space-between"}>
-                    <FormLabel fontWeight={"bold"} fontSize={"1.5rem"}>
-                      최종 결제 금액
-                    </FormLabel>
-                    <Box fontWeight={"bold"} fontSize={"1.5rem"} color={"red"}>
-                      {purchaseInfo
-                        ? (
-                            purchaseInfo.totalOptionPrice +
-                            purchaseInfo.shippingFee
-                          ).toLocaleString("ko-KR")
-                        : "0"}
-                      원
-                    </Box>
-                  </Flex>
-                </Box>
-              </FormControl>
+              <Divider variant="dashed" color="#EEEEEE" borderWidth="1px" />
+              <Flex justifyContent="space-between" my={2}>
+                <Heading size="md">결제 금액</Heading>
+                <Heading size="md" color="red">
+                  {purchaseInfo
+                    ? (totalPrice + shippingFee).toLocaleString("ko-Kr")
+                    : 0}
+                  원
+                </Heading>
+              </Flex>
               <Button
                 background={"black"}
                 color={"white"}
@@ -621,24 +574,22 @@ export function ProductPay() {
       </Box>
 
       {/* ------------------------------------- 주소변경 모달창 ------------------------------------- */}
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
+      <Modal isOpen={isModalOpen} onClose={closeModal} isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader boxShadow={"md"} mb={5}>
-            주소 변경
-          </ModalHeader>
-          <ModalCloseButton />
+          <ModalHeader>주소 변경</ModalHeader>
+          <ModalCloseButton size="lg" mt={1} />
           <ModalBody>
             {userAddresses.map((address) => (
               <Box
                 key={address.id}
                 p={4}
-                borderWidth="1px"
+                border="1px solid #E8E8E8"
                 borderRadius="lg"
+                shadow="md"
                 mb={2}
-                bg={selectedAddress === address ? "#eeeeee" : "transparent"}
-                _hover={{ cursor: "pointer", background: "#eeeeee" }}
-                boxShadow={"md"}
+                bg={selectedAddress === address ? "#FFC444" : "transparent"}
+                _hover={{ cursor: "pointer", background: "#FFC444" }}
                 onClick={() => handleAddressSelect(address)}
               >
                 <Text fontWeight="bold">{address.member_address_name}</Text>
