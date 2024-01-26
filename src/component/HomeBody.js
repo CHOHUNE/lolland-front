@@ -39,26 +39,17 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 export function HomeBody() {
-  const categoryStyle = {
-    m: "auto",
-    height: "150px",
-    w: "150px",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-  };
-
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const toast = useToast();
   const [showAllCategories, setShowAllCategories] = useState(false);
 
-  const [mostReviewedProducts, setMostReviewedProducts] = useState([]);
-  const [boardList, setBoardList] = useState(null);
-  const [naver, setNaver] = useState(null);
+  const [mostReviewedProducts, setMostReviewedProducts] = useState([]); // 리뷰많은 3개 상품 상태
+  const [boardList, setBoardList] = useState(null); // 게임장비커뮤니티 베스트게시물 상태
+  const [top, setTop] = useState(null); // 게임커뮤니티 베스트게시물 상태
+  const [naver, setNaver] = useState(null); // 뉴스기사 상태
 
-  // 리뷰많은 상품 3개 불러오기
+  // -------------------------------- 리뷰많은 상품 3개 불러오기 --------------------------------
   useEffect(() => {
     axios
       .get("/api/product/most-reviewed")
@@ -70,7 +61,34 @@ export function HomeBody() {
       });
   }, []);
 
-  // 카테고리 불러오기
+  // -------------------------------- 게임장비 커뮤니티 오늘의 베스트 가져오기 --------------------------------
+
+  useEffect(() => {
+    axios
+      .get("api/gearboard/today")
+      .then((response) => setBoardList(response.data));
+  }, []);
+
+  const handleViewAllCategories = () => {
+    setShowAllCategories(!showAllCategories);
+  };
+
+  // -------------------------------- 게임커뮤니티 베스트게시물 가져오기 --------------------------------
+
+  useEffect(() => {
+    axios
+      .get("/api/gameboard/list/top")
+      .then((response) => setTop(response.data));
+  }, []);
+
+  // -------------------------------- 커뮤니티 뉴스API 가져오기 --------------------------------
+  useEffect(() => {
+    axios.get("/api/gameboard/naver").then((response) => {
+      setNaver(response.data);
+    });
+  }, []);
+
+  // -------------------------------- 카테고리 불러오기 --------------------------------
   useEffect(() => {
     axios
       .get("/api/product/mainCategory")
@@ -95,32 +113,9 @@ export function HomeBody() {
       });
   }, []);
 
-  // ------------------------------ 커뮤니티 뉴스API 가져오기 ------------------------------
-  useEffect(() => {
-    axios.get("/api/gameboard/naver").then((response) => {
-      setNaver(response.data);
-    });
-  }, []);
-
-  // ------------------------------ 게임장비 커뮤니티 오늘의 베스트 가져오기 ------------------------------
-
-  useEffect(() => {
-    axios
-      .get("api/gearboard/today")
-      .then((response) => setBoardList(response.data));
-  }, []);
-
-  const handleViewAllCategories = () => {
-    setShowAllCategories(!showAllCategories);
-  };
-
-  // ------------------------------- 최근본상품 애니메이션 ----------------------------
+  // -------------------------------- 최근본상품 로컬스토리지 & 애니메이션 --------------------------------
   const [scrollPosition, setScrollPosition] = useState(0);
-
-  // 메뉴가 고정될 기준 위치 (예를 들어 배너의 높이 + 상단 메뉴의 높이)
   const fixedTopPosition = 650;
-
-  // 실제로 메뉴를 고정시킬 위치
   const stickyTopPosition = 100;
 
   useEffect(() => {
@@ -150,6 +145,7 @@ export function HomeBody() {
     transition: "top 0.3s ease-in-out",
   };
 
+  // -------------------------------- 글자수가 특정개수 이상일때 자르기 --------------------------------
   const truncateText = (str, num) => {
     if (str && str.length > num) {
       return str.slice(0, num) + "...";
@@ -157,12 +153,12 @@ export function HomeBody() {
     return str;
   };
 
-  // ------------------------------ 가격 ex) 1,000 ,로 구분지어 보여지게 처리 ------------------------------
+  // -------------------------------- 가격 ex) 1,000 ,로 구분지어 보여지게 처리 --------------------------------
   const formatPrice = (price) => {
     return new Intl.NumberFormat("ko-KR", { style: "decimal" }).format(price);
   };
 
-  // ------------------------------ 버튼 디자인 ------------------------------
+  // -------------------------------- 버튼 디자인 --------------------------------
   const buttonStyle = {
     background: "black",
     color: "whitesmoke",
@@ -176,11 +172,23 @@ export function HomeBody() {
     },
   };
 
+  // -------------------------------- 중간2 카테고리 버튼 디자인 --------------------------------
+  const categoryStyle = {
+    m: "auto",
+    height: "150px",
+    w: "150px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+  };
+
+  // -------------------------------- null 오류 방지 --------------------------------
   if (boardList === null) {
     return <Spinner />;
-  }
-
-  if (naver === null) {
+  } else if (naver === null) {
+    return <Spinner />;
+  } else if (top === null) {
     return <Spinner />;
   }
 
@@ -192,7 +200,7 @@ export function HomeBody() {
           <SwiperImg />
         </Box>
 
-        {/* -------- 최근본상품 -------- */}
+        {/* ------------------------ 최근본상품 ------------------------ */}
         <Box style={menuStyle}>
           <Recent />
         </Box>
@@ -200,14 +208,20 @@ export function HomeBody() {
 
       {/* ------------------------ 중간 이미지 및 게시글 ------------------------ */}
       <Box justifyContent="center" display="flex">
-        <Box justifyContent="center" display="flex" minW={"1300px"} mt={"40px"}>
+        <Box
+          justifyContent="center"
+          display="flex"
+          minW={"1300px"}
+          mt={"40px"}
+          mb={10}
+        >
           {/* 큰 상품 박스 */}
           <Swiper
             modules={[EffectFade, Autoplay]}
             spaceBetween={50}
             slidesPerView={1}
             pagination={{ clickable: true }}
-            autoplay={{ delay: 9000 }}
+            autoplay={{ delay: 3000 }}
             effect="fade"
             style={{ width: "600px" }}
           >
@@ -225,11 +239,10 @@ export function HomeBody() {
                     alignItems="center"
                     position={"relative"}
                   >
-                    {/* "현재 인기 상품" 텍스트 추가 */}
                     <Box
                       position="absolute"
-                      top="10px" // 원하는 위치로 조정하세요.
-                      left="10px" // 원하는 위치로 조정하세요.
+                      top="10px"
+                      left="10px"
                       bg="white"
                       p={2}
                       borderRadius="4px"
@@ -243,8 +256,8 @@ export function HomeBody() {
                     <Box
                       position="absolute"
                       top="50px"
-                      w="350px" // 이미지의 너비를 350px로 고정
-                      h="350px" // 이미지의 높이를 350px로 고정
+                      w="350px"
+                      h="350px"
                       p={5}
                       display="flex"
                       justifyContent="center"
@@ -254,8 +267,8 @@ export function HomeBody() {
                         position="absolute"
                         src={product.productImgs[0].main_img_uri}
                         alt="Product Image"
-                        width="100%" // 이미지를 가득 채우도록 설정
-                        height="100%" // 이미지를 가득 채우도록 설정
+                        width="100%"
+                        height="100%"
                       />
                     </Box>
 
@@ -299,15 +312,15 @@ export function HomeBody() {
             ))}
           </Swiper>
 
-          {/* ------------------------ 작은 상품 박스들 ------------------------ */}
+          {/*  작은 상품 박스들  */}
           <Box mt={"40px"} display="flex" flexDirection="column" gap="24px">
             <Flex gap={4}>
-              {/* ------------------------ 게임장비커뮤니티 게시글 ------------------------ */}
+              {/* ------------------------ 게임장비커뮤니티 베스트게시글 ------------------------ */}
               <Box p={2} border="1px solid #E5E5E5" w="350px" h="300px">
                 <Text color={"gray"}>게임장비커뮤니티</Text>
                 <Flex w={"100%"} justifyContent={"space-between"}>
                   <Text fontSize={"1.5rem"} fontWeight={"bold"}>
-                    오늘의 베스트
+                    오늘의 Best
                   </Text>
                   <Button
                     bg={"none"}
@@ -324,7 +337,7 @@ export function HomeBody() {
                     <Flex
                       key={item.gear_id}
                       justify="flex-start"
-                      alignItems="center" // 수직 정렬 중앙으로 조정
+                      alignItems="center"
                     >
                       <Box mt={3}>
                         <Heading
@@ -336,7 +349,6 @@ export function HomeBody() {
                           textTransform="uppercase"
                         >
                           {item.gear_title}
-                          {/*{truncateText(product.product_content, 40)}*/}
                         </Heading>
                         <Text pt="2" fontSize="sm">
                           {truncateText(item.gear_content, 30)}
@@ -347,13 +359,50 @@ export function HomeBody() {
                 </Stack>
               </Box>
 
-              {/* ------------------------ 게임커뮤니티 게시글 ------------------------ */}
-              <Box border="1px solid #E5E5E5" w="350px" h="300px">
-                3
+              {/* ------------------------ 게임커뮤니티 베스트게시물 ------------------------ */}
+              <Box p={2} border="1px solid #E5E5E5" w="350px" h="300px">
+                <Text color={"gray"}>게임커뮤니티</Text>
+                <Flex w={"100%"} justifyContent={"space-between"}>
+                  <Text fontSize={"1.5rem"} fontWeight={"bold"}>
+                    Best 게시물
+                  </Text>
+                  <Button
+                    bg={"none"}
+                    fontSize={"12px"}
+                    color={"gray"}
+                    _hover={{ background: "none", color: "black" }}
+                    onClick={() => navigate("/gameboard/list?s=")}
+                  >
+                    더보기
+                  </Button>
+                </Flex>
+                <Stack divider={<StackDivider />} spacing="3">
+                  {top.slice(0, 3).map((item) => (
+                    <Flex
+                      key={item.gear_id}
+                      justify="flex-start"
+                      alignItems="center"
+                    >
+                      <Box mt={3}>
+                        <Heading
+                          _hover={{ cursor: "pointer" }}
+                          onClick={() => navigate("/gameboard/id/" + item.id)}
+                          size="xs"
+                          textTransform="uppercase"
+                        >
+                          {item.title}
+                        </Heading>
+                        <Text pt="2" fontSize="sm">
+                          {truncateText(item.board_content, 30)}
+                        </Text>
+                      </Box>
+                    </Flex>
+                  ))}
+                </Stack>
               </Box>
             </Flex>
 
-            {/* ------------------------ 최신뉴스기사??? ------------------------ */}
+            {/* ------------------------ 최신뉴스기사 게시글 ------------------------ */}
             <Box p={2} border="1px solid #E5E5E5" w="716px" h="275px">
               <Text color={"gray"}>리그오브레전드 관련</Text>
               <Flex w={"100%"} justifyContent={"space-between"}>
@@ -394,10 +443,17 @@ export function HomeBody() {
         </Box>
       </Box>
 
-      {/* ------------------------- 중간2 카테고리 표시 ------------------------- */}
-      <Box display="flex" justifyContent="center" alignItems="center" p={10}>
+      {/* ------------------------ 중간2 카테고리 이미지로 표시 ------------------------ */}
+      <Box
+        borderTop={"1px solid #eeeeee"}
+        mt={10}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        p={10}
+      >
         <Box w={"70%"}>
-          <Text fontWeight={"bold"} fontSize="2xl" textAlign="center" mt={5}>
+          <Text fontWeight={"bold"} fontSize="2.3rem" textAlign="center" mt={5}>
             Categories
           </Text>
           <Text textAlign="center" color="gray.500" mb={5}>
@@ -407,6 +463,7 @@ export function HomeBody() {
           <SimpleGrid columns={"4"} gap={10} p={5} mt={10}>
             {categories.map((category, index) => {
               // 9번째 카테고리 숨김 처리
+              // 버튼 누르면 보임
               if (index === 8 && !showAllCategories) return null;
               let imageUrl;
               switch (category.category_id) {
@@ -447,7 +504,6 @@ export function HomeBody() {
                     "https://image3.compuzone.co.kr/img/product_img/2018/0207/447472/447472_600.jpg"; // 외장하드
                   break;
               }
-
               return (
                 <Box
                   _hover={{
@@ -486,7 +542,7 @@ export function HomeBody() {
         </Box>
       </Box>
 
-      {/* ------------------------- 하단 배너 등 아직 결정안함  ------------------------- */}
+      {/* ------------------------- TODO : 하단 이미지배너 할지 상품목록 전체 리스트 뿌릴지 고민중  ------------------------- */}
 
       <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
         <Box
