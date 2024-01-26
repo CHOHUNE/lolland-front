@@ -152,7 +152,6 @@ export function MemberLogin() {
           <FormControl mt={20} mb={10}>
             <Flex justifyContent={"center"}>
               <Button
-                {...buttonStyle}
                 w={"600px"}
                 h={"50px"}
                 color={"black"}

@@ -113,11 +113,11 @@ function MemberBoardLikePagination({ pageInfo }) {
 export function MemberBoardLike() {
   // 버튼 css
   const buttonStyle = {
-    background: "gray.100",
-    color: "black",
+    background: "black",
+    color: "whitesmoke",
     shadow: "1px 1px 3px 1px #dadce0",
     _hover: {
-      backgroundColor: "orange",
+      backgroundColor: "whitesmoke",
       color: "black",
       transition:
         "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
@@ -348,6 +348,7 @@ export function MemberBoardLike() {
                   <Td textAlign={"center"}>
                     <Button
                       {...buttonStyle}
+                      bg={"gray"}
                       onClick={() => handleLikeDeleteClick(gameBoard.id)}
                     >
                       <FontAwesomeIcon icon={faBan} fontSize={"2rem"} />
