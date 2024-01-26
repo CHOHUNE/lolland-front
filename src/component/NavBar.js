@@ -108,7 +108,6 @@ export function NavBar() {
           p={5}
           w="full"
           minW={"1400px"}
-          // px="3%"
           shadow="sm"
           position="fixed"
           zIndex={100}
