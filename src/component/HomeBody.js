@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Flex,
+  Image,
   Img,
   SimpleGrid,
   Spinner,
@@ -17,12 +18,22 @@ import "swiper/css/pagination";
 import "swiper/css";
 
 import "./swiper.css";
-import { Autoplay, Grid } from "swiper/modules";
+import {
+  Autoplay,
+  EffectFade,
+  Grid,
+  Navigation,
+  Pagination,
+} from "swiper/modules";
 import SwiperImg from "./SwiperImg";
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Recent } from "./RecentViewed";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
 export function HomeBody() {
   const categoryStyle = {
     m: "auto",
@@ -39,7 +50,21 @@ export function HomeBody() {
   const toast = useToast();
   const [showAllCategories, setShowAllCategories] = useState(false);
 
-  // 카테고리 불러오기 TODO: 왜??? 서브 카테고리까지 불러와서 누산기 돌리는 건지 질문 카테고리만 가져오는 메소드 따로 있음
+  const [mostReviewedProducts, setMostReviewedProducts] = useState([]);
+
+  // 리뷰많은 상품 3개 불러오기
+  useEffect(() => {
+    axios
+      .get("/api/product/most-reviewed")
+      .then((response) => {
+        setMostReviewedProducts(response.data);
+      })
+      .catch((error) => {
+        console.error("에러메세지 :", error);
+      });
+  }, []);
+
+  // 카테고리 불러오기
   useEffect(() => {
     axios
       .get("/api/product/mainCategory")
@@ -111,41 +136,88 @@ export function HomeBody() {
         <Box borderRadius={"20px"} background={"white"} w={"90%"} h={"100%"}>
           <SwiperImg />
         </Box>
-        <Box
-          // position="fixed" // 절대 위치를 사용해 오버레이 설정
-          // top="300" // 배너의 상단에서 시작
-          // right="2" // 배너의 우측에서 시작
-          // zIndex="10" // 다른 요소보다 위에 오도록 z-index 설정
-          // p="4" // 패딩 값
-          // bg="rgba(255, 255, 255, 0.1)" // 배경색
-          // boxShadow="lg" // 그림자 효과
-          // maxW="sm" // 최대 너비 설정
-          // overflow="hidden" // 내용이 넘치면 숨김
-          // borderRadius="15px"
-          style={menuStyle}
-        >
+
+        {/* -------- 최근본상품 -------- */}
+        <Box style={menuStyle}>
           <Recent />
         </Box>
       </Box>
 
       {/* ------------------------ 중간 이미지 및 게시글 ------------------------ */}
       <Box justifyContent="center" display="flex">
-        <Box justifyContent="center" display="flex" w={"70%"} gap="24px">
+        <Box justifyContent="center" display="flex" minW={"1300px"} mt={"40px"}>
           {/* 큰 상품 박스 */}
-          <Box mt={"40px"} border="1px solid black" w="400px" h="500px">
-            1
-          </Box>
+          <Swiper
+            modules={[EffectFade, Pagination, Autoplay]}
+            spaceBetween={50}
+            slidesPerView={1}
+            pagination={{ clickable: true }}
+            autoplay={{ delay: 9000 }}
+            effect="fade"
+            style={{ width: "600px" }}
+          >
+            {mostReviewedProducts.map((product) => (
+              <SwiperSlide key={product.product_id}>
+                <Box
+                  mr={2}
+                  mt={"40px"}
+                  border="1px solid black"
+                  w="600px"
+                  h="600px"
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="center"
+                  alignItems="center"
+                  position={"relative"}
+                >
+                  {product.productImgs && product.productImgs.length > 0 && (
+                    <Box
+                      position="absolute"
+                      top={"0"}
+                      left={"0"}
+                      h={"350px"} // 높이를 고정값으로 설정
+                      w={"590px"} // 너비를 고정값으로 설정
+                      border={"1px solid red"}
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      overflow="hidden"
+                    >
+                      <Image
+                        src={product.productImgs[0].main_img_uri}
+                        alt="Product Image"
+                        objectFit="contain"
+                        w={"100%"}
+                        h={"100%"}
+                      />
+                    </Box>
+                  )}
+
+                  <Text
+                    mt="200px"
+                    mb="20px"
+                    border={"1px solid red"}
+                    w={"100%"}
+                  >
+                    [{product.company_name}]
+                    <br />
+                    {product.product_name}
+                  </Text>
+                </Box>
+              </SwiperSlide>
+            ))}
+          </Swiper>
           {/* 작은 상품 박스들 */}
           <Box mt={"40px"} display="flex" flexDirection="column" gap="24px">
             <Flex gap={4}>
-              <Box border="1px solid black" w="300px" h="200px">
+              <Box border="1px solid black" w="350px" h="300px">
                 2
               </Box>
-              <Box border="1px solid black" w="300px" h="200px">
+              <Box border="1px solid black" w="350px" h="300px">
                 3
               </Box>
             </Flex>
-            <Box border="1px solid black" w="617px" h="275px">
+            <Box border="1px solid black" w="716px" h="275px">
               4
             </Box>
           </Box>
