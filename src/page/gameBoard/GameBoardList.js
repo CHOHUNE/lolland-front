@@ -47,6 +47,7 @@ import { LoginContext } from "../../component/LoginProvider";
 import { AddIcon, ChatIcon, StarIcon } from "@chakra-ui/icons";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination as SwiperPagination } from "swiper/modules";
+import YouTube from "react-youtube";
 
 function PageButton({ variant, pageNumber, children }) {
   const [params] = useSearchParams();
@@ -238,20 +239,59 @@ function GameBoardList() {
     navigate("/gameboard/list?" + params);
   }, [sortBy]);
 
+  const opts = {
+    width: "250",
+    height: "150",
+    playerVars: {
+      autoplay: 0,
+    },
+  };
+
+  useEffect(() => {
+    const params = {
+      key: process.env.REACT_APP_YOUTUBE_API_KEY,
+      q: "게임 리뷰",
+      part: "snippet",
+      type: "video",
+      maxResults: 8,
+      fields: "items(id, snippet(title))",
+      videoEmbeddable: true,
+    };
+    const youtubeDatas = axios.get(
+      "https://www.googleapis.com/youtube/v3/search",
+      {
+        params,
+      },
+    );
+  }, []);
+
+  const searchedVideos = [];
+
+  const getSearchedVideos = async (youtubeDatas) => {
+    // 빈 배열 초기화
+
+    // YouTube API에서 받아온 데이터의 items 배열에 접근
+    const videoLists = youtubeDatas.data.items;
+
+    // 각 동영상에 대해 반복
+    videoLists.forEach((element) => {
+      // 동영상의 ID와 제목 추출
+      const videoId = element.id.videoId;
+      const title = element.snippet.title;
+
+      // 추출한 정보를 객체로 만들어 배열에 추가
+      searchedVideos.push({ videoId, title });
+    });
+
+    // 완성된 배열을 반환
+    return searchedVideos;
+  };
+
+  // 비동기 함수 getSearchedVideos 정의
+
   if (gameBoardList === null || pageInfo === null) {
     return <Spinner />;
   }
-
-  const property = {
-    imageUrl: "https://bit.ly/2Z4KKcF",
-    imageAlt: "Rear view of modern home with pool",
-    beds: 3,
-    baths: 2,
-    title: "Modern home in city center in the heart of historic Los Angeles",
-    formattedPrice: "$1,900.00",
-    reviewCount: 34,
-    rating: 4,
-  };
 
   return (
     <Box>
@@ -410,98 +450,6 @@ function GameBoardList() {
                 ))}
             </SimpleGrid>
 
-            {/*상단 Best 부분 테이블 */}
-
-            {/*<Center w={"75%"}>*/}
-            {/*  <TableContainer w={"100%"}>*/}
-            {/*    <Table size="sm" border={"1px solid whitesmoke"}>*/}
-            {/*      <Thead>*/}
-            {/*        <Tr>*/}
-            {/*          <Th w="5%" textAlign={"center"}>*/}
-            {/*            추천*/}
-            {/*          </Th>*/}
-            {/*          <Th w="5%" pl="0">*/}
-            {/*            분류*/}
-            {/*          </Th>*/}
-            {/*          <Th w="40%" colSpan={2} textAlign={"center"}>*/}
-            {/*            제목*/}
-            {/*          </Th>*/}
-            {/*          <Th w="10%">조회수</Th>*/}
-            {/*          <Th w="10%">작성자</Th>*/}
-            {/*          <Th w="10%">날짜</Th>*/}
-            {/*        </Tr>*/}
-            {/*      </Thead>*/}
-            {/*      <Tbody>*/}
-            {/*        {top &&*/}
-            {/*          top.map((topTen) => (*/}
-            {/*            <Tr key={topTen.id} borderRadius="10px">*/}
-            {/*              <Td w="10%" textAlign={"center"}>*/}
-            {/*                <Badge*/}
-            {/*                  colorScheme="green"*/}
-            {/*                  variant="outline"*/}
-            {/*                  mx={"2px"} // Adjusted spacing around Badge*/}
-            {/*                  fontWeight={"bold"}*/}
-            {/*                  bgColor={`rgba(0, 128, 0, ${*/}
-            {/*                    topTen.count_like / 10*/}
-            {/*                  })`}*/}
-            {/*                >*/}
-            {/*                  {topTen.count_like}*/}
-            {/*                </Badge>*/}
-            {/*              </Td>*/}
-
-            {/*              <Td w="5%" pl="0">*/}
-            {/*                {topTen.category}*/}
-            {/*              </Td>*/}
-            {/*              <Td*/}
-            {/*                w="40%"*/}
-            {/*                colSpan={2}*/}
-            {/*                textAlign={"center"}*/}
-            {/*                onClick={() =>*/}
-            {/*                  navigate("/gameboard/id/" + topTen.id)*/}
-            {/*                }*/}
-            {/*                _hover={{ cursor: "pointer" }}*/}
-            {/*              >*/}
-            {/*                <span style={{ marginLeft: "+10%" }}>*/}
-            {/*                  {topTen.title}*/}
-            {/*                </span>*/}
-
-            {/*                {topTen.count_comment !== 0 && (*/}
-            {/*                  <Badge*/}
-            {/*                    colorScheme={"green"}*/}
-            {/*                    variant="outline"*/}
-            {/*                    mx={"1%"}*/}
-            {/*                  >*/}
-            {/*                    {topTen.count_comment}*/}
-            {/*                    <ChatIcon />*/}
-            {/*                  </Badge>*/}
-            {/*                )}*/}
-
-            {/*                {topTen.countFile !== 0 && (*/}
-            {/*                  <Badge mx={"1%"}>*/}
-            {/*                    {topTen.countFile}*/}
-            {/*                    <FontAwesomeIcon icon={faImage} />*/}
-            {/*                  </Badge>*/}
-            {/*                )}*/}
-            {/*              </Td>*/}
-            {/*              <Td w="10%">{topTen.board_count}</Td>*/}
-            {/*              <Td w="10%">{topTen.member_id}</Td>*/}
-            {/*              <Td w="10%">*/}
-            {/*                {new Date(topTen.reg_time).toLocaleDateString(*/}
-            {/*                  "ko-KR",*/}
-            {/*                  {*/}
-            {/*                    year: "numeric",*/}
-            {/*                    month: "long",*/}
-            {/*                    day: "numeric",*/}
-            {/*                  },*/}
-            {/*                )}*/}
-            {/*              </Td>*/}
-            {/*            </Tr>*/}
-            {/*          ))}*/}
-            {/*      </Tbody>*/}
-            {/*    </Table>*/}
-            {/*  </TableContainer>*/}
-            {/*</Center>*/}
-
             {/* 그 외의 게시물 게시판 */}
             <Center>
               <Heading as="h2" size="lg" my={"15px"}>
@@ -517,7 +465,6 @@ function GameBoardList() {
                 my={"1%"}
                 mt={"15px"}
                 w={"100%"}
-                담
                 shadow={"1px 1px 3px 1px #dadce0"}
               >
                 <Button
@@ -816,6 +763,31 @@ function GameBoardList() {
           </Card>
           <br />
           <br />
+          <Card>
+            <CardHeader size={"md"}>
+              <Heading>화제의 게임 동영상</Heading>
+            </CardHeader>
+            <CardBody>
+              <div
+                style={{
+                  margin: 20,
+                  display: "flex",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  width: "80%",
+                }}
+              >
+                {searchedVideos.map((item) => (
+                  <Box>
+                    <YouTube videoId={item.videoId} opts={opts} />
+                    <div style={{ width: 280 }}>
+                      {item.title.replace(/&QUOT;/gi, '"')}
+                    </div>
+                  </Box>
+                ))}
+              </div>
+            </CardBody>
+          </Card>
           <br />
           <Box>
             <Divider orientation="horizontal" color={"orange"} />
