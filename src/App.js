@@ -46,6 +46,7 @@ import { MemberBoardLike } from "./page/member/MemberViewPage/MemberBoardLike";
 import { HomeBody } from "./component/HomeBody";
 import { ProductMainList } from "./page/product/ProductMainList";
 import { ProductSubList } from "./page/product/ProductSubList";
+import { CompanyList } from "./page/product/CompanyList";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -58,6 +59,7 @@ const routes = createBrowserRouter(
         path="/category/:category_id/:subcategory_id"
         element={<ProductSubList />}
       />
+      <Route path="/company/:company_id" element={<CompanyList />} />
 
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />

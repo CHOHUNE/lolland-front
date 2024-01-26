@@ -76,11 +76,37 @@ export function ProductView() {
     );
   }, 0);
 
-  // ---------------------------- 상품 렌더링 ----------------------------
+  // ------------------------------------ 최근 본 상품 ------------------------------------
+  const saveTransToRecentViewed = (productData) => {
+    const recent = JSON.parse(localStorage.getItem("recent")) || [];
+    const mainImgUrl =
+      productData.productImgs && productData.productImgs.length > 0
+        ? productData.productImgs[0].main_img_uri
+        : "기본이미지URL"; // 기본 이미지 URL 설정
+
+    const productName = productData.product.product_name; // 상품명 추가
+
+    // 현재 상품이 이미 recent 목록에 있는지 확인
+    const isProductAlreadyInRecent = recent.some(
+      (item) => item.mainImgUrl === mainImgUrl,
+    );
+
+    if (!isProductAlreadyInRecent) {
+      const updatedRecentViewed = [
+        { mainImgUrl, product_id: productData.product.product_id, productName },
+        ...recent,
+      ].slice(0, 5);
+      localStorage.setItem("recent", JSON.stringify(updatedRecentViewed));
+    }
+  };
+
+  // ---------------------------- 상품 렌더링 ---------------------------- @@
   useEffect(() => {
     axios.get("/api/product/product_id/" + product_id).then((response) => {
       setProduct(response.data);
       setProductDetailImg(response.data.productDetailsImgs[0].sub_img_uri);
+      // --------------------- 최근 본 상품 ----------------------
+      saveTransToRecentViewed(response.data);
     });
   }, []);
 
@@ -259,21 +285,6 @@ export function ProductView() {
       });
   }
 
-  // ----------------------------------- 상품 상세이미지 관련 로직 -----------------------------------
-  // const renderProductDetailsImages = () => {
-  //   return product?.productDetailsImgs?.map((detailImg) => {
-  //     return (
-  //       <Image
-  //         key={detailImg.details_img_id}
-  //         src={detailImg.sub_img_uri}
-  //         alt={`Product Detail Image ${detailImg.details_img_id}`}
-  //         boxSize="100px"
-  //         objectFit="cover"
-  //       />
-  //     );
-  //   });
-  // };
-
   // ----------------------------------- 찜하기 -----------------------------------
   const handleFavoriteClick = () => {
     // 현재 하트 상태 토글
@@ -398,25 +409,6 @@ export function ProductView() {
     }
   }
 
-  // // --------------------- 최근 본 상품 ----------------------
-  // const saveTransToRecentViewed = (productData) => {
-  //   const recentViewed = JSON.parse(localStorage.getItem("recentViewed")) || [];
-  //   const mainImgUrl =
-  //     product.productImgs && product.productImgs.length > 0
-  //       ? product.productImgs[0].main_img_uri
-  //       : ""; // 메인 이미지 URL
-  //   const updatedRecentViewed = [mainImgUrl, ...recentViewed].slice(0, 5);
-  //   localStorage.setItem("recentViewed", JSON.stringify(updatedRecentViewed));
-  // };
-  //
-  // useEffect(() => {
-  //   axios.get("/api/product/product_id/" + product_id).then((response) => {
-  //     setProduct(response.data);
-  //     // --------------------- 최근 본 상품 ----------------------
-  //     saveTransToRecentViewed(response.data);
-  //   });
-  // }, [product_id]);
-
   return (
     <Box mx={"15%"} p={5}>
       {/* ------------------------------ 상품 수정, 삭제 ------------------------------ */}
@@ -510,7 +502,11 @@ export function ProductView() {
 
             <HStack w={"100%"} h={"auto"} borderBottom={"1px solid #eeeeee"}>
               <HStack mt={3} mb={3}>
-                <FormLabel w={"100px"} fontWeight="bold">
+                <FormLabel
+                  w={"100px"}
+                  fontWeight="bold"
+                  onClick={() => navigate(`/company/${product.company_id}`)}
+                >
                   제조사
                 </FormLabel>
                 <Text fontWeight={400} mt={-2} border={"none"} flex={1}>

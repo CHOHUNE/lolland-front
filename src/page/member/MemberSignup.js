@@ -21,6 +21,18 @@ import axios from "axios";
 import { useDaumPostcodePopup } from "react-daum-postcode";
 
 export function MemberSignup() {
+  // readonly input 스타일
+  const readOnlyStyle = {
+    style: {
+      boxShadow: "1px 1px 3px 2px #dadce0 inset",
+      width: "500px",
+      height: "50px",
+      borderRadius: "6px",
+      textIndent: "15px",
+      fontSize: "16px",
+    },
+  };
+
   const [member_name, setMember_name] = useState("");
   const [member_login_id, setMember_login_id] = useState("");
   const [member_password, setMember_password] = useState("");
@@ -611,9 +623,8 @@ export function MemberSignup() {
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 우편번호
               </FormLabel>
-              <Input
-                w={"350px"}
-                h={"50px"}
+              <input
+                style={{ ...readOnlyStyle.style, width: "350px" }}
                 readOnly
                 defaultValue={member_post_code}
               />
@@ -630,22 +641,21 @@ export function MemberSignup() {
               </Button>
             </Flex>
           </FormControl>
+
           {/* 주소 */}
           <FormControl mt={2}>
             <Flex justifyContent={"center"}>
               <FormLabel w={"100px"} fontSize={"1.1rem"} lineHeight={"50px"}>
                 주소
               </FormLabel>
-              <Input
-                textArea
-                boxShadow={"1px 1px 3px 1px #dadce0 inset"}
-                w={"500px"}
-                h={"50px"}
+              <input
+                {...readOnlyStyle}
                 readOnly
                 defaultValue={member_address}
               />
             </Flex>
           </FormControl>
+
           {/* 상세주소 */}
           <FormControl mt={2}>
             <Flex justifyContent={"center"}>

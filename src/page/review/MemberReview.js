@@ -42,7 +42,6 @@ function PageButton({ variant, pageNumber, children }) {
 
   function handleClick() {
     params.set("p", pageNumber);
-    console.log(params.get("p"));
     navigate("?" + params);
   }
   return (

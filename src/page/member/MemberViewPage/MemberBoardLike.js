@@ -3,10 +3,16 @@ import {
   Button,
   Card,
   CardBody,
+  CardFooter,
   CardHeader,
   Center,
   Checkbox,
   Flex,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Select,
   Table,
   Tbody,
   Td,
@@ -20,9 +26,82 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCaretLeft,
+  faCaretRight,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp } from "@fortawesome/free-regular-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { ChevronDownIcon } from "@chakra-ui/icons";
+
+function MemberBoardLikePagination({ pageInfo }) {
+  const navigate = useNavigate();
+
+  const [params] = useSearchParams();
+  const listPage = params.get("page");
+
+  const pageNumbers = [];
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <Box>
+      {pageInfo.prvePageNumber && (
+        <Button
+          bg={"white"}
+          color={"black"}
+          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+          onClick={() => navigate("?page=" + pageInfo.prevPageNumber)}
+        >
+          <FontAwesomeIcon icon={faCaretLeft} />
+        </Button>
+      )}
+
+      {pageNumbers.map((pageNumber) => (
+        <Button
+          bg={listPage === pageNumber.toString() ? "black" : "white"}
+          color={listPage === pageNumber.toString() ? "white" : "black"}
+          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+          ml={2}
+          key={pageNumber}
+          onClick={() => navigate("?page=" + pageNumber)}
+        >
+          {pageNumber}
+        </Button>
+      ))}
+
+      {pageInfo.nextPageNumber && (
+        <Button
+          bg={"white"}
+          color={"black"}
+          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+          ml={2}
+          onClick={() => navigate("?page=" + pageInfo.nextPageNumber)}
+        >
+          <FontAwesomeIcon icon={faCaretRight} />
+        </Button>
+      )}
+    </Box>
+  );
+}
+
+// 조회 타입
+function QueryCategory() {
+  return (
+    <Box>
+      <Select defaultValue={"전체"} w={"100px"} onChange={() => {}}>
+        <option value="전체">전체</option>
+        <option value="잡담">잡담</option>
+        <option value="질문">질문</option>
+        <option value="정보">정보</option>
+        <option value="공지">공지</option>
+        <option>본문</option>
+      </Select>
+    </Box>
+  );
+}
 
 export function MemberBoardLike() {
   // 버튼 css
@@ -42,6 +121,9 @@ export function MemberBoardLike() {
   // 회원이 좋아요 한 게임 게시글 목록
   const [gameBoardList, setGameBoardList] = useState([]);
 
+  // 페이지 정보
+  const [pageInfo, setPageInfo] = useState("");
+
   // 좋아요 삭제 인식
   const [deletedLikeStatus, setDeletedLikeStatus] = useState(false);
 
@@ -52,20 +134,22 @@ export function MemberBoardLike() {
 
   const navigate = useNavigate();
 
+  const [params] = useSearchParams();
+
+  const location = useLocation();
+
   useEffect(() => {
-    axios.get("/api/member/getGameBoardLike").then((response) => {
-      setGameBoardList(response.data);
+    axios.get("/api/member/getGameBoardLike?" + params).then((response) => {
+      setGameBoardList(response.data.gameBoardLikeList);
+      setPageInfo(response.data.pageInfo);
     });
-  }, [deletedLikeStatus]);
+  }, [deletedLikeStatus, location]);
 
   // 게임 좋아요 하나 삭제
   const handleLikeDeleteClick = (gameBoardId) => {
     axios
       .delete("/api/member/deleteGameBoardLike", {
         data: [gameBoardId],
-        // headers: {
-        //   "Content-Type": "application/json",
-        // },
       })
       .then(() => {
         setDeletedLikeStatus((prev) => !prev);
@@ -164,6 +248,10 @@ export function MemberBoardLike() {
         </CardHeader>
 
         <CardBody>
+          <QueryCategory />
+        </CardBody>
+
+        <CardBody>
           <Table textAlign={"center"}>
             <Thead>
               <Tr>
@@ -234,6 +322,12 @@ export function MemberBoardLike() {
             </Tbody>
           </Table>
         </CardBody>
+
+        <Center>
+          <CardFooter>
+            <MemberBoardLikePagination pageInfo={pageInfo} />
+          </CardFooter>
+        </Center>
       </Card>
     </Center>
   );

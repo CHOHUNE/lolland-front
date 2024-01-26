@@ -11,9 +11,12 @@ import {
   Divider,
   Flex,
   Heading,
+  HStack,
   Image,
   Input,
   Select,
+  SimpleGrid,
+  Spacer,
   Spinner,
   Stack,
   StackDivider,
@@ -33,12 +36,14 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   faAngleLeft,
   faAngleRight,
+  faCaretDown,
   faImage,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { LoginContext } from "../../component/LoginProvider";
 import { AddIcon, ChatIcon } from "@chakra-ui/icons";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 function PageButton({ variant, pageNumber, children }) {
   const [params] = useSearchParams();
@@ -194,6 +199,11 @@ function GameBoardList() {
     });
   }, []);
 
+  useEffect(() => {
+    params.set("s", sortBy);
+    navigate("/gameboard/list?" + params);
+  }, [sortBy]);
+
   if (gameBoardList === null || pageInfo === null) {
     return <Spinner />;
   }
@@ -305,13 +315,14 @@ function GameBoardList() {
               </Heading>
             </Center>
 
-            <Center>
+            <Flex w={"75%"}>
               <ButtonGroup
                 variant={"ouline"}
                 spacing={"6"}
                 border={"1px solid whitesmoke"}
                 my={"1%"}
                 mt={"15px"}
+                w={"100%"}
               >
                 <Button
                   onClick={() => navigate("")}
@@ -321,28 +332,69 @@ function GameBoardList() {
                 </Button>
 
                 <Button
-                  colorScheme={"blue"}
                   onClick={() => navigate("?k=잡담")}
                   _hover={{ bgColor: "whitesmoke", color: "black" }}
                 >
                   잡담
                 </Button>
                 <Button
-                  colorScheme={"blue"}
                   onClick={() => navigate("?k=질문")}
                   _hover={{ bgColor: "whitesmoke", color: "black" }}
                 >
                   질문
                 </Button>
                 <Button
-                  colorScheme={"blue"}
                   onClick={() => navigate("?k=정보")}
                   _hover={{ bgColor: "whitesmoke", color: "black" }}
                 >
                   정보
                 </Button>
+                <Spacer />
+                <Stack spacing={3}>
+                  <Select
+                    variant={"outline"}
+                    placeholder={"정렬"}
+                    onChange={(e) => {
+                      const selectedValue = e.target.value;
+
+                      // 정렬 기준에 따라 상태 업데이트
+                      if (selectedValue === "조회수") {
+                        setSortBy((prevSortBy) =>
+                          prevSortBy === "board_count" ? "" : "board_count",
+                        );
+                      } else if (selectedValue === "추천") {
+                        setSortBy((prevSortBy) =>
+                          prevSortBy === "count_like" ? "" : "count_like",
+                        );
+                      } else if (selectedValue === "날짜") {
+                        setSortBy("");
+                        params.set("s", sortBy);
+                        navigate("/gameboard/list?" + params);
+                      }
+                    }}
+                  >
+                    <option value="조회수">조회수</option>
+                    <option value="추천">추천</option>
+                    <option value="날짜">날짜</option>
+                    {/* 다른 정렬 기준이 추가될 경우 option 추가 */}
+                  </Select>
+                </Stack>
+
+                <Button
+                  _hover={{ bgColor: "whitesmoke", color: "black" }}
+                  onClick={() => {
+                    if (isAuthenticated()) {
+                      // 괄호 추가
+                      navigate("write");
+                    } else {
+                      toast({ description: "로그인 후 글 작성" });
+                    }
+                  }}
+                >
+                  글 작성
+                </Button>
               </ButtonGroup>
-            </Center>
+            </Flex>
 
             <Center w={"100%"}>
               <TableContainer w={"75%"}>
@@ -354,12 +406,13 @@ function GameBoardList() {
                         textAlign={"center"}
                         cursor={"pointer"}
                         onClick={() => {
-                          setSortBy("count_like");
-                          params.set("s", sortBy);
-                          navigate("/gameboard/list?" + params);
+                          setSortBy((prevSortBy) =>
+                            prevSortBy === "count_like" ? "" : "count_like",
+                          );
                         }}
                       >
                         추천
+                        <FontAwesomeIcon icon={faCaretDown} />
                       </Th>
                       <Th w="5%" pl="0">
                         분류
@@ -371,12 +424,13 @@ function GameBoardList() {
                         w="10%"
                         cursor={"pointer"}
                         onClick={() => {
-                          setSortBy("board_count");
-                          params.set("s", sortBy);
-                          navigate("/gameboard/list?" + params);
+                          setSortBy((prevSortBy) =>
+                            prevSortBy === "board_count" ? "" : "board_count",
+                          );
                         }}
                       >
                         조회수
+                        <FontAwesomeIcon icon={faCaretDown} />
                       </Th>
                       <Th w="10%">작성자</Th>
                       <Th
@@ -389,6 +443,7 @@ function GameBoardList() {
                         }}
                       >
                         날짜
+                        <FontAwesomeIcon icon={faCaretDown} />
                       </Th>
                     </Tr>
                   </Thead>
@@ -527,21 +582,7 @@ function GameBoardList() {
                 </Table>
               </TableContainer>
             </Center>
-            <Center>
-              <Button
-                my="20px"
-                onClick={() => {
-                  if (isAuthenticated()) {
-                    // 괄호 추가
-                    navigate("write");
-                  } else {
-                    toast({ description: "로그인 후 글 작성" });
-                  }
-                }}
-              >
-                글 작성
-              </Button>
-            </Center>
+
             <Center>
               <VStack>
                 <SearchComponent />
@@ -610,6 +651,7 @@ function GameBoardList() {
               </CardBody>
             </Card>
           </Box>
+          정
         </Box>
       </Flex>
     </Box>

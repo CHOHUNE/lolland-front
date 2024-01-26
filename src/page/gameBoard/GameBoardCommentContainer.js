@@ -5,6 +5,7 @@ import {
   Card,
   CardBody,
   CardHeader,
+  Image,
   Flex,
   Heading,
   Stack,
@@ -37,14 +38,26 @@ function CommentForm({ isSubmitting, onSubmit }) {
     setComment(""); // Clear the input field after submission
   }
 
-  // handle Enter key Submit
-  useEffect(() => {}, [handleSubmit]);
-
   return (
-    <Box>
-      <Textarea value={comment} onChange={(e) => setComment(e.target.value)} />
-      <Tooltip isDisabled={!isAuthenticated()} hasArrow label={"로그인 하세요"}>
-        <Button isDisabled={isSubmitting} onClick={handleSubmit}>
+    <Box display="flex" alignItems="center">
+      <Textarea
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        width="100%"
+        padding={2}
+        borderRadius="md"
+        boxShadow="md"
+        height="auto" // 자동으로 높이 조절
+      />
+      <Tooltip isDisabled={!isAuthenticated()} hasArrow label="로그인 하세요">
+        <Button
+          isDisabled={isSubmitting}
+          onClick={handleSubmit}
+          marginLeft={2}
+          paddingX={4}
+          height="80px" // 자동으로 높이 조절
+          width={"80px"}
+        >
           쓰기
         </Button>
       </Tooltip>
@@ -104,111 +117,124 @@ function CommentItem({ comment, onDelete, setIsSubmitting, isSubmitting }) {
   }
 
   return (
-    <Box ml={`${comment.depth * 20}px`}>
-      <Flex justifyContent="space-between">
-        <Heading size="xs">{comment.member_id}</Heading>
-        <Text fontSize="xs">{comment.ago}</Text>
-      </Flex>
-      <Flex justifyContent="space-between" alignItems="center">
-        <Box flex={1}>
-          <Text sx={{ whiteSpace: "pre-wrap" }} pt="2" fontSize="sm">
-            내용: {comment.comment_content}
-          </Text>
-          {isEditing && (
-            <Box>
-              <Textarea
-                value={commentEdited}
-                onChange={(e) => setCommentEdited(e.target.value)}
-              />
-              <Button
-                colorScheme="blue"
-                isDisabled={isSubmitting}
-                onClick={handleEditSubmit}
-              >
-                수정 - 저장
-              </Button>
-            </Box>
-          )}
+    <Flex
+      justifyContent={"flex-start"}
+      alignItems={"center"}
+      ml={`${comment.depth * 20}px`}
+    >
+      <Image
+        borderRadius={"full"}
+        boxSize={"70px"}
+        src={comment.file_url}
+        alt="프로필 이미지"
+      ></Image>
 
-          {isWriting && (
-            <Box>
-              <Textarea
-                value={replyComment}
-                onChange={(e) => setReplyComment(e.target.value)}
-              />
-              <Button
-                colorScheme="blue"
-                isDisabled={isSubmitting}
-                onClick={handleDuplicateSubmit}
-              >
-                댓글-댓글 저장
-              </Button>
-            </Box>
-          )}
-        </Box>
+      <Box w={"100%"} ml={"10px"}>
+        <Flex justifyContent="space-between">
+          <Heading fontSize="1.2rem">{comment.member_id}</Heading>
+          <Text fontSize="1rem">{comment.ago}</Text>
+        </Flex>
+        <Flex justifyContent="space-between" alignItems="center">
+          <Box flex={1}>
+            <Text sx={{ whiteSpace: "pre-wrap" }} pt="2" fontSize="1rem">
+              {comment.comment_content}
+            </Text>
+            {isEditing && (
+              <Box>
+                <Textarea
+                  value={commentEdited}
+                  onChange={(e) => setCommentEdited(e.target.value)}
+                />
+                <Button
+                  colorScheme="blue"
+                  isDisabled={isSubmitting}
+                  onClick={handleEditSubmit}
+                >
+                  수정 - 저장
+                </Button>
+              </Box>
+            )}
 
-        <Box>
-          {isAuthenticated() && (
-            <>
-              {isWriting || (
+            {isWriting && (
+              <Box>
+                <Textarea
+                  value={replyComment}
+                  onChange={(e) => setReplyComment(e.target.value)}
+                />
+                <Button
+                  colorScheme="blue"
+                  isDisabled={isSubmitting}
+                  onClick={handleDuplicateSubmit}
+                >
+                  댓글-댓글 저장
+                </Button>
+              </Box>
+            )}
+          </Box>
+
+          <Box>
+            {isAuthenticated() && (
+              <>
+                {isWriting || (
+                  <Button
+                    size="xs"
+                    colorScheme="green"
+                    onClick={() => setIsWriting(true)}
+                  >
+                    <AddIcon />
+                  </Button>
+                )}
+                {isWriting && (
+                  <Button
+                    size="xs"
+                    colorScheme="gray"
+                    onClick={() => setIsWriting(false)}
+                  >
+                    <NotAllowedIcon />
+                  </Button>
+                )}
+              </>
+            )}
+          </Box>
+
+          {(hasAccess(comment.member_id) || isAdmin()) && (
+            <Box>
+              {isEditing || (
                 <Button
                   size="xs"
-                  colorScheme="green"
-                  onClick={() => setIsWriting(true)}
+                  colorScheme="purple"
+                  onClick={() => setIsEditing(true)}
                 >
-                  <AddIcon />
+                  <EditIcon />
                 </Button>
               )}
-              {isWriting && (
+              {isEditing && (
                 <Button
                   size="xs"
                   colorScheme="gray"
-                  onClick={() => setIsWriting(false)}
+                  onClick={() => setIsEditing(false)}
                 >
                   <NotAllowedIcon />
                 </Button>
               )}
-            </>
+              <Button
+                onClick={() => onDelete(comment.id)}
+                size="xs"
+                colorScheme="red"
+              >
+                <DeleteIcon />
+              </Button>
+            </Box>
           )}
-        </Box>
-
-        {(hasAccess(comment.member_id) || isAdmin()) && (
-          <Box>
-            {isEditing || (
-              <Button
-                size="xs"
-                colorScheme="purple"
-                onClick={() => setIsEditing(true)}
-              >
-                <EditIcon />
-              </Button>
-            )}
-            {isEditing && (
-              <Button
-                size="xs"
-                colorScheme="gray"
-                onClick={() => setIsEditing(false)}
-              >
-                <NotAllowedIcon />
-              </Button>
-            )}
-            <Button
-              onClick={() => onDelete(comment.id)}
-              size="xs"
-              colorScheme="red"
-            >
-              <DeleteIcon />
-            </Button>
-          </Box>
-        )}
-      </Flex>
-    </Box>
+        </Flex>
+      </Box>
+    </Flex>
   );
 }
 
 function CommentList({ commentList, onDelete, setIsSubmitting }) {
   return (
-    <Card>
+    <Card mt={"50px"} boxShadow={"md"}>
       <CardHeader>
         <Heading size="md">댓글 리스트</Heading>
       </CardHeader>
