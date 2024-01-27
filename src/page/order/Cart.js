@@ -126,9 +126,58 @@ export function Cart() {
   }
 
   function handlePurchase(selectedProducts) {
-    localStorage.removeItem("purchaseInfo"); // 단일상품에선 로컬스토리지 사용으로 인해 상품저장된 내역있음, 장바구니에선 db로 결제내역을 옮기기때문에 이게 먼저 실행 되어야함
-    // axios.post() TODO: 결제로 옮기기
-    // 여기부터 코드작성 해주세요
+    localStorage.removeItem("purchaseInfo");
+
+    const selectedProductInfo = selectedProducts.map((productId) => {
+      const product = productList.find((p) => p.cart_id === productId);
+      return {
+        productId: product.product_id,
+        productName: product.product_name,
+        optionName: product.option_name,
+        quantity: product.quantity,
+        price: product.product_price,
+        mainImgUrl: product.main_img_uri,
+      };
+    });
+
+    // 같은 상품의 다른 옵션만 취합해서 묶기
+    const groupedPurchaseInfo = selectedProductInfo.reduce(
+      (result, purchase) => {
+        const existingEntry = result.find(
+          (group) => group.productId === purchase.productId,
+        );
+
+        if (existingEntry) {
+          existingEntry.options.push({
+            optionName: purchase.optionName,
+            quantity: purchase.quantity,
+            price: purchase.price,
+          });
+        } else {
+          result.push({
+            productId: purchase.productId,
+            mainImgUrl: purchase.mainImgUrl,
+            productName: purchase.productName,
+            options: [
+              {
+                optionName: purchase.optionName,
+                quantity: purchase.quantity,
+                price: purchase.price,
+              },
+            ],
+          });
+        }
+
+        return result;
+      },
+      [],
+    );
+
+    // Step 3: Save the grouped information to localStorage
+    localStorage.setItem("purchaseInfo", JSON.stringify(groupedPurchaseInfo));
+
+    // Step 4: Navigate to the payment page
+    navigate("/pay");
   }
 
   function handleDeleteAll() {
@@ -213,8 +262,6 @@ export function Cart() {
     );
   }
 
-  console.log("selectedProducts: " + selectedProducts);
-
   return (
     <>
       <Heading my={5} mx={10}>
@@ -244,7 +291,6 @@ export function Cart() {
               선택 삭제
             </Button>
             <Button
-              isDisabled={true}
               {...buttonStyles}
               onClick={() => handlePurchase(selectedProducts)}
             >
