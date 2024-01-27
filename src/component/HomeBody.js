@@ -462,7 +462,7 @@ export function HomeBody() {
                 <Text color={"gray"}>게임장비커뮤니티</Text>
                 <Flex w={"100%"} justifyContent={"space-between"}>
                   <Text fontSize={"1.5rem"} fontWeight={"bold"}>
-                    오늘의 Best
+                    추천 게시물
                   </Text>
                   <Button
                     bg={"none"}
