@@ -183,49 +183,6 @@ export function HomeBody() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   let isCancelled = false;
-  //
-  //   const fetchAllCategoryProducts = async () => {
-  //     try {
-  //       // 카테고리 데이터를 먼저 가져옵니다.
-  //       const categoriesResponse = await axios.get("/api/product/mainCategory");
-  //       if (isCancelled) return;
-  //
-  //       // 모든 카테고리에 대한 상품 목록을 한 번에 요청합니다.
-  //       const allCategoriesId = categoriesResponse.data.map(
-  //         (category) => category.category_id,
-  //       );
-  //       const params = new URLSearchParams({
-  //         categories: allCategoriesId.join(","),
-  //         limit: 8,
-  //       });
-  //
-  //       // 상품 목록 요청
-  //       const productsResponse = await axios.get(`/api/product/list?${params}`);
-  //       if (isCancelled) return;
-  //
-  //       // 상태 업데이트
-  //       setCategories(categoriesResponse.data);
-  //       setCategoryProducts(productsResponse.data); // 백엔드가 이 형식을 지원한다고 가정합니다.
-  //     } catch (error) {
-  //       if (!isCancelled) {
-  //         toast({
-  //           title: "데이터 불러오는 도중 에러 발생",
-  //           description: error.response.data,
-  //           status: "error",
-  //         });
-  //       }
-  //     }
-  //   };
-  //
-  //   fetchAllCategoryProducts();
-  //
-  //   return () => {
-  //     isCancelled = true;
-  //   };
-  // }, []);
-
   const handleViewAllCategories = () => {
     setShowAllCategories(!showAllCategories);
   };
@@ -330,7 +287,7 @@ export function HomeBody() {
     5: ["비즈니스를 위한", "막강한 파워"],
     6: ["타이핑이 즐거워지는 느낌", "손끝에서 시작되는 기적."],
     7: ["빠르고 정밀한 마우스플레이", "정확한 클릭, 빠른 반응."],
-    8: ["부드러운 슬립감", "안정성과 정확성의 기반."], // 마우스패드
+    8: ["부드러운 슬립감", "안정성과 정확성의 기반."],
     9: ["레노버 서버 사은품행사", "강력한 성능, 놀라운 혜택."],
   };
 
@@ -691,13 +648,7 @@ export function HomeBody() {
         justifyContent={"center"}
         alignItems={"center"}
       >
-        <Box
-          mt={10}
-          mx="10%"
-          // display={"flex"}
-          // justifyContent={"center"}
-          // alignItems={"center"}
-        >
+        <Box mt={10} mx="10%">
           {categories.map((category) => (
             <Box mt={10} key={category.category_id} mb="40px">
               <Flex
@@ -768,7 +719,6 @@ export function HomeBody() {
                         display="flex"
                         flexDirection="column"
                       >
-                        {/* 이미지를 감싸는 Box에 중앙 정렬 스타일을 적용합니다. */}
                         <Flex
                           h={"246px"}
                           w={"250px"}
