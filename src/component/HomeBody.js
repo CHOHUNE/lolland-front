@@ -353,7 +353,7 @@ export function HomeBody() {
         <Box
           justifyContent="center"
           display="flex"
-          minW={"1300px"}
+          minW={"1400px"}
           mt={"40px"}
           mb={10}
         >
@@ -594,7 +594,7 @@ export function HomeBody() {
         alignItems="center"
         p={10}
       >
-        <Box w={"70%"}>
+        <Box minW={"1400px"}>
           <Text fontWeight={"bold"} fontSize="2.3rem" textAlign="center" mt={5}>
             Categories
           </Text>
@@ -684,9 +684,7 @@ export function HomeBody() {
         </Box>
       </Box>
 
-      {/* ------------------------- TODO : 하단 어떻게 할지 상품목록 전체 리스트 뿌릴지 고민중  ------------------------- */}
-      {/* ------------------------- TODO : 임시로 상품목록 뿌리기 ------------------------- */}
-
+      {/* ------------------------- TODO : 임시로 카테고리별 상품목록 및 텍스트/이미지 출력완료 ------------------------- */}
       <Box
         borderTop={"1px solid #eeeeee"}
         display={"flex"}
