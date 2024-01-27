@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
 
 const apiSecretKey = process.env.REACT_APP_TOSS_SECRET_KEY;
 
@@ -9,6 +10,8 @@ function SuccessPage() {
 
   // 수량, 고객번호, 고유 나노아이디, 주문명, 고객명
 
+  ///success?paymentType={PAYMENT_TYPE}&orderId={ORDER_ID}&paymentKey={PAYMENT_KEY}&amount={AMOUNT}
+
   useEffect(() => {
     const requestData = {
       orderId: searchParams.get("orderId"),
@@ -16,23 +19,24 @@ function SuccessPage() {
       paymentKey: searchParams.get("paymentKey"),
     };
     async function confirm() {
-      const response = await fetch("/confirm", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      const json = await response.json();
-
-      if (!response.ok) {
-        // 결제 실패 비즈니스 로직을 구현하세요.
-        navigate(`/fail?message=${json.message}&code=${json.code}`);
-        return;
+      try {
+        const response = await axios.post(
+          "/payment/toss/success",
+          requestData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
+        // 결제 성공 비즈니스 로직 TODO: 백엔드로 전송
+        navigate("/");
+      } catch (error) {
+        if (error.response) {
+          const { code, message } = error.response.data;
+          navigate(`/fail?message=${message}&code=${code}`);
+        }
       }
-
-      // 결제 성공 비즈니스 로직 TODO: 백엔드로 전송
     }
     confirm();
   }, []);
