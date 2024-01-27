@@ -391,13 +391,28 @@ export function ProductView() {
           {
             optionName: selectedOption.option_name,
             quantity: selectedOption.quantity,
-            price: selectedOption.option_price,
+            price: product.product.product_price,
           },
         ],
       };
     });
 
-    const groupedPurchaseInfo = [...selectedProductInfo];
+    const groupedPurchaseInfo = selectedProductInfo.reduce(
+      (result, purchase) => {
+        const existingEntry = result.find(
+          (group) => group.productId === purchase.productId,
+        );
+
+        if (existingEntry) {
+          existingEntry.options.push(...purchase.options);
+        } else {
+          result.push(purchase);
+        }
+
+        return result;
+      },
+      [],
+    );
 
     try {
       localStorage.setItem("purchaseInfo", JSON.stringify(groupedPurchaseInfo));
