@@ -79,8 +79,20 @@ export function MemberFindPassword() {
         // 임시 비밀 번호 발급 모달 띄우기
         onOpen();
       })
-      .catch(() => {
-        toast({ description: "회원 정보가 없습니다.", status: "error" });
+      .catch((error) => {
+        if (error.response && error.response.status === 400) {
+          let errorMessage = error.response.data;
+          toast({
+            description: errorMessage,
+            status: "error",
+          });
+        } else {
+          // 기타 오류에 대한 처리
+          toast({
+            description: "비밀번호 찾기 중 문제가 발생했습니다.",
+            status: "error",
+          });
+        }
       });
   }
 

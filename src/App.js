@@ -47,6 +47,7 @@ import { HomeBody } from "./component/HomeBody";
 import { ProductMainList } from "./page/product/ProductMainList";
 import { ProductSubList } from "./page/product/ProductSubList";
 import { CompanyList } from "./page/product/CompanyList";
+import { ProductEventList } from "./page/product/ProductEventList";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -64,6 +65,9 @@ const routes = createBrowserRouter(
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
       <Route path="edit/:product_id" element={<ProductEdit />} />
+
+      {/* 이벤트 페이지 */}
+      <Route path="productEvent" element={<ProductEventList />} />
 
       {/* 리뷰 */}
 
