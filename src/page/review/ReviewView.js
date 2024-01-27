@@ -33,7 +33,7 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { QnaView } from "../qna/QnaView";
 import { useNavigate } from "react-router-dom";
-import loginProvider, { LoginContext } from "../../component/LoginProvider";
+import { LoginContext } from "../../component/LoginProvider";
 import { ProductStats } from "./ProductStats";
 
 // 리뷰 등록할 때 별점 부분
