@@ -47,6 +47,7 @@ import { HomeBody } from "./component/HomeBody";
 import { ProductMainList } from "./page/product/ProductMainList";
 import { ProductSubList } from "./page/product/ProductSubList";
 import { CompanyList } from "./page/product/CompanyList";
+import PaymentPage from "./page/order/PaymentPage";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -74,6 +75,7 @@ const routes = createBrowserRouter(
 
       {/* 결제 */}
       <Route path="pay" element={<ProductPay />} />
+      <Route path="payment" element={<PaymentPage />} />
 
       {/* 회원관련 */}
       <Route path="signup" element={<MemberSignup />} />
