@@ -15,7 +15,7 @@ import GameBoardView from "./page/gameBoard/GameBoardView";
 import { ProductWrite } from "./page/product/ProductWrite";
 import { ProductList } from "./page/product/ProductList";
 import { ProductView } from "./page/product/ProductView";
-import { Cart } from "./page/Cart/Cart";
+import { Cart } from "./page/order/Cart";
 import { GearBoard } from "./page/gearBoard/GearBoard";
 import { GearList } from "./page/gearBoard/GearList";
 import { GearListAll } from "./page/gearBoard/GearListAll";
@@ -37,7 +37,7 @@ import { AdminView } from "./page/admin/AdminView";
 import { MemberList } from "./page/admin/MemberList";
 import { QnaAnswer } from "./page/qna/QnaAnswer";
 import { QnaWriteAnswer } from "./page/qna/QnaWriteAnswer";
-import { ProductPay } from "./ProductPay";
+import { ProductPay } from "./page/order/ProductPay";
 import { MemberQuestion } from "./page/qna/MemberQuestion";
 import { MemberReview } from "./page/review/MemberReview";
 import { MemberAnswer } from "./page/qna/MemberAnswer";
@@ -54,12 +54,12 @@ const routes = createBrowserRouter(
       {/* 메인페이지 */}
       <Route index element={<HomeBody />} />
       {/* 상품관련 */}
-      <Route path="/category/:category_id" element={<ProductMainList />} />
+      <Route path="category/:category_id" element={<ProductMainList />} />
       <Route
-        path="/category/:category_id/:subcategory_id"
+        path="category/:category_id/:subcategory_id"
         element={<ProductSubList />}
       />
-      <Route path="/company/:company_id" element={<CompanyList />} />
+      <Route path="company/:company_id" element={<CompanyList />} />
 
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
@@ -68,12 +68,12 @@ const routes = createBrowserRouter(
       {/* 리뷰 */}
 
       {/* 장바구니 */}
-      <Route path="/cart" element={<Cart />} />
+      <Route path="cart" element={<Cart />} />
 
       {/* Q&A */}
 
       {/* 결제 */}
-      <Route path="product/pay/:product_id" element={<ProductPay />} />
+      <Route path="pay" element={<ProductPay />} />
 
       {/* 회원관련 */}
       <Route path="signup" element={<MemberSignup />} />
