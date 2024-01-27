@@ -2,8 +2,6 @@ import {
   Box,
   Button,
   Card,
-  CardBody,
-  Center,
   Divider,
   Flex,
   FormControl,
@@ -20,8 +18,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
-  Stack,
   Table,
   Tbody,
   Td,
@@ -30,11 +26,10 @@ import {
   Th,
   Thead,
   Tr,
-  useRadio,
-  useRadioGroup,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDaumPostcodePopup } from "react-daum-postcode";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -42,14 +37,20 @@ import React from "react";
 import { parse } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCreditCard, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { LoginContext } from "../../component/LoginProvider";
 
 export function ProductPay() {
   const [addressOption, setAddressOption] = useState("회원 정보와 동일");
   const [purchaseInfo, setPurchaseInfo] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [totalQuantity, setTotalQuantity] = useState(0);
   const [shippingFee, setShippingFee] = useState(3000);
   const navigate = useNavigate();
-  const [orderName, setOrderName] = useState();
+  const [orderName, setOrderName] = useState("");
+  const [requirement, setRequirement] = useState("");
+  const [dataFetched, setDataFetched] = useState(false);
+  const { isAuthenticated } = useContext(LoginContext);
+  const toast = useToast();
 
   const [isModalOpen, setIsModalOpen] = useState(false); // 주소목록 모달창
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -62,6 +63,7 @@ export function ProductPay() {
   const closeModal = () => setIsModalOpen(false);
 
   const [userInfo, setUserInfo] = useState({
+    orderMember: "",
     receiver: "",
     contact: "",
     postalCode: "",
@@ -131,6 +133,7 @@ export function ProductPay() {
         setContactLast(contactParts[2]);
       }
       setUserInfo({
+        orderMember: data.member_name,
         receiver: data.member_name,
         contact: data.member_phone_number,
         email: data.member_email,
@@ -141,7 +144,7 @@ export function ProductPay() {
   };
 
   // ------------------------------ 회원 주소목록 가져오는 로직 ------------------------------
-  const fetchUserAddress = async (isInitialLoad = false) => {
+  const fetchUserAddress = async () => {
     try {
       const response = await axios.get("/api/memberAddress/loginUser");
       if (response.status !== 200) {
@@ -150,19 +153,17 @@ export function ProductPay() {
       const addressData = response.data;
       setUserAddresses(addressData);
 
-      if (isInitialLoad) {
-        // main 타입의 주소만 필터링하여 첫 번째 주소를 userInfo에 설정합니다.
-        const mainAddress = addressData.find(
-          (address) => address.member_address_type === "main",
-        );
-        if (mainAddress) {
-          setUserInfo((prevState) => ({
-            ...prevState,
-            postalCode: mainAddress.member_post_code,
-            basicAddress: mainAddress.member_address,
-            detailAddress: mainAddress.member_detail_address,
-          }));
-        }
+      // main 타입의 주소만 필터링하여 첫 번째 주소를 userInfo에 설정합니다.
+      const mainAddress = addressData.find(
+        (address) => address.member_address_type === "main",
+      );
+      if (mainAddress) {
+        setUserInfo((prevState) => ({
+          ...prevState,
+          postalCode: mainAddress.member_post_code,
+          basicAddress: mainAddress.member_address,
+          detailAddress: mainAddress.member_detail_address,
+        }));
       }
     } catch (error) {
       console.error(error);
@@ -171,9 +172,12 @@ export function ProductPay() {
 
   // ------------------------------ 페이지 로드 시에 회원정보, 주소 호출 ------------------------------
   useEffect(() => {
-    fetchUserInfo();
-    fetchUserAddress(true); // 초기 로드 시 main 주소를 설정
-  }, []);
+    if (!dataFetched) {
+      fetchUserInfo();
+      fetchUserAddress();
+      setDataFetched(true);
+    }
+  }, [dataFetched]);
 
   // ------------------------------ 주소변경 클릭 시 실행되는 로직 ------------------------------
   const handleAddressChangeClick = async () => {
@@ -235,7 +239,8 @@ export function ProductPay() {
     if (storedPurchaseInfo) {
       const parsedPurchaseInfo = JSON.parse(storedPurchaseInfo);
       setPurchaseInfo(parsedPurchaseInfo);
-      setTotalPrice(calculateTotalPrice(parsedPurchaseInfo));
+      setTotalPrice(calculateTotalPrice(parsedPurchaseInfo)); // 총 가격 계산
+      setTotalQuantity(calculateTotalQuantity(parsedPurchaseInfo)); // 총 수량 계산
       // 주문 이름 생성
       if (parsedPurchaseInfo.length > 1) {
         // 여러 상품일 경우 : 첫 상품명 외 {나머지 상품 갯수} 건
@@ -252,10 +257,11 @@ export function ProductPay() {
     } else {
       console.log("No purchase info found in localStorage");
     }
-  }, [purchaseInfo]);
+  }, []);
 
-  const calculateTotalPrice = (groupedPurchaseInfo) => {
-    return groupedPurchaseInfo.reduce((total, group) => {
+  // ------------------------------ 총 가격 계산 ------------------------------
+  const calculateTotalPrice = (purchaseInfo) => {
+    return purchaseInfo.reduce((total, group) => {
       const groupTotal = group.options.reduce(
         (groupTotal, option) => groupTotal + option.price * option.quantity,
         0,
@@ -264,8 +270,21 @@ export function ProductPay() {
     }, 0);
   };
 
+  // ------------------------------ 총 수량 계산 ------------------------------
+  const calculateTotalQuantity = (purchaseInfo) => {
+    return purchaseInfo.reduce((total, group) => {
+      return (
+        total +
+        group.options.reduce(
+          (groupTotal, option) => groupTotal + option.quantity,
+          0,
+        )
+      );
+    }, 0);
+  };
+
+  // ------------------------------ 삭제 ------------------------------
   function handleDelete(groupIndex) {
-    console.log("delete group: " + groupIndex);
     const updatedPurchaseInfo = [...purchaseInfo];
     updatedPurchaseInfo.splice(groupIndex, 1);
 
@@ -282,7 +301,23 @@ export function ProductPay() {
     }
   }
 
-  function handlePayment() {}
+  // ------------------------------ 주문 정보 로컬 스토리지에 저장 ------------------------------
+  function handlePayment() {
+    const orderData = {
+      orderName: orderName,
+      price: totalPrice,
+      quantity: totalQuantity,
+      customerName: userInfo.orderMember,
+      customerEmail: userInfo.email,
+      customerMobilePhone: `${contactFirst}${contactMiddle}${contactLast}`,
+      receiver: userInfo.receiver,
+      address: `${userInfo.basicAddress} ${userInfo.detailAddress}`,
+      postalCode: userInfo.postalCode,
+      requirement: requirement,
+    };
+    localStorage.setItem("orderDetail", JSON.stringify(orderData));
+    navigate("/payment");
+  }
 
   return (
     <Box my={10} mx="10%" justifyContent={"center"} alignItems={"center"}>
@@ -541,7 +576,10 @@ export function ProductPay() {
 
                 <FormControl>
                   <FormLabel>배송메모</FormLabel>
-                  <Textarea placeholder="배송시 요청사항을 입력해주세요" />
+                  <Textarea
+                    placeholder="배송시 요청사항을 입력해주세요"
+                    onChange={(e) => setRequirement(e.target.value)}
+                  />
                 </FormControl>
               </VStack>
             </Card>
@@ -559,7 +597,7 @@ export function ProductPay() {
                       주문자명
                     </Text>
                     <Text as="span" fontSize="md" textAlign={"flex-start"}>
-                      {userInfo.receiver}
+                      {userInfo.orderMember}
                     </Text>
                   </Flex>
 
@@ -618,8 +656,21 @@ export function ProductPay() {
                   color={"white"}
                   size="lg"
                   _hover={{ color: "black", bg: "#eeeeee" }}
-                  onClick={handlePayment}
-                  isDisabled
+                  onClick={() => {
+                    if (isAuthenticated()) {
+                      if (purchaseInfo.length > 0) {
+                        handlePayment();
+                      } else {
+                        toast({
+                          title: "주문하신 상품이 없습니다",
+                          description: "다시 시도해주세요",
+                          status: "error",
+                        });
+                      }
+                    } else {
+                      navigate("/login");
+                    }
+                  }}
                 >
                   결제하기
                 </Button>

@@ -48,6 +48,9 @@ import { ProductMainList } from "./page/product/ProductMainList";
 import { ProductSubList } from "./page/product/ProductSubList";
 import { CompanyList } from "./page/product/CompanyList";
 import { ProductEventList } from "./page/product/ProductEventList";
+import PaymentPage from "./page/order/PaymentPage";
+import SuccessPage from "./page/order/SuccessPage";
+import FailPage from "./page/order/FailPage";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -78,6 +81,9 @@ const routes = createBrowserRouter(
 
       {/* 결제 */}
       <Route path="pay" element={<ProductPay />} />
+      <Route path="payment" element={<PaymentPage />} />
+      <Route path="success" element={<SuccessPage />} />
+      <Route path="fail" element={<FailPage />} />
 
       {/* 회원관련 */}
       <Route path="signup" element={<MemberSignup />} />
