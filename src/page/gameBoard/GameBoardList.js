@@ -240,12 +240,14 @@ function GameBoardList() {
   }, [sortBy]);
 
   const opts = {
-    width: "250",
-    height: "150",
+    width: "100%",
+    height: "100%",
     playerVars: {
       autoplay: 0,
     },
   };
+
+  const [searchedVideos, setSearchedVideos] = useState([]);
 
   useEffect(() => {
     const params = {
@@ -253,41 +255,28 @@ function GameBoardList() {
       q: "게임 리뷰",
       part: "snippet",
       type: "video",
-      maxResults: 8,
+      maxResults: 4,
       fields: "items(id, snippet(title))",
       videoEmbeddable: true,
     };
-    const youtubeDatas = axios.get(
-      "https://www.googleapis.com/youtube/v3/search",
-      {
+
+    axios
+      .get("https://www.googleapis.com/youtube/v3/search", {
         params,
-      },
-    );
+      })
+      .then((response) => {
+        const videos = response.data.items.map((item) => {
+          return {
+            videoId: item.id.videoId,
+            title: item.snippet.title,
+          };
+        });
+
+        setSearchedVideos(videos);
+      });
   }, []);
 
-  const searchedVideos = [];
-
-  const getSearchedVideos = async (youtubeDatas) => {
-    // 빈 배열 초기화
-
-    // YouTube API에서 받아온 데이터의 items 배열에 접근
-    const videoLists = youtubeDatas.data.items;
-
-    // 각 동영상에 대해 반복
-    videoLists.forEach((element) => {
-      // 동영상의 ID와 제목 추출
-      const videoId = element.id.videoId;
-      const title = element.snippet.title;
-
-      // 추출한 정보를 객체로 만들어 배열에 추가
-      searchedVideos.push({ videoId, title });
-    });
-
-    // 완성된 배열을 반환
-    return searchedVideos;
-  };
-
-  // 비동기 함수 getSearchedVideos 정의
+  // 비동기 함수 정의
 
   if (gameBoardList === null || pageInfo === null) {
     return <Spinner />;
@@ -778,7 +767,7 @@ function GameBoardList() {
                 }}
               >
                 {searchedVideos.map((item) => (
-                  <Box>
+                  <Box key={item.videoId}>
                     <YouTube videoId={item.videoId} opts={opts} />
                     <div style={{ width: 280 }}>
                       {item.title.replace(/&QUOT;/gi, '"')}
