@@ -152,9 +152,7 @@ export function HomeBody() {
 
           // 각 카테고리별 상품 데이터 가져오기
           const categoryRequests = categoryResponse.data.map((category) =>
-            axios.get(
-              `/api/product/list?category=${category.category_id}&limit=8`,
-            ),
+            axios.get(`/api/product/list?c=${category.category_id}&limit=8`),
           );
           const productResponses = await axios.all(categoryRequests);
           if (!isCancelled) {
@@ -320,8 +318,20 @@ export function HomeBody() {
     5: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_171282.jpg",
     6: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_176479.jpg",
     7: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_176493.jpg",
-    8: "마우스패드", // 적절한 이미지 없음
+    8: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_174682.jpg",
     9: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_174682.jpg",
+  };
+  // -------------------------------- 상품목록 텍스트 매핑 --------------------------------
+  const categoryDescriptions = {
+    1: ["게임은 역시 장비빨", "고성능 노트북으로 승부하라!"],
+    2: ["구매왕 챌린지!", "화질의 한계를 넘어서세요."],
+    3: ["최상의 게임 경험을 위한 필수품", "몰입감을 높여줄 최적의 선택."],
+    4: ["휴대성과 성능의 완벽한 조화", "언제 어디서나 당신의 일터."],
+    5: ["비즈니스를 위한", "막강한 파워"],
+    6: ["타이핑이 즐거워지는 느낌", "손끝에서 시작되는 기적."],
+    7: ["빠르고 정밀한 마우스플레이", "정확한 클릭, 빠른 반응."],
+    8: ["부드러운 슬립감", "안정성과 정확성의 기반."], // 마우스패드
+    9: ["레노버 서버 사은품행사", "강력한 성능, 놀라운 혜택."],
   };
 
   return (
@@ -709,21 +719,44 @@ export function HomeBody() {
                   더보기
                 </Button>
               </Flex>
-              <Flex gap={2}>
+              <Flex minW={"1400px"} gap={2}>
                 <VStack spacing={0}>
-                  <Box w="385px" h="562px" m={0} overflow="hidden">
+                  <Box
+                    borderRadius={"10px"}
+                    w="385px"
+                    h="562px"
+                    m={0}
+                    overflow="hidden"
+                  >
                     <Image
                       src={categoryImages[category.category_id]}
                       objectFit="contain"
                       display="block"
                     />
                   </Box>
-                  <Box w={"385px"} h={"200px"} bg={"gray"} mt={-2}>
-                    <Text>무슨글을쓸까</Text>
+                  <Box
+                    borderBottomRadius={"10px"}
+                    w={"385px"}
+                    h={"200px"}
+                    bg={"gray"}
+                    mt={-2}
+                  >
+                    <Text
+                      lineHeight={"100px"}
+                      textAlign={"center"}
+                      fontSize="1.8rem"
+                      color={"white"}
+                      fontWeight="bold"
+                    >
+                      {categoryDescriptions[category.category_id][0]}
+                    </Text>
+                    <Text color={"white"} textAlign={"center"} fontSize="md">
+                      {categoryDescriptions[category.category_id][1]}
+                    </Text>
                   </Box>
                 </VStack>
 
-                <SimpleGrid columns={3} spacing={9}>
+                <SimpleGrid columns={4} spacing={9}>
                   {categoryProducts[category.category_id]
                     ?.slice(0, 6)
                     .map((product) => (
@@ -739,7 +772,7 @@ export function HomeBody() {
                       >
                         {/* 이미지를 감싸는 Box에 중앙 정렬 스타일을 적용합니다. */}
                         <Flex
-                          h={"250px"}
+                          h={"246px"}
                           w={"250px"}
                           align="center"
                           justify="center"
