@@ -16,6 +16,7 @@ import {
   StackDivider,
   Text,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
 import { Swiper } from "swiper/react";
 import { SwiperSlide } from "swiper/react";
@@ -139,75 +140,35 @@ export function HomeBody() {
   }, []);
 
   // -------------------------------- 카테고리 & 카테고리별 상품 불러오기 --------------------------------
-  // useEffect(() => {
-  //   let isCancelled = false;
-  //
-  //   async function fetchInitialData() {
-  //     try {
-  //       // 카테고리 데이터 가져오기
-  //       const categoryResponse = await axios.get("/api/product/mainCategory");
-  //       if (!isCancelled) {
-  //         setCategories(categoryResponse.data);
-  //
-  //         // 각 카테고리별 상품 데이터 가져오기
-  //         const categoryRequests = categoryResponse.data.map((category) =>
-  //           axios.get(
-  //             `/api/product/list?category=${category.category_id}&limit=8`,
-  //           ),
-  //         );
-  //         const productResponses = await axios.all(categoryRequests);
-  //         if (!isCancelled) {
-  //           const newCategoryProducts = productResponses.reduce(
-  //             (acc, response, index) => {
-  //               const categoryId = categoryResponse.data[index].category_id;
-  //               acc[categoryId] = response.data.product;
-  //               return acc;
-  //             },
-  //             {},
-  //           );
-  //           setCategoryProducts(newCategoryProducts);
-  //         }
-  //       }
-  //     } catch (error) {
-  //       if (!isCancelled) {
-  //         toast({
-  //           title: "데이터 불러오는 도중 에러 발생",
-  //           description: error.response.data,
-  //           status: "error",
-  //         });
-  //       }
-  //     }
-  //   }
-  //   fetchInitialData();
-  //   return () => {
-  //     isCancelled = true;
-  //   };
-  // }, []);
   useEffect(() => {
     let isCancelled = false;
 
-    const fetchAllCategoryProducts = async () => {
+    async function fetchInitialData() {
       try {
-        // 카테고리 데이터를 먼저 가져옵니다.
-        const categoriesResponse = await axios.get("/api/product/mainCategory");
-        if (isCancelled) return;
+        // 카테고리 데이터 가져오기
+        const categoryResponse = await axios.get("/api/product/mainCategory");
+        if (!isCancelled) {
+          setCategories(categoryResponse.data);
 
-        // 모든 카테고리에 대한 상품 목록을 한 번에 요청합니다.
-        const allCategoriesId = categoriesResponse.data.map(
-          (category) => category.category_id,
-        );
-        const params = new URLSearchParams({
-          categories: allCategoriesId.join(","),
-          limit: 8,
-        });
-
-        // 상품 목록 요청
-        const productsResponse = await axios.get(`/api/product/list?${params}`);
-        if (isCancelled) return;
-
-        // 상태 업데이트
-        setCategories(categoriesResponse.data);
-        setCategoryProducts(productsResponse.data); // 백엔드가 이 형식을 지원한다고 가정합니다.
+          // 각 카테고리별 상품 데이터 가져오기
+          const categoryRequests = categoryResponse.data.map((category) =>
+            axios.get(
+              `/api/product/list?category=${category.category_id}&limit=8`,
+            ),
+          );
+          const productResponses = await axios.all(categoryRequests);
+          if (!isCancelled) {
+            const newCategoryProducts = productResponses.reduce(
+              (acc, response, index) => {
+                const categoryId = categoryResponse.data[index].category_id;
+                acc[categoryId] = response.data.product;
+                return acc;
+              },
+              {},
+            );
+            setCategoryProducts(newCategoryProducts);
+          }
+        }
       } catch (error) {
         if (!isCancelled) {
           toast({
@@ -217,14 +178,55 @@ export function HomeBody() {
           });
         }
       }
-    };
-
-    fetchAllCategoryProducts();
-
+    }
+    fetchInitialData();
     return () => {
       isCancelled = true;
     };
   }, []);
+
+  // useEffect(() => {
+  //   let isCancelled = false;
+  //
+  //   const fetchAllCategoryProducts = async () => {
+  //     try {
+  //       // 카테고리 데이터를 먼저 가져옵니다.
+  //       const categoriesResponse = await axios.get("/api/product/mainCategory");
+  //       if (isCancelled) return;
+  //
+  //       // 모든 카테고리에 대한 상품 목록을 한 번에 요청합니다.
+  //       const allCategoriesId = categoriesResponse.data.map(
+  //         (category) => category.category_id,
+  //       );
+  //       const params = new URLSearchParams({
+  //         categories: allCategoriesId.join(","),
+  //         limit: 8,
+  //       });
+  //
+  //       // 상품 목록 요청
+  //       const productsResponse = await axios.get(`/api/product/list?${params}`);
+  //       if (isCancelled) return;
+  //
+  //       // 상태 업데이트
+  //       setCategories(categoriesResponse.data);
+  //       setCategoryProducts(productsResponse.data); // 백엔드가 이 형식을 지원한다고 가정합니다.
+  //     } catch (error) {
+  //       if (!isCancelled) {
+  //         toast({
+  //           title: "데이터 불러오는 도중 에러 발생",
+  //           description: error.response.data,
+  //           status: "error",
+  //         });
+  //       }
+  //     }
+  //   };
+  //
+  //   fetchAllCategoryProducts();
+  //
+  //   return () => {
+  //     isCancelled = true;
+  //   };
+  // }, []);
 
   const handleViewAllCategories = () => {
     setShowAllCategories(!showAllCategories);
@@ -307,6 +309,20 @@ export function HomeBody() {
   } else if (productList === null) {
     return <Spinner />;
   }
+
+  // -------------------------------- 상품목록 이미지 매핑 --------------------------------
+  // TODO : DB에 작업저장해서 사용해도 상관없음
+  const categoryImages = {
+    1: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_176425.jpg",
+    2: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_174694.jpg",
+    3: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_174769.jpg",
+    4: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_174698.jpg",
+    5: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_171282.jpg",
+    6: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_176479.jpg",
+    7: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_176493.jpg",
+    8: "마우스패드", // 적절한 이미지 없음
+    9: "https://image5.compuzone.co.kr/img/images/main2014/H/MainCategoryRolling_174682.jpg",
+  };
 
   return (
     <Box minW={"1400px"}>
@@ -693,64 +709,83 @@ export function HomeBody() {
                   더보기
                 </Button>
               </Flex>
-              <SimpleGrid columns={4} spacing={9}>
-                {categoryProducts[category.category_id]
-                  ?.slice(0, 8)
-                  .map((product) => (
-                    <Box
-                      key={product.product_id}
-                      borderWidth="1px"
-                      borderRadius="lg"
-                      overflow="hidden"
-                      h={"100%"}
-                      w={"100%"}
-                      display="flex"
-                      flexDirection="column"
-                    >
-                      {/* 이미지를 감싸는 Box에 중앙 정렬 스타일을 적용합니다. */}
-                      <Flex h={"250px"} align="center" justify="center">
-                        <Image
-                          src={
-                            product.mainImgs[0]?.main_img_uri ||
-                            "default-product-image.jpg"
-                          }
-                          alt={product.product_name}
-                          maxH="200px" // 이미지의 최대 높이를 지정하여 Box 크기를 넘지 않도록 합니다.
-                          objectFit="contain" // 이미지 비율을 유지하며 Box에 맞게 조절합니다.
-                        />
-                      </Flex>
-                      <Box p="6">
-                        <Box display="flex" alignItems="baseline">
+              <Flex gap={2}>
+                <VStack spacing={0}>
+                  <Box w="385px" h="562px" m={0} overflow="hidden">
+                    <Image
+                      src={categoryImages[category.category_id]}
+                      objectFit="contain"
+                      display="block"
+                    />
+                  </Box>
+                  <Box w={"385px"} h={"200px"} bg={"gray"} mt={-2}>
+                    <Text>무슨글을쓸까</Text>
+                  </Box>
+                </VStack>
+
+                <SimpleGrid columns={3} spacing={9}>
+                  {categoryProducts[category.category_id]
+                    ?.slice(0, 6)
+                    .map((product) => (
+                      <Box
+                        key={product.product_id}
+                        borderWidth="1px"
+                        borderRadius="lg"
+                        overflow="hidden"
+                        h={"100%"}
+                        w={"250px"}
+                        display="flex"
+                        flexDirection="column"
+                      >
+                        {/* 이미지를 감싸는 Box에 중앙 정렬 스타일을 적용합니다. */}
+                        <Flex
+                          h={"250px"}
+                          w={"250px"}
+                          align="center"
+                          justify="center"
+                        >
+                          <Image
+                            src={
+                              product.mainImgs[0]?.main_img_uri ||
+                              "default-product-image.jpg"
+                            }
+                            alt={product.product_name}
+                            maxH="200px"
+                            objectFit="contain"
+                          />
+                        </Flex>
+                        <Box p="6">
+                          <Box display="flex" alignItems="baseline">
+                            <Box
+                              color="gray.500"
+                              fontWeight="semibold"
+                              letterSpacing="wide"
+                              fontSize="xs"
+                              textTransform="uppercase"
+                            >
+                              [{product.company_name}]
+                            </Box>
+                          </Box>
+
                           <Box
-                            color="gray.500"
+                            mt="1"
                             fontWeight="semibold"
-                            letterSpacing="wide"
-                            fontSize="xs"
-                            textTransform="uppercase"
-                            ml="2"
+                            as="h4"
+                            lineHeight="tight"
+                            isTruncated
                           >
-                            {product.subcategory_name}
+                            {product.product_name}
+                          </Box>
+
+                          <Box>
+                            {product.product_price.toLocaleString("ko-KR")}원
+                            <Box as="span" color="gray.600" fontSize="sm"></Box>
                           </Box>
                         </Box>
-
-                        <Box
-                          mt="1"
-                          fontWeight="semibold"
-                          as="h4"
-                          lineHeight="tight"
-                          isTruncated
-                        >
-                          {product.product_name}
-                        </Box>
-
-                        <Box>
-                          {product.product_price.toLocaleString("ko-KR")}원
-                          <Box as="span" color="gray.600" fontSize="sm"></Box>
-                        </Box>
                       </Box>
-                    </Box>
-                  ))}
-              </SimpleGrid>
+                    ))}
+                </SimpleGrid>
+              </Flex>
             </Box>
           ))}
         </Box>
