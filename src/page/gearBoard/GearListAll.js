@@ -79,17 +79,87 @@ export function GearListAll() {
           )}
         </Tbody>
       </Table>
-      <Box>
-        <Button onClick={() => navigate("/gearlistlayout?p=1")}>1</Button>
-        <Button onClick={() => navigate("/gearlistlayout?p=2")}>2</Button>
-        <Button onClick={() => navigate("/gearlistlayout?p=3")}>3</Button>
-        <Button onClick={() => navigate("/gearlistlayout?p=4")}>4</Button>
-        <Button onClick={() => navigate("/gearlistlayout?p=5")}>5</Button>
-        <Button onClick={() => navigate("/gearlistlayout?p=6")}>6</Button>
-        <Button onClick={() => navigate("/gearlistlayout?p=7")}>7</Button>
-        <Button onClick={() => navigate("/gearlistlayout?p=8")}>8</Button>
-        <Button onClick={() => navigate("/gearlistlayout?p=9")}>9</Button>
-        <Button onClick={() => navigate("/gearlistlayout?p=10")}>10</Button>
+      <br />
+      <Box justifyContent="center" textAlign="center" bg="white" p={4}>
+        <Button
+          onClick={() => navigate("/gearlistlayout?p=1")}
+          mr={2}
+          color="black"
+          bg="white"
+        >
+          1
+        </Button>
+        <Button
+          onClick={() => navigate("/gearlistlayout?p=2")}
+          mr={2}
+          color="black"
+          bg="white"
+        >
+          2
+        </Button>
+        <Button
+          onClick={() => navigate("/gearlistlayout?p=3")}
+          mr={2}
+          color="black"
+          bg="white"
+        >
+          3
+        </Button>
+        <Button
+          onClick={() => navigate("/gearlistlayout?p=4")}
+          mr={2}
+          color="black"
+          bg="white"
+        >
+          4
+        </Button>
+        <Button
+          onClick={() => navigate("/gearlistlayout?p=5")}
+          mr={2}
+          color="black"
+          bg="white"
+        >
+          5
+        </Button>
+        <Button
+          onClick={() => navigate("/gearlistlayout?p=6")}
+          mr={2}
+          color="black"
+          bg="white"
+        >
+          6
+        </Button>
+        <Button
+          onClick={() => navigate("/gearlistlayout?p=7")}
+          mr={2}
+          color="black"
+          bg="white"
+        >
+          7
+        </Button>
+        <Button
+          onClick={() => navigate("/gearlistlayout?p=8")}
+          mr={2}
+          color="black"
+          bg="white"
+        >
+          8
+        </Button>
+        <Button
+          onClick={() => navigate("/gearlistlayout?p=9")}
+          mr={2}
+          color="black"
+          bg="white"
+        >
+          9
+        </Button>
+        <Button
+          onClick={() => navigate("/gearlistlayout?p=10")}
+          color="black"
+          bg="white"
+        >
+          10
+        </Button>
       </Box>
     </Box>
   );
