@@ -1,6 +1,7 @@
 import {
   Badge,
   Box,
+  Button,
   Spinner,
   Table,
   Tbody,
@@ -11,21 +12,21 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faImage } from "@fortawesome/free-solid-svg-icons";
 import { faImages } from "@fortawesome/free-regular-svg-icons";
 
-export function GearListAll({ category }) {
+export function GearListAll() {
   const [gearboardList, setGearboardList] = useState(null);
   const toast = useToast();
+  const [params] = useSearchParams();
   const navigate = useNavigate();
-
   useEffect(() => {
     axios
-      .get("/api/gearboard/listAll")
+      .get("/api/gearboard/listAll?" + params)
       .then((response) => setGearboardList(response.data));
-  }, [category]);
+  }, [params]);
 
   return (
     <Box>
@@ -78,6 +79,18 @@ export function GearListAll({ category }) {
           )}
         </Tbody>
       </Table>
+      <Box>
+        <Button onClick={() => navigate("/gearlistlayout?p=1")}>1</Button>
+        <Button onClick={() => navigate("/gearlistlayout?p=2")}>2</Button>
+        <Button onClick={() => navigate("/gearlistlayout?p=3")}>3</Button>
+        <Button onClick={() => navigate("/gearlistlayout?p=4")}>4</Button>
+        <Button onClick={() => navigate("/gearlistlayout?p=5")}>5</Button>
+        <Button onClick={() => navigate("/gearlistlayout?p=6")}>6</Button>
+        <Button onClick={() => navigate("/gearlistlayout?p=7")}>7</Button>
+        <Button onClick={() => navigate("/gearlistlayout?p=8")}>8</Button>
+        <Button onClick={() => navigate("/gearlistlayout?p=9")}>9</Button>
+        <Button onClick={() => navigate("/gearlistlayout?p=10")}>10</Button>
+      </Box>
     </Box>
   );
 }
