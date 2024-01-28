@@ -63,6 +63,7 @@ export function ProductPay() {
   const closeModal = () => setIsModalOpen(false);
 
   const [userInfo, setUserInfo] = useState({
+    orderMemberId: null,
     orderMember: "",
     receiver: "",
     contact: "",
@@ -125,6 +126,7 @@ export function ProductPay() {
         throw new Error("사용자 정보를 불러오는데 실패했습니다.");
       }
       const data = await response.json();
+      console.log(data);
       // 연락처를 하이픈으로 분리하여 상태에 저장
       const contactParts = data.member_phone_number.split("-");
       if (contactParts.length === 3) {
@@ -133,6 +135,7 @@ export function ProductPay() {
         setContactLast(contactParts[2]);
       }
       setUserInfo({
+        orderMemberId: data.id,
         orderMember: data.member_name,
         receiver: data.member_name,
         contact: data.member_phone_number,
@@ -307,6 +310,7 @@ export function ProductPay() {
       orderName: orderName,
       price: totalPrice,
       quantity: totalQuantity,
+      orderMemberId: userInfo.orderMemberId,
       customerName: userInfo.orderMember,
       customerEmail: userInfo.email,
       customerMobilePhone: `${contactFirst}${contactMiddle}${contactLast}`,
@@ -315,6 +319,7 @@ export function ProductPay() {
       postalCode: userInfo.postalCode,
       requirement: requirement,
     };
+
     localStorage.setItem("orderDetail", JSON.stringify(orderData));
     navigate("/payment");
   }

@@ -15,9 +15,10 @@ function SuccessPage() {
   useEffect(() => {
     const requestData = {
       orderId: searchParams.get("orderId"),
-      amount: searchParams.get("quantity"),
+      amount: searchParams.get("amount"),
       paymentKey: searchParams.get("paymentKey"),
     };
+    console.log(requestData);
     async function confirm() {
       try {
         const response = await axios.post(
