@@ -80,7 +80,7 @@ export function GearListAll() {
         </Tbody>
       </Table>
       <br />
-      <Box justifyContent="center" textAlign="center" bg="white" p={4}>
+      <Box justifyContent="center" textAlign="center" bg="white" p={4} mb={-4}>
         <Button
           onClick={() => navigate("/gearlistlayout?p=1")}
           mr={2}

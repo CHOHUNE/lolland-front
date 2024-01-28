@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faImage } from "@fortawesome/free-solid-svg-icons";
 import { faImages } from "@fortawesome/free-regular-svg-icons";
@@ -20,7 +20,7 @@ export function GearList({ category }) {
   const [gearboardList, setGearboardList] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
-
+  const [params] = useSearchParams();
   useEffect(() => {
     axios
       .get("/api/gearboard/list?category=" + category)

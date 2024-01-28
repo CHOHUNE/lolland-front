@@ -42,7 +42,6 @@ export function GearListlayout() {
 
   return (
     <Box w={"80%"} margin={"15px auto"}>
-      <Button onClick={() => navigate("/gearboard")}> 글쓰기</Button>
       <Flex>
         {/* 왼쪽 70%  오늘의 베스트 , 게시판 리스트 */}
         <Box w={"70%"} margin={"15px  auto"} mr={"20px"}>
@@ -141,11 +140,17 @@ export function GearListlayout() {
                 <GearList category={category} />
               </TabPanel>
               {/* 인사정보 */}
-              <TabPanel>
-                <GearList category={category} />
-              </TabPanel>
             </TabPanels>
           </Tabs>
+          <Box textAlign="center">
+            <Button
+              onClick={() => navigate("/gearboard")}
+              bg="orange"
+              color="white"
+            >
+              글쓰기
+            </Button>
+          </Box>
         </Box>
         {/* 오른쪽 30%  자유게시판BEST , 최신 공식기사 */}
         <Box w={"30%"} margin={"15px auto"}>
