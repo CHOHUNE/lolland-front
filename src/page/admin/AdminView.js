@@ -6,10 +6,26 @@ import {
   Center,
   Flex,
 } from "@chakra-ui/react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { AdminNavBar } from "./AdminNavBar";
+import { useContext, useEffect } from "react";
+import { LoginContext } from "../../component/LoginProvider";
 
 export function AdminView() {
+  const { isAdmin } = useContext(LoginContext);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAdmin()) {
+      navigate("/");
+    }
+  }, [isAdmin]);
+
+  if (!isAdmin()) {
+    return null;
+  }
+
   return (
     <>
       <Flex position="relative" justifyContent="space-between">
