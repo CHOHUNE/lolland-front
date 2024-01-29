@@ -27,7 +27,14 @@ export function GearEdit() {
   const toast = useToast();
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [gearboard, updateGearboard] = useImmer(null);
-  const categories = ["전체", "잡담", "질문", "정보", "축하", "고민", "인사"];
+  const categories = [
+    "전체",
+    "모니터",
+    "키보드",
+    "마우스",
+    "오디오",
+    "최신기기",
+  ];
   const [removeFileIds, setRemoveFileIds] = useState([]);
   const [uploadFiles, setUploadFiles] = useState(null);
 
