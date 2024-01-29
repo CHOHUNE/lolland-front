@@ -34,7 +34,7 @@ export function TodayBest() {
     <Card>
       <CardHeader>
         <Heading size="md" color="orange">
-          오늘의 베스트
+          최신글
         </Heading>
       </CardHeader>
       <Divider orientation="horizontal" color={"orange"} />

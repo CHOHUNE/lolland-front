@@ -3,8 +3,10 @@ import { Box, Flex, Image, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 export function GearContentMain() {
+  const navigate = useNavigate();
   const [gearboard, setGearboard] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useToast();
@@ -40,6 +42,7 @@ export function GearContentMain() {
         {gearboard &&
           gearboard.files.map((file, index) => (
             <Box
+              onClick={() => navigate("/gearlist/gear_id/91")}
               key={file.id}
               my="5px"
               display={index === currentIndex ? "block" : "none"}

@@ -24,14 +24,18 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useImmer } from "use-immer";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import * as PropTypes from "prop-types";
 import { GearCommentContainer } from "./comment/GearCommentContainer";
 import { faHeart as em } from "@fortawesome/free-regular-svg-icons";
 import { faHeart as ful } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { EffectCoverflow, Pagination } from "swiper/modules";
 
+// Import Swiper styles
+import "../../component/swiper.css";
 function LikeContainer({ like, onClick }) {
   if (like === null) {
     return <Spinner />;
@@ -159,6 +163,32 @@ export function GearView() {
           </Button>
         </Flex>
         <br />
+
+        <Box>
+          <Swiper
+            effect={"coverflow"}
+            grabCursor={true}
+            centeredSlides={true}
+            slidesPerView={"auto"}
+            coverflowEffect={{
+              rotate: 50,
+              stretch: 0,
+              depth: 100,
+              modifier: 1,
+              slideShadows: true,
+            }}
+            pagination={true}
+            modules={[EffectCoverflow, Pagination]}
+            className="mySwiper"
+          >
+            {gearboard.files.map((file) => (
+              <SwiperSlide key={file.id}>
+                <img src={file.url} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </Box>
+
         <Box display="flex" justifyContent="space-between">
           {gearboard.files.map((file) => (
             <Box key={file.id} my="5px">

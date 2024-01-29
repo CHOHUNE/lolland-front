@@ -46,6 +46,7 @@ export function GearListlayout() {
         {/* 왼쪽 70%  오늘의 베스트 , 게시판 리스트 */}
         <Box w={"70%"} margin={"15px  auto"} mr={"20px"}>
           {/* 내용을 여기에 넣으세요 */}
+
           <GearContentMain />
           <br />
 
