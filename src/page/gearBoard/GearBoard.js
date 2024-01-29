@@ -23,7 +23,14 @@ export function GearBoard() {
   const toast = useToast();
   const navigate = useNavigate();
   const [uploadFiles, setUploadFiles] = useState(null);
-  const categories = ["전체", "잡담", "질문", "정보", "축하", "고민", "인사"];
+  const categories = [
+    "전체",
+    "모니터",
+    "키보드",
+    "마우스",
+    "오디오",
+    "최신기기",
+  ];
   const { isAuthenticated } = useContext(LoginContext);
 
   function handleSave() {
@@ -47,7 +54,8 @@ export function GearBoard() {
   }
 
   return (
-    <Box>
+    <Box w={"80%"} textAlign={"center"} m={"0 auto"}>
+      <br />
       <h1>게임 장비 게시판</h1>
       <VStack spacing={2} align="start">
         <FormControl>
@@ -74,6 +82,7 @@ export function GearBoard() {
       <FormControl>
         <FormLabel>컨텐츠</FormLabel>
         <Textarea
+          style={{ height: "200px" }}
           value={gear_content}
           onChange={(e) => setGear_content(e.target.value)}
         />
@@ -86,18 +95,12 @@ export function GearBoard() {
           accept="image/*"
           onChange={(e) => setUploadFiles(e.target.files)}
         />
+        <br />
         <FormHelperText>
           한 개 파일은 1MB 이내, 총 용량으 10MB 이내로 첨부 하세요.
         </FormHelperText>
       </FormControl>
-
-      {/*<FormControl>*/}
-      {/*  <FormLabel>작성자</FormLabel>*/}
-      {/*  <Input*/}
-      {/*    value={member_name}*/}
-      {/*    onChange={(e) => setGear_title(e.target.value)}*/}
-      {/*  />*/}
-      {/*</FormControl>*/}
+      <br />
       <Button
         isDisabled={isSubmitting}
         onClick={handleSave}

@@ -9,6 +9,7 @@ import {
   Spinner,
   Stack,
   StackDivider,
+  Td,
   Text,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
@@ -48,7 +49,7 @@ export function FreeBest() {
                   {item.gear_title}
                 </Heading>
                 <Text pt="2" fontSize="sm">
-                  {item.gear_content}
+                  {item.gear_content.slice(0, 90)}
                 </Text>
               </Box>
             </Flex>

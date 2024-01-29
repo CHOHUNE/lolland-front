@@ -36,23 +36,24 @@ export function CommentList() {
   }
 
   return (
-    <Card>
-      <CardHeader size={"md"}>댓글</CardHeader>
+    <Card boxShadow={"none"}>
       <CardBody>
         <Stack divider={<StackDivider />} spacing="4">
           {commentList.map((comment) => (
             <Box key={comment.id}>
-              <Flex justifyContent={"space-between"}>
-                <Heading size="xs">{comment.member_name} </Heading>
-                <Text fontSize="xs">{comment.inserted}</Text>
-              </Flex>
-              <Flex justifyContent={"space-between"}>
-                <Text pt="2" fontSize="sm">
-                  {comment.comment}
-                </Text>
+              <Flex justifyContent={"space-between"} alignItems={"center"}>
+                <Box>
+                  <Heading size="sm">{comment.member_name} </Heading>
+                  <Text pt="2" fontSize="sm">
+                    {comment.comment}
+                  </Text>
+                  <Text color={"orange"} mt={"10px"} fontSize="xs">
+                    {comment.inserted}
+                  </Text>
+                </Box>
                 <Button
                   onClick={() => handleDelete(comment.id)}
-                  size={"xs"}
+                  size={"sm"}
                   colorScheme={"red"}
                 >
                   <DeleteIcon />

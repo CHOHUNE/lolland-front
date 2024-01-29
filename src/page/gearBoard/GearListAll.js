@@ -11,21 +11,28 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faImage } from "@fortawesome/free-solid-svg-icons";
+import { faComment } from "@fortawesome/free-solid-svg-icons";
 import { faImages } from "@fortawesome/free-regular-svg-icons";
+import Pagination from "./Pagination";
 
-export function GearListAll({ category }) {
+export function GearListAll() {
   const [gearboardList, setGearboardList] = useState(null);
+  const [pageInfo, setPageInfo] = useState(null);
+
   const toast = useToast();
+  const [params] = useSearchParams();
   const navigate = useNavigate();
 
+  const location = useLocation();
+
   useEffect(() => {
-    axios
-      .get("/api/gearboard/listAll")
-      .then((response) => setGearboardList(response.data));
-  }, [category]);
+    axios.get("/api/gearboard/listAll?" + params).then((response) => {
+      setGearboardList(response.data.gearboardList);
+      setPageInfo(response.data.pageInfo);
+    });
+  }, [location]);
 
   return (
     <Box>
@@ -33,10 +40,10 @@ export function GearListAll({ category }) {
         <Thead>
           <Tr>
             <Td>추천</Td>
-            <Td>카테고리</Td>
+            {/*<Td>카테고리</Td>*/}
             <Td>제목</Td>
             <Td>컨텐츠</Td>
-            <Td>날짜</Td>
+            {/*<Td>날짜</Td>*/}
           </Tr>
         </Thead>
         <Tbody>
@@ -49,9 +56,9 @@ export function GearListAll({ category }) {
                 onClick={() => navigate("/gearlist/gear_id/" + item.gear_id)}
               >
                 <Td>{item.countLike}</Td>
-                <Td>{item.category}</Td>
+                {/*<Td>{item.category}</Td>*/}
                 <Td>
-                  {item.gear_title}
+                  {item.gear_title.slice(0, 30)}
                   {item.countFile > 0 && (
                     <Badge
                       style={{ backgroundColor: "white", color: "orange" }}
@@ -69,13 +76,101 @@ export function GearListAll({ category }) {
                     </Badge>
                   )}
                 </Td>
-                <Td>{item.gear_content}</Td>
-                <Td>{item.gear_inserted}</Td>
+                {/*<Td>{item.gear_content}</Td>*/}
+                <Td>{item.gear_content.slice(0, 90)}</Td>
+
+                {/*<Td>{item.gear_inserted}</Td>*/}
               </Tr>
             ))
           )}
         </Tbody>
       </Table>
+      <br />
+      <Box textAlign={"center"}>
+        <Pagination pageInfo={pageInfo} />
+      </Box>
+
+      {/*<Box justifyContent="center" textAlign="center" bg="white" p={4} mb={-4}>*/}
+      {/*  <Button*/}
+      {/*    onClick={() => navigate("/gearlistlayout?p=1")}*/}
+      {/*    mr={2}*/}
+      {/*    color="black"*/}
+      {/*    bg="white"*/}
+      {/*  >*/}
+      {/*    1*/}
+      {/*  </Button>*/}
+      {/*  <Button*/}
+      {/*    onClick={() => navigate("/gearlistlayout?p=2")}*/}
+      {/*    mr={2}*/}
+      {/*    color="black"*/}
+      {/*    bg="white"*/}
+      {/*  >*/}
+      {/*    2*/}
+      {/*  </Button>*/}
+      {/*  <Button*/}
+      {/*    onClick={() => navigate("/gearlistlayout?p=3")}*/}
+      {/*    mr={2}*/}
+      {/*    color="black"*/}
+      {/*    bg="white"*/}
+      {/*  >*/}
+      {/*    3*/}
+      {/*  </Button>*/}
+      {/*  <Button*/}
+      {/*    onClick={() => navigate("/gearlistlayout?p=4")}*/}
+      {/*    mr={2}*/}
+      {/*    color="black"*/}
+      {/*    bg="white"*/}
+      {/*  >*/}
+      {/*    4*/}
+      {/*  </Button>*/}
+      {/*  <Button*/}
+      {/*    onClick={() => navigate("/gearlistlayout?p=5")}*/}
+      {/*    mr={2}*/}
+      {/*    color="black"*/}
+      {/*    bg="white"*/}
+      {/*  >*/}
+      {/*    5*/}
+      {/*  </Button>*/}
+      {/*  <Button*/}
+      {/*    onClick={() => navigate("/gearlistlayout?p=6")}*/}
+      {/*    mr={2}*/}
+      {/*    color="black"*/}
+      {/*    bg="white"*/}
+      {/*  >*/}
+      {/*    6*/}
+      {/*  </Button>*/}
+      {/*  <Button*/}
+      {/*    onClick={() => navigate("/gearlistlayout?p=7")}*/}
+      {/*    mr={2}*/}
+      {/*    color="black"*/}
+      {/*    bg="white"*/}
+      {/*  >*/}
+      {/*    7*/}
+      {/*  </Button>*/}
+      {/*  <Button*/}
+      {/*    onClick={() => navigate("/gearlistlayout?p=8")}*/}
+      {/*    mr={2}*/}
+      {/*    color="black"*/}
+      {/*    bg="white"*/}
+      {/*  >*/}
+      {/*    8*/}
+      {/*  </Button>*/}
+      {/*  <Button*/}
+      {/*    onClick={() => navigate("/gearlistlayout?p=9")}*/}
+      {/*    mr={2}*/}
+      {/*    color="black"*/}
+      {/*    bg="white"*/}
+      {/*  >*/}
+      {/*    9*/}
+      {/*  </Button>*/}
+      {/*  <Button*/}
+      {/*    onClick={() => navigate("/gearlistlayout?p=10")}*/}
+      {/*    color="black"*/}
+      {/*    bg="white"*/}
+      {/*  >*/}
+      {/*    10*/}
+      {/*  </Button>*/}
+      {/*</Box>*/}
     </Box>
   );
 }

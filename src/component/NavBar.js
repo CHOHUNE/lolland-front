@@ -102,14 +102,14 @@ export function NavBar() {
 
   return (
     <>
-      <Box>
+      <Box minW={"1400px"}>
         {/* ------------------- 상단 네브 바 ------------------- */}
         <Flex
           top={0}
           justifyContent="space-between"
           p={5}
           w="full"
-          // px="3%"
+          minW={"1400px"}
           shadow="sm"
           position="fixed"
           zIndex={100}
