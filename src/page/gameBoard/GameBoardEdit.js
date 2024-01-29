@@ -26,6 +26,8 @@ export function GameBoardEdit(props) {
   const { id } = useParams();
   const [removeFileIds, setRemoveFileIds] = useState([]);
   const [uploadFiles, setUploadFiles] = useState(null);
+  const { isAuthenticated, isAdmin } = useContext(LoginContext);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   let toast = useToast();
   let navigate = useNavigate();
@@ -74,7 +76,8 @@ export function GameBoardEdit(props) {
             status: "error",
           });
         }
-      });
+      })
+      .finally(() => setIsSubmitting(false));
   }
 
   function handleRemoveFileSwitch(e) {
@@ -107,7 +110,7 @@ export function GameBoardEdit(props) {
 
   return (
     <Center>
-      <Box py={"200px"}>
+      <Box py={"100px"} w={"60%"}>
         <h1>{id} 번 게시물 수정 </h1>
         <Box>
           <Select
@@ -121,9 +124,12 @@ export function GameBoardEdit(props) {
               });
             }}
           >
-            <option value="공지">공지</option>
+            {isAdmin() && <option value="공지">공지</option>}
+            <option value="리그 오브 레전드">리그 오브 레전드</option>
+            <option value="로스트 아크">로스트 아크</option>
+            <option value="콘솔 게임">콘솔 게임</option>
+            <option value="모바일 게임">모바일 게임</option>
             <option value="자유">자유</option>
-            <option value="롤">롤</option>
           </Select>
           <FormControl>
             <FormLabel>제목</FormLabel>
@@ -141,6 +147,7 @@ export function GameBoardEdit(props) {
             <FormLabel>본문</FormLabel>
             <Textarea
               value={board.board_content}
+              style={{ height: "150px" }} // 높이 조절
               onChange={(e) =>
                 updateBoard((draft) => {
                   draft.board_content = e.target.value;
