@@ -37,9 +37,39 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ChevronDownIcon } from "@chakra-ui/icons";
+import * as PropTypes from "prop-types";
+
+// 관리자 회원 관리 페이지 버튼
+function AdminMemberPageButton({
+  pageBg,
+  pageColor,
+  pageHove,
+  pageNumber,
+  children,
+}) {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+
+  function handleClickButton() {
+    params.set("page", pageNumber);
+    navigate("?" + params);
+  }
+
+  return (
+    <Button
+      ml={2}
+      bg={pageBg}
+      color={pageColor}
+      _hover={pageHove}
+      onClick={handleClickButton}
+    >
+      {children}
+    </Button>
+  );
+}
 
 // 페이지 버튼
-function Pagination({ pageInfo }) {
+function AdminMemberPagination({ pageInfo }) {
   const navigate = useNavigate();
 
   const [params] = useSearchParams();
@@ -64,18 +94,15 @@ function Pagination({ pageInfo }) {
         </Button>
       )}
       {pageNumbers.map((pageNumber) => (
-        <Button
-          bg={listPage === pageNumber.toString() ? "black" : "white"}
-          color={listPage === pageNumber.toString() ? "white" : "black"}
-          _hover={{ backgroundColor: "black", color: "whitesmoke" }}
-          ml={2}
+        <AdminMemberPageButton
+          pageBg={listPage === pageNumber.toString() ? "black" : "white"}
+          pageColor={listPage === pageNumber.toString() ? "white" : "black"}
+          pageHove={{ backgroundColor: "black", color: "whitesmoke" }}
           key={pageNumber}
-          onClick={() => {
-            navigate("?page=" + pageNumber);
-          }}
+          pageNumber={pageNumber}
         >
           {pageNumber}
-        </Button>
+        </AdminMemberPageButton>
       ))}
       {pageInfo.nextPageNumber && (
         <Button
@@ -316,7 +343,7 @@ export function MemberList() {
           </Table>
 
           <SearchMember />
-          <Pagination pageInfo={pageInfo} />
+          <AdminMemberPagination pageInfo={pageInfo} />
         </CardBody>
 
         {/* 탈퇴 모달 */}

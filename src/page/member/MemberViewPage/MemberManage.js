@@ -24,9 +24,10 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { LoginContext } from "../../../component/LoginProvider";
 
 export function MemberManage() {
   const [member, setMember] = useState(null);
@@ -36,6 +37,8 @@ export function MemberManage() {
   const { isOpen, onClose, onOpen } = useDisclosure();
 
   const navigate = useNavigate();
+
+  const { fetchLogin } = useContext(LoginContext);
 
   // 버튼 css
   const buttonStyle = {
@@ -84,6 +87,7 @@ export function MemberManage() {
 
   // 회원 탈퇴 버튼 클릭
   function handleMemberDeleteClick() {
+    // 탈퇴 처리 로직 실행
     axios
       .delete("/api/member")
       .then(() =>
@@ -96,6 +100,20 @@ export function MemberManage() {
           colorScheme: "gray",
         }),
       );
+
+    // 탈퇴처리 완료 후 로그아웃 처리
+    axios
+      .post("/api/member/logout")
+      .then(() => {
+        navigate("/");
+      })
+      .catch(() => {
+        toast({
+          description: "로그 아웃 중 문제가 발생하였습니다.",
+          status: "error",
+        });
+      })
+      .finally(() => fetchLogin());
   }
 
   return (

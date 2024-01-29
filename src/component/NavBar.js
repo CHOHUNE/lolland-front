@@ -108,7 +108,6 @@ export function NavBar() {
           p={5}
           w="full"
           minW={"1400px"}
-          // px="3%"
           shadow="sm"
           position="fixed"
           zIndex={100}
@@ -119,7 +118,7 @@ export function NavBar() {
               <Button onClick={() => navigate("/")}>HOME</Button>
               <Button onClick={() => navigate("/product/list/")}>신상품</Button>
               <Button>인기글</Button>
-              <Button>이벤트</Button>
+              <Button onClick={() => navigate("/productEvent")}>이벤트</Button>
             </ButtonGroup>
           </Flex>
 
