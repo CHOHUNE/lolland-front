@@ -24,6 +24,8 @@ import { TodayBest } from "./TodayBest";
 import { FreeBest } from "./FreeBest";
 import { GearNews } from "./GearNews";
 import { GearNotice } from "./GearNotice";
+import { GearContentMain } from "./GearContentMain";
+import { GearAppleNews } from "./GearAppleNews";
 
 function Pageing() {
   return null;
@@ -40,22 +42,30 @@ export function GearListlayout() {
 
   return (
     <Box w={"80%"} margin={"15px auto"}>
-      <Button onClick={() => navigate("/gearboard")}> 글쓰기</Button>
       <Flex>
         {/* 왼쪽 70%  오늘의 베스트 , 게시판 리스트 */}
         <Box w={"70%"} margin={"15px  auto"} mr={"20px"}>
-          {/* 오늘의 베스트*/}
-          <Flex>
-            <Box w={"48%"} mr={"1%"}>
-              <FreeBest />
-            </Box>
-            <Box w={"50%"} ml={"1%"}>
-              <TodayBest />
-            </Box>
-          </Flex>
+          {/* 내용을 여기에 넣으세요 */}
+          <GearContentMain />
+          <br />
+
+          {/*/!* 오늘의 베스트*!/*/}
+          {/*<Flex>*/}
+          {/*  <Box w={"48%"} mr={"1%"}>*/}
+          {/*    <FreeBest />*/}
+          {/*  </Box>*/}
+          {/*  <Box w={"50%"} ml={"1%"}>*/}
+          {/*    <TodayBest />*/}
+          {/*  </Box>*/}
+          {/*</Flex>*/}
+
+          <TodayBest />
 
           <br />
           <br />
+          <br />
+          <br />
+
           {/*공지사항*/}
           <GearNotice />
 
@@ -72,39 +82,33 @@ export function GearListlayout() {
               </Tab>
               <Tab
                 _selected={{ color: "white", bg: "orange.400" }}
-                onClick={(e) => setCategory("잡담")}
+                onClick={(e) => setCategory("모니터")}
               >
-                잡담
+                모니터
               </Tab>
               <Tab
                 _selected={{ color: "white", bg: "orange.400" }}
-                onClick={(e) => setCategory("질문")}
+                onClick={(e) => setCategory("키보드")}
               >
-                질문
+                키보드
               </Tab>
               <Tab
                 _selected={{ color: "white", bg: "orange.400" }}
-                onClick={(e) => setCategory("정보")}
+                onClick={(e) => setCategory("마우스")}
               >
-                정보
+                마우스
               </Tab>
               <Tab
                 _selected={{ color: "white", bg: "orange.400" }}
-                onClick={(e) => setCategory("축하")}
+                onClick={(e) => setCategory("오디오")}
               >
-                축하
+                오디오
               </Tab>
               <Tab
                 _selected={{ color: "white", bg: "orange.400" }}
-                onClick={(e) => setCategory("고민")}
+                onClick={(e) => setCategory("최신기기")}
               >
-                고민
-              </Tab>
-              <Tab
-                _selected={{ color: "white", bg: "orange.400" }}
-                onClick={(e) => setCategory("인사")}
-              >
-                인사
+                최신기기
               </Tab>
             </TabList>
 
@@ -115,35 +119,61 @@ export function GearListlayout() {
               <TabPanel>
                 <GearListAll category={category} />
               </TabPanel>
-              {/* 잡담정보 */}
+              {/* 모니터 */}
               <TabPanel>
                 <GearList category={category} />
               </TabPanel>
-              {/* 질문정보 */}
+              {/* 키보드 */}
               <TabPanel>
                 <GearList category={category} />
               </TabPanel>
-              {/* 정보정보 */}
+              {/* 마우스 */}
               <TabPanel>
                 <GearList category={category} />
               </TabPanel>
-              {/* 축하정보 */}
+              {/* 오디오  */}
               <TabPanel>
                 <GearList category={category} />
               </TabPanel>
-              {/* 고민정보 */}
+              {/* 최신기기 */}
               <TabPanel>
                 <GearList category={category} />
               </TabPanel>
               {/* 인사정보 */}
-              <TabPanel>
-                <GearList category={category} />
-              </TabPanel>
             </TabPanels>
           </Tabs>
+          <Box textAlign="center">
+            <Button
+              onClick={() => navigate("/gearboard")}
+              bg="orange"
+              color="white"
+            >
+              글쓰기
+            </Button>
+          </Box>
         </Box>
         {/* 오른쪽 30%  자유게시판BEST , 최신 공식기사 */}
         <Box w={"30%"} margin={"15px auto"}>
+          <Box w={"100%"} h={"240px"} mt={"5px"} mb={"10px"}>
+            <iframe
+              title="YouTube Video"
+              width="100%"
+              height="100%"
+              src={`https://www.youtube.com/embed/luFGI13Mv8o`}
+              allowFullScreen
+            ></iframe>
+          </Box>
+          <Box w={"100%"} h={"240px"} mt={"10px"}>
+            <iframe
+              title="YouTube Video"
+              width="100%"
+              height="100%"
+              src={`https://www.youtube.com/embed/CUwg_JoNHpo`}
+              allowFullScreen
+            ></iframe>
+          </Box>
+          <br />
+
           <GearNews />
           <br />
           <br />
