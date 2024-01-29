@@ -608,6 +608,12 @@ export function HomeBody() {
                   _hover={{
                     cursor: "pointer",
                   }}
+                  css={{
+                    transition: "transform 0.3s ease-in-out", // 변환 애니메이션 적용
+                    "&:hover": {
+                      transform: "scale(1.1)", // 확대 효과
+                    },
+                  }}
                   {...categoryStyle}
                   key={category.category_id}
                   onClick={() => navigate(`/category/${category.category_id}`)}
@@ -773,7 +779,7 @@ export function HomeBody() {
                           </Box>
 
                           <Box>
-                            {product.product_price.toLocaleString("ko-KR")}원
+                            {/*{product.product_price.toLocaleString("ko-KR")}원*/}
                             <Box as="span" color="gray.600" fontSize="sm"></Box>
                           </Box>
                         </Box>
