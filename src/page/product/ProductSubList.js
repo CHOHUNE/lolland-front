@@ -32,13 +32,59 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import {
+  faAngleLeft,
+  faAngleRight,
   faChevronRight,
   faMinus,
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
-function SubCategoryPagination() {
-  return null;
+function SubCategoryPagination({ pageInfo }) {
+  const pageNumbers = [];
+  const navigate = useNavigate();
+
+  if (!pageInfo) {
+    // pageInfo가 null이면 빈 배열을 반환하여 렌더링하지 않음
+    return null;
+  }
+  console.log(pageNumbers);
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+  return (
+    <Box mb={10} mt={6} display={"flex"} justifyContent={"center"}>
+      {pageInfo.prevPageNumber && (
+        <Button
+          variant={"ghost"}
+          onClick={() => navigate("?p=" + pageInfo.prevPageNumber)}
+        >
+          <FontAwesomeIcon icon={faAngleLeft} />
+        </Button>
+      )}
+
+      {pageNumbers.map((pageNumber) => (
+        <Button
+          key={pageNumber}
+          variant={
+            pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
+          }
+          onClick={() => navigate("?p=" + pageNumber)}
+        >
+          {pageNumber}
+        </Button>
+      ))}
+
+      {pageInfo.nextPageNumber && (
+        <Button
+          variant={"ghost"}
+          onClick={() => navigate("?p=" + pageInfo.nextPageNumber)}
+        >
+          <FontAwesomeIcon icon={faAngleRight} />
+        </Button>
+      )}
+    </Box>
+  );
 }
 
 export function ProductSubList() {
@@ -61,6 +107,7 @@ export function ProductSubList() {
       .then((response) => {
         setProductList(response.data.products); // response.data.products
         setPageInfo(response.data.pageInfo);
+        console.log(response.data.pageInfo);
       })
       .catch((error) => {
         toast({
@@ -248,16 +295,10 @@ export function ProductSubList() {
               </Flex>
             </Box>
           ))}
-          {/*@@*/}
-          <Box>
-            <Button onClick={() => navigate("?p=1")}>1</Button>
-            <Button onClick={() => navigate("?p=2")}>2</Button>
-            <Button onClick={() => navigate("?p=3")}>3</Button>
-          </Box>
         </SimpleGrid>
       </Flex>
 
-      <SubCategoryPagination />
+      <SubCategoryPagination pageInfo={pageInfo} />
     </Flex>
   );
 }
