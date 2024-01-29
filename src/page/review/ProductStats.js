@@ -15,7 +15,6 @@ export const ProductStats = ({ product_id, average_rate }) => {
       .get(`/api/review/rating-distribution?product_id=${product_id}`)
       .then((response) => {
         setRatingDistribution(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error("별점 분포도 가져오는 도중 에러 발생:", error);

@@ -85,6 +85,8 @@ export function NavBar() {
           description: "로그 아웃 되었습니다.",
           status: "success",
         });
+        localStorage.removeItem("orderDetail");
+        localStorage.removeItem("purchaseInfo");
         navigate("/");
       })
       .catch(() => {
