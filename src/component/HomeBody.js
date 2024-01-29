@@ -189,7 +189,7 @@ export function HomeBody() {
 
   // -------------------------------- 최근본상품 로컬스토리지 & 애니메이션 --------------------------------
   const [scrollPosition, setScrollPosition] = useState(0);
-  const fixedTopPosition = 650;
+  const fixedTopPosition = 700;
   const stickyTopPosition = 100;
   useEffect(() => {
     const handleScroll = () => {
@@ -478,7 +478,7 @@ export function HomeBody() {
                 <Stack divider={<StackDivider />} spacing="3">
                   {top.slice(0, 3).map((item) => (
                     <Flex
-                      key={item.gear_id}
+                      key={item.id}
                       justify="flex-start"
                       alignItems="center"
                     >
@@ -705,19 +705,33 @@ export function HomeBody() {
                   </Box>
                 </VStack>
 
-                <SimpleGrid columns={4} spacing={9}>
+                <SimpleGrid
+                  borderWidth={"1px"}
+                  borderRadius={"lg"}
+                  columns={4}
+                  spacing={9}
+                >
                   {categoryProducts[category.category_id]
                     ?.slice(0, 6)
                     .map((product) => (
                       <Box
                         key={product.product_id}
-                        borderWidth="1px"
                         borderRadius="lg"
                         overflow="hidden"
                         h={"100%"}
                         w={"250px"}
                         display="flex"
                         flexDirection="column"
+                        _hover={{ cursor: "pointer" }}
+                        onClick={() =>
+                          navigate(`/product/${product.product_id}`)
+                        }
+                        css={{
+                          transition: "transform 0.3s ease-in-out", // 변환 애니메이션 적용
+                          "&:hover": {
+                            transform: "scale(1.1)", // 확대 효과
+                          },
+                        }}
                       >
                         <Flex
                           h={"246px"}
