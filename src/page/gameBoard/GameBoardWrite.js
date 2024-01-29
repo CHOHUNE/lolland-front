@@ -28,13 +28,13 @@ export function GameBoardWrite(props) {
 
   function handleSubmit() {
     // Check if uploadFiles is null
-    if (uploadFiles === null) {
-      toast({
-        description: "사진을 업로드해주세요.",
-        status: "error",
-      });
-      return; // Stop further execution if uploadFiles is null
-    }
+    // if (uploadFiles === null) {
+    //   toast({
+    //     description: "사진을 업로드해주세요.",
+    //     status: "error",
+    //   });
+    //   return; // Stop further execution if uploadFiles is null
+    // }
 
     setIsSubmitting(true);
     axios
@@ -72,9 +72,11 @@ export function GameBoardWrite(props) {
             }}
           >
             {isAdmin() && <option value="공지">공지</option>}
-            <option value="잡담">잡담</option>
-            <option value="질문">질문</option>
-            <option value="정보">정보</option>
+            <option value="리그 오브 레전드">리그 오브 레전드</option>
+            <option value="로스트 아크">로스트 아크</option>
+            <option value="콘솔 게임">콘솔 게임</option>
+            <option value="모바일 게임">모바일 게임</option>
+            <option value="자유">자유</option>
           </Select>
           <FormControl>
             <FormLabel>제목</FormLabel>
