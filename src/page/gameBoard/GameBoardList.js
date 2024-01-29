@@ -240,8 +240,8 @@ function GameBoardList() {
   }, []);
 
   const opts = {
-    width: "100%",
-    height: "100%",
+    width: "550px",
+    height: "400px",
     playerVars: {
       autoplay: 0,
     },
@@ -251,32 +251,32 @@ function GameBoardList() {
 
   const [searchedVideos, setSearchedVideos] = useState([]);
 
-  // useEffect(() => {
-  //   const params = {
-  //     key: process.env.REACT_APP_YOUTUBE_API_KEY,
-  //     q: "게임 리뷰",
-  //     part: "snippet",
-  //     type: "video",
-  //     maxResults: 4,
-  //     fields: "items(id, snippet(title))",
-  //     videoEmbeddable: true,
-  //   };
-  //
-  //   axios
-  //     .get("https://www.googleapis.com/youtube/v3/search", {
-  //       params,
-  //     })
-  //     .then((response) => {
-  //       const videos = response.data.items.map((item) => {
-  //         return {
-  //           videoId: item.id.videoId,
-  //           title: item.snippet.title,
-  //         };
-  //       });
-  //
-  //       setSearchedVideos(videos);
-  //     });
-  // }, []);
+  useEffect(() => {
+    const params = {
+      key: process.env.REACT_APP_YOUTUBE_API_KEY,
+      q: "게임 리뷰",
+      part: "snippet",
+      type: "video",
+      maxResults: 3,
+      fields: "items(id, snippet(title))",
+      videoEmbeddable: true,
+    };
+
+    axios
+      .get("https://www.googleapis.com/youtube/v3/search", {
+        params,
+      })
+      .then((response) => {
+        const videos = response.data.items.map((item) => {
+          return {
+            videoId: item.id.videoId,
+            title: item.snippet.title,
+          };
+        });
+
+        setSearchedVideos(videos);
+      });
+  }, []);
 
   // 각 카테고리에 대한 색상 매핑
   const categoryColors = {
@@ -798,15 +798,7 @@ function GameBoardList() {
               </Heading>
             </CardHeader>
             <CardBody>
-              <div
-                style={{
-                  margin: 20,
-                  display: "flex",
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  width: "100%",
-                }}
-              >
+              <Box>
                 <Swiper
                   slidesPerView={1}
                   pagination={{
@@ -818,7 +810,7 @@ function GameBoardList() {
                   {searchedVideos &&
                     searchedVideos.map((item) => (
                       <SwiperSlide key={item.videoId}>
-                        <Box key={item.videoId}>
+                        <Box key={item.videoId} mb={"50px"}>
                           <YouTube videoId={item.videoId} opts={opts} />
                           <div style={{ width: 400 }}>
                             {item.title.replace(/&QUOT;/gi, '"')}
@@ -827,7 +819,7 @@ function GameBoardList() {
                       </SwiperSlide>
                     ))}
                 </Swiper>
-              </div>
+              </Box>
             </CardBody>
           </Card>
           <br />
