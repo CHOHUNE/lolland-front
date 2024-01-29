@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { nanoid } from "nanoid";
 import { loadPaymentWidget } from "@tosspayments/payment-widget-sdk";
 import { Box, Button, ButtonGroup, Checkbox, Heading } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { nanoid } from "nanoid";
 
 const apiKey = process.env.REACT_APP_TOSS_CLIENT_KEY;
-const orderId = nanoid();
+const orderId = nanoid(); // 지우기
 
 function PaymentPage() {
   const [paymentWidget, setPaymentWidget] = useState(null);

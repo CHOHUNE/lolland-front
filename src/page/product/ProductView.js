@@ -389,6 +389,7 @@ export function ProductView() {
         mainImgUrl: mainImgUrl,
         options: [
           {
+            optionId: selectedOption.option_id,
             optionName: selectedOption.option_name,
             quantity: selectedOption.quantity,
             price: product.product.product_price,
