@@ -35,6 +35,9 @@ function SuccessPage() {
         if (error.response) {
           const { code, message } = error.response.data;
           navigate(`/fail?message=${message}&code=${code}`);
+        } else {
+          console.error("Unexpected error:", error.message);
+          navigate("/fail?message=Unexpected error&code=500");
         }
       }
     }

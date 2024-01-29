@@ -9,8 +9,8 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { nanoid } from "nanoid";
 import { LoginContext } from "../../component/LoginProvider";
+import axios from "axios";
 
 const apiKey = process.env.REACT_APP_TOSS_CLIENT_KEY;
 
@@ -86,12 +86,33 @@ function PaymentPage() {
         customerMobilePhone: phone,
         successUrl: `${window.location.origin}/success`,
         failUrl: `${window.location.origin}/fail`,
-        _skipAuth: "FORCE_SUCCESS",
+        // _skipAuth: "FORCE_SUCCESS",
       });
     } catch (error) {
       console.error("Error requesting payment:", error);
     }
   };
+
+  function handleOrderCancel() {
+    axios
+      .post("/api/payment/toss/cancel", {
+        orderId: order_nano_id,
+      })
+      .then((response) => {
+        toast({
+          title: "주문이 성공적으로 취소되었습니다",
+          status: "success",
+        });
+        navigate("/");
+      })
+      .catch((error) => {
+        toast({
+          title: "취소 도중 에러가 발생했습니다",
+          description: "다시 한 번 시도해주시거나, 관리자에게 문의해주세요",
+          status: "error",
+        });
+      });
+  }
 
   return (
     <div
@@ -128,6 +149,7 @@ function PaymentPage() {
           onClick={() => {
             localStorage.removeItem("orderDetail");
             localStorage.removeItem("purchaseInfo");
+            handleOrderCancel();
             navigate("/");
           }}
         >

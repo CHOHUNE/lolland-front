@@ -40,9 +40,8 @@ import { faCreditCard, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { LoginContext } from "../../component/LoginProvider";
 import { nanoid } from "nanoid";
 
-const orderId = nanoid();
-
 export function ProductPay() {
+  const orderId = nanoid();
   const [addressOption, setAddressOption] = useState("회원 정보와 동일");
   const [purchaseInfo, setPurchaseInfo] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
