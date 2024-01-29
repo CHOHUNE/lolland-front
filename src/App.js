@@ -15,7 +15,7 @@ import GameBoardView from "./page/gameBoard/GameBoardView";
 import { ProductWrite } from "./page/product/ProductWrite";
 import { ProductList } from "./page/product/ProductList";
 import { ProductView } from "./page/product/ProductView";
-import { Cart } from "./page/Cart/Cart";
+import { Cart } from "./page/order/Cart";
 import { GearBoard } from "./page/gearBoard/GearBoard";
 import { GearList } from "./page/gearBoard/GearList";
 import { GearListAll } from "./page/gearBoard/GearListAll";
@@ -37,7 +37,7 @@ import { AdminView } from "./page/admin/AdminView";
 import { MemberList } from "./page/admin/MemberList";
 import { QnaAnswer } from "./page/qna/QnaAnswer";
 import { QnaWriteAnswer } from "./page/qna/QnaWriteAnswer";
-import { ProductPay } from "./ProductPay";
+import { ProductPay } from "./page/order/ProductPay";
 import { MemberQuestion } from "./page/qna/MemberQuestion";
 import { MemberReview } from "./page/review/MemberReview";
 import { MemberAnswer } from "./page/qna/MemberAnswer";
@@ -47,6 +47,10 @@ import { HomeBody } from "./component/HomeBody";
 import { ProductMainList } from "./page/product/ProductMainList";
 import { ProductSubList } from "./page/product/ProductSubList";
 import { CompanyList } from "./page/product/CompanyList";
+import { ProductEventList } from "./page/product/ProductEventList";
+import PaymentPage from "./page/order/PaymentPage";
+import SuccessPage from "./page/order/SuccessPage";
+import FailPage from "./page/order/FailPage";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -54,26 +58,32 @@ const routes = createBrowserRouter(
       {/* 메인페이지 */}
       <Route index element={<HomeBody />} />
       {/* 상품관련 */}
-      <Route path="/category/:category_id" element={<ProductMainList />} />
+      <Route path="category/:category_id" element={<ProductMainList />} />
       <Route
-        path="/category/:category_id/:subcategory_id"
+        path="category/:category_id/:subcategory_id"
         element={<ProductSubList />}
       />
-      <Route path="/company/:company_id" element={<CompanyList />} />
+      <Route path="company/:company_id" element={<CompanyList />} />
 
       <Route path="product/list/" element={<ProductList />} />
       <Route path="product/:product_id" element={<ProductView />} />
       <Route path="edit/:product_id" element={<ProductEdit />} />
 
+      {/* 이벤트 페이지 */}
+      <Route path="productEvent" element={<ProductEventList />} />
+
       {/* 리뷰 */}
 
       {/* 장바구니 */}
-      <Route path="/cart" element={<Cart />} />
+      <Route path="cart" element={<Cart />} />
 
       {/* Q&A */}
 
       {/* 결제 */}
-      <Route path="product/pay/:product_id" element={<ProductPay />} />
+      <Route path="pay" element={<ProductPay />} />
+      <Route path="payment" element={<PaymentPage />} />
+      <Route path="success" element={<SuccessPage />} />
+      <Route path="fail" element={<FailPage />} />
 
       {/* 회원관련 */}
       <Route path="signup" element={<MemberSignup />} />

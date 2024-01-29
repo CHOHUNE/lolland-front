@@ -68,7 +68,7 @@ export function ProductView() {
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  const { login, isAdmin } = useContext(LoginContext);
+  const { isAuthenticated, isAdmin } = useContext(LoginContext);
 
   const totalOptionPrice = selectedOptionList.reduce((total, option) => {
     return (
@@ -364,46 +364,63 @@ export function ProductView() {
   // ------------------------------ 로컬스토리지 이용 ------------------------------
   function handlePaymentClick() {
     localStorage.removeItem("purchaseInfo");
-    if (login !== "") {
-      // 상세 옵션 선택 안하면 선택하라고 토스트 표시
-      if (selectedOptionList.length === 0) {
-        toast({
-          title: "옵션 선택 필요",
-          description: "상세 옵션을 선택해주세요.",
-          status: "warning",
-          duration: 2000,
-          isClosable: true,
-        });
-        return; // 함수 실행을 여기서 중지
-      }
 
-      const mainImgUrl =
-        product.productImgs && product.productImgs.length > 0
-          ? product.productImgs[0].main_img_uri
-          : ""; // 메인 이미지 URL
+    // 상세 옵션 선택 안하면 선택하라고 토스트 표시
+    if (selectedOptionList.length === 0) {
+      toast({
+        title: "옵션 선택 필요",
+        description: "상세 옵션을 선택해주세요.",
+        status: "warning",
+        duration: 2000,
+        isClosable: true,
+      });
+      return; // 함수 실행을 여기서 중지
+    }
 
-      const purchaseInfo = {
-        product_id: product_id,
+    const mainImgUrl =
+      product.productImgs && product.productImgs.length > 0
+        ? product.productImgs[0].main_img_uri
+        : ""; // 메인 이미지 URL
+
+    const selectedProductInfo = selectedOptionList.map((selectedOption) => {
+      return {
+        productId: product_id,
         productName: product.product.product_name,
         mainImgUrl: mainImgUrl,
-        selectedOptions: selectedOptionList,
-        totalOptionPrice: totalOptionPrice, // 총 상품 금액 추가
-        shippingFee: 3000,
+        options: [
+          {
+            optionName: selectedOption.option_name,
+            quantity: selectedOption.quantity,
+            price: product.product.product_price,
+          },
+        ],
       };
+    });
 
-      try {
-        localStorage.setItem("purchaseInfo", JSON.stringify(purchaseInfo));
-        navigate("/product/pay/" + product_id);
-      } catch (error) {
-        console.error("Error saving to localStorage", error);
-        toast({
-          description: "저장 중 오류가 발생했습니다.",
-          status: "error",
-        });
-      }
-    } else {
+    const groupedPurchaseInfo = selectedProductInfo.reduce(
+      (result, purchase) => {
+        const existingEntry = result.find(
+          (group) => group.productId === purchase.productId,
+        );
+
+        if (existingEntry) {
+          existingEntry.options.push(...purchase.options);
+        } else {
+          result.push(purchase);
+        }
+
+        return result;
+      },
+      [],
+    );
+
+    try {
+      localStorage.setItem("purchaseInfo", JSON.stringify(groupedPurchaseInfo));
+      navigate("/pay/");
+    } catch (error) {
+      console.error("Error saving to localStorage", error);
       toast({
-        description: "로그인 해주시기 바랍니다.",
+        description: "저장 중 오류가 발생했습니다.",
         status: "error",
       });
     }
@@ -759,7 +776,18 @@ export function ProductView() {
                 color={"white"}
                 border={"1px solid #eeeeee"}
                 _hover={{ color: "black", background: "gray.300" }}
-                onClick={handlePaymentClick}
+                onClick={() => {
+                  if (isAuthenticated()) {
+                    handlePaymentClick();
+                  } else {
+                    toast({
+                      title: "로그인 되지 않았습니다",
+                      description: "결제는 로그인 후 가능합니다",
+                      status: "error",
+                    });
+                    navigate("/login");
+                  }
+                }}
               >
                 구매하기
               </Button>

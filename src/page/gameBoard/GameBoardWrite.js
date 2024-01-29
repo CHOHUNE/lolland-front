@@ -78,7 +78,12 @@ export function GameBoardWrite(props) {
           </Select>
           <FormControl>
             <FormLabel>제목</FormLabel>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              목
+              placeholder={"제목"}
+            />
           </FormControl>
           <FormControl>
             <FormLabel>본문</FormLabel>
@@ -86,6 +91,7 @@ export function GameBoardWrite(props) {
               value={board_content}
               onChange={(e) => setBoard_content(e.target.value)}
               style={{ height: "150px" }} // 높이 조절
+              placeholder={"본문 내용을 입력 해주세요."}
             />
           </FormControl>
           <FormControl>

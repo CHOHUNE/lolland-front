@@ -56,8 +56,20 @@ export function MemberLogin() {
         toast({ description: "로그인에 성공 하였습니다.", status: "success" });
         navigate(-1);
       })
-      .catch(() => {
-        toast({ description: "로그인에 실패 하셨습니다.", status: "error" });
+      .catch((error) => {
+        if (error.response && error.response.status === 400) {
+          let errorMessage = error.response.data;
+          toast({
+            description: errorMessage,
+            status: "error",
+          });
+        } else {
+          // 기타 오류에 대한 처리
+          toast({
+            description: "로그인 중 문제가 발생했습니다.",
+            status: "error",
+          });
+        }
       })
       .finally(() => {
         fetchLogin();
@@ -152,7 +164,6 @@ export function MemberLogin() {
           <FormControl mt={20} mb={10}>
             <Flex justifyContent={"center"}>
               <Button
-                {...buttonStyle}
                 w={"600px"}
                 h={"50px"}
                 color={"black"}
