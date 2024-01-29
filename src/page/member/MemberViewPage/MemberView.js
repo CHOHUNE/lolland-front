@@ -8,10 +8,28 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { MemberNavBar } from "./MemberNavBar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { MemberNavBarTest } from "../../admin/MemberNavBarTest";
+import { useContext, useEffect } from "react";
+import { LoginContext } from "../../../component/LoginProvider";
 
 export function MemberView() {
+  const { isAuthenticated } = useContext(LoginContext);
+
+  const navigate = useNavigate();
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      navigate("/login");
+    }
+  }, [location]);
+
+  if (!isAuthenticated()) {
+    return null;
+  }
+
   return (
     <Card shadow={"none"}>
       <Flex position="relative" justifyContent="space-between">
