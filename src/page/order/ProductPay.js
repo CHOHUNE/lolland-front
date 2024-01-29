@@ -336,13 +336,13 @@ export function ProductPay() {
       // 서버에 저장
       const response = await axios.post("/api/payment/toss", orderData);
       console.log(response);
+
       // 응답 데이터를 사용하여 Payment페이지로 넘기기
-      // localStorage.setItem("orderDetail", JSON.stringify(orderData));
-      // navigate("/payment", {
-      //         state: {
-      //           ...response.data,
-      //         },
-      //       });
+      navigate("/payment", {
+        state: {
+          ...response.data,
+        },
+      });
     } else {
       toast({
         title: "권한이 없습니다",

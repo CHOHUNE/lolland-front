@@ -22,7 +22,7 @@ function SuccessPage() {
     async function confirm() {
       try {
         const response = await axios.post(
-          "/payment/toss/success",
+          "/api/payment/toss/success",
           requestData,
           {
             headers: {
@@ -30,7 +30,6 @@ function SuccessPage() {
             },
           },
         );
-        // 결제 성공 비즈니스 로직 TODO: 백엔드로 전송
         navigate("/");
       } catch (error) {
         if (error.response) {
