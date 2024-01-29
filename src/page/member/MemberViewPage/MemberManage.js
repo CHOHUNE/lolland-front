@@ -38,7 +38,7 @@ export function MemberManage() {
 
   const navigate = useNavigate();
 
-  const { fetchLogin } = useContext(LoginContext);
+  const { isAuthenticated, fetchLogin } = useContext(LoginContext);
 
   // 버튼 css
   const buttonStyle = {
@@ -76,13 +76,21 @@ export function MemberManage() {
   };
 
   useEffect(() => {
-    axios.get("/api/member/memberInfo").then((response) => {
-      setMember(response.data);
-    });
-  }, []);
+    if (!isAuthenticated()) {
+      navigate("/");
+    } else {
+      axios.get("/api/member/memberInfo").then((response) => {
+        setMember(response.data);
+      });
+    }
+  }, [isAuthenticated]);
 
   if (member == null) {
     return <Spinner />;
+  }
+
+  if (!isAuthenticated()) {
+    return null;
   }
 
   // 회원 탈퇴 버튼 클릭
