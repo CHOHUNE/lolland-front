@@ -8,11 +8,15 @@ import {
   FormControl,
   FormLabel,
   Image,
+  SimpleGrid,
   Text,
   useToast,
   VStack,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { faThumbsUp } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
 
 export function ProductLike() {
   const [productLike, setProductLike] = useState([]);
@@ -129,9 +133,27 @@ export function ProductLike() {
     }
   };
 
+  // -------------------------------- 글자수가 특정개수 이상일때 자르기 --------------------------------
+  const truncateText = (str, num) => {
+    if (str && str.length > num) {
+      return str.slice(0, num) + "...";
+    }
+    return str;
+  };
+
   return (
-    <Box>
-      <Flex gap={5}>
+    <Box mt={5}>
+      <Flex gap={4}>
+        <FontAwesomeIcon
+          icon={faHeart}
+          style={{ color: "#f70202" }}
+          fontSize={"2.5rem"}
+        />
+        <Text mt={-1} fontWeight={"bold"} fontSize={"2rem"}>
+          좋아요한 상품 목록
+        </Text>
+      </Flex>
+      <SimpleGrid columns={4} gap={5} mt={10}>
         {productLike.map((bucket, index) => (
           <Box
             key={bucket.product_id}
@@ -140,7 +162,7 @@ export function ProductLike() {
             borderWidth="1px"
             align="center"
             w={"300px"}
-            h={"270px"}
+            h={"320px"}
             border={"1px solid #eeeeee"}
             transition="0.3s ease-in-out"
             position="relative" // 상위 Box를 relative로 설정
@@ -149,7 +171,7 @@ export function ProductLike() {
               transform: "scale(1.1)",
             }}
           >
-            <VStack w={"200px"} boxSize="150px" flexShrink={0}>
+            <VStack boxSize="150px" flexShrink={0}>
               <Button
                 position="absolute"
                 top="0"
@@ -182,21 +204,42 @@ export function ProductLike() {
                 isChecked={productChecked[index]}
                 onChange={() => handleCheckboxClick(index)}
               />
-              <Image
-                boxSize="full"
-                objectFit="cover"
-                src={bucket.main_img_uri}
-                alt={bucket.product_name}
-                onClick={() => navigate("/product/" + bucket.product_id)}
-              />
-              <Text fontSize="lg" fontWeight="bold">
-                {bucket.product_name}
-              </Text>
-              <Text fontSize="md">{formatPrice(bucket.product_price)}</Text>
+              <Box mt={3}>
+                <Image
+                  boxSize="150px"
+                  objectFit="cover"
+                  src={bucket.main_img_uri}
+                  alt={bucket.product_name}
+                  onClick={() => navigate("/product/" + bucket.product_id)}
+                />
+                <Text textAlign="left" paddingLeft={2} fontWeight={"bold"}>
+                  [{bucket.company_name}]
+                </Text>
+                <Text
+                  paddingLeft={2}
+                  textAlign="left"
+                  fontSize="md"
+                  fontWeight="bold"
+                  w={"300px"}
+                  color={"gray"}
+                  mt={2}
+                >
+                  {truncateText(bucket.product_name, 58)}
+                </Text>
+                <Text
+                  mt={1}
+                  paddingLeft={2}
+                  textAlign="left"
+                  fontSize="md"
+                  fontWeight={"bold"}
+                >
+                  {formatPrice(bucket.product_price)}원
+                </Text>
+              </Box>
             </VStack>
           </Box>
         ))}
-      </Flex>
+      </SimpleGrid>
 
       <Box mt={10}>
         <Flex

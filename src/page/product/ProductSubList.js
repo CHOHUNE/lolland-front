@@ -15,17 +15,21 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   Button,
+  Center,
   Divider,
   Flex,
   Heading,
   IconButton,
   Image,
+  Input,
   List,
   ListItem,
+  Select,
   SimpleGrid,
   Spinner,
   Text,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -39,6 +43,22 @@ import {
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
+function PageButton({ variant, pageNumber, children }) {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+
+  function handleClick() {
+    params.set("p", pageNumber);
+    navigate("?" + params);
+  }
+
+  return (
+    <Button variant={variant} onClick={handleClick}>
+      {children}
+    </Button>
+  );
+}
+
 function SubCategoryPagination({ pageInfo }) {
   const pageNumbers = [];
   const navigate = useNavigate();
@@ -47,43 +67,87 @@ function SubCategoryPagination({ pageInfo }) {
     // pageInfo가 null이면 빈 배열을 반환하여 렌더링하지 않음
     return null;
   }
-  console.log(pageNumbers);
 
   for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
     pageNumbers.push(i);
   }
+
   return (
-    <Box mb={10} mt={6} display={"flex"} justifyContent={"center"}>
+    <Box mb={10} mt={10} display={"flex"} justifyContent={"center"}>
       {pageInfo.prevPageNumber && (
-        <Button
-          variant={"ghost"}
-          onClick={() => navigate("?p=" + pageInfo.prevPageNumber)}
-        >
+        <PageButton variant={"ghost"} pageNumber={pageInfo.prevPageNumber}>
           <FontAwesomeIcon icon={faAngleLeft} />
-        </Button>
+        </PageButton>
       )}
 
       {pageNumbers.map((pageNumber) => (
-        <Button
+        <PageButton
           key={pageNumber}
           variant={
             pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
           }
-          onClick={() => navigate("?p=" + pageNumber)}
+          pageNumber={pageNumber}
         >
           {pageNumber}
-        </Button>
+        </PageButton>
       ))}
 
       {pageInfo.nextPageNumber && (
-        <Button
-          variant={"ghost"}
-          onClick={() => navigate("?p=" + pageInfo.nextPageNumber)}
-        >
+        <PageButton variant={"ghost"} pageNumber={pageInfo.nextPageNumber}>
           <FontAwesomeIcon icon={faAngleRight} />
-        </Button>
+        </PageButton>
       )}
     </Box>
+  );
+}
+
+function SearchComponent() {
+  const [keyword, setKeyword] = useState("");
+  const navigate = useNavigate();
+  const [category, setCategory] = useState("all");
+
+  function handleSearch() {
+    const params = new URLSearchParams();
+
+    params.set("k", keyword);
+    params.set("c", category);
+    navigate("?" + params);
+  }
+
+  const buttonStyle = {
+    background: "black",
+    borderRadius: "0",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
+  return (
+    <Flex>
+      <Select
+        borderRadius={0}
+        defaultValue="all"
+        w={"140px"}
+        onChange={(e) => setCategory(e.target.value)}
+      >
+        <option value="all">전체</option>
+        <option value={"product_name"}>상품명</option>
+      </Select>
+      <Input
+        borderRadius={0}
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+      />
+      <Button onClick={handleSearch} {...buttonStyle}>
+        검색
+      </Button>
+    </Flex>
   );
 }
 
@@ -298,7 +362,12 @@ export function ProductSubList() {
         </SimpleGrid>
       </Flex>
 
-      <SubCategoryPagination pageInfo={pageInfo} />
+      <Center>
+        <VStack>
+          <SearchComponent />
+          <SubCategoryPagination pageInfo={pageInfo} />
+        </VStack>
+      </Center>
     </Flex>
   );
 }
