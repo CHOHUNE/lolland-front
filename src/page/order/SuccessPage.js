@@ -15,13 +15,14 @@ function SuccessPage() {
   useEffect(() => {
     const requestData = {
       orderId: searchParams.get("orderId"),
-      amount: searchParams.get("quantity"),
+      amount: searchParams.get("amount"),
       paymentKey: searchParams.get("paymentKey"),
     };
+    console.log(requestData);
     async function confirm() {
       try {
         const response = await axios.post(
-          "/payment/toss/success",
+          "/api/payment/toss/success",
           requestData,
           {
             headers: {
@@ -29,12 +30,14 @@ function SuccessPage() {
             },
           },
         );
-        // 결제 성공 비즈니스 로직 TODO: 백엔드로 전송
         navigate("/");
       } catch (error) {
         if (error.response) {
           const { code, message } = error.response.data;
           navigate(`/fail?message=${message}&code=${code}`);
+        } else {
+          console.error("Unexpected error:", error.message);
+          navigate("/fail?message=Unexpected error&code=500");
         }
       }
     }

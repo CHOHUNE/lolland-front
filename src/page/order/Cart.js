@@ -149,6 +149,7 @@ export function Cart() {
 
         if (existingEntry) {
           existingEntry.options.push({
+            option_id: purchase.option_id,
             optionName: purchase.optionName,
             quantity: purchase.quantity,
             price: purchase.price,
