@@ -21,6 +21,10 @@ export function GearContentMain() {
   //   return <Spinner />;
   // }
 
+  if (gearboard == null) {
+    return <Spinner />;
+  }
+
   const handlePrevClick = () => {
     setCurrentIndex(
       (prevIndex) =>
