@@ -12,23 +12,137 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   Button,
+  Center,
   Divider,
   Flex,
   Heading,
   HStack,
   Image,
+  Input,
   Link,
+  Select,
   SimpleGrid,
   Spinner,
   Tag,
   Text,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight, faHouse } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAngleLeft,
+  faAngleRight,
+  faChevronRight,
+  faHouse,
+} from "@fortawesome/free-solid-svg-icons";
 
-function CategoryPagination() {
-  return null;
+function PageButton({ variant, pageNumber, children }) {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+
+  function handleClick() {
+    params.set("p", pageNumber);
+    navigate("?" + params);
+  }
+
+  return (
+    <Button variant={variant} onClick={handleClick}>
+      {children}
+    </Button>
+  );
+}
+
+function CategoryPagination({ pageInfo }) {
+  const pageNumbers = [];
+  const navigate = useNavigate();
+
+  if (!pageInfo) {
+    // pageInfo가 null이면 빈 배열을 반환하여 렌더링하지 않음
+    return null;
+  }
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <Box mb={10} mt={10} display={"flex"} justifyContent={"center"}>
+      {pageInfo.prevPageNumber && (
+        <PageButton variant={"ghost"} pageNumber={pageInfo.prevPageNumber}>
+          <FontAwesomeIcon icon={faAngleLeft} />
+        </PageButton>
+      )}
+
+      {pageNumbers.map((pageNumber) => (
+        <PageButton
+          key={pageNumber}
+          variant={
+            pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
+          }
+          pageNumber={pageNumber}
+        >
+          {pageNumber}
+        </PageButton>
+      ))}
+
+      {pageInfo.nextPageNumber && (
+        <PageButton variant={"ghost"} pageNumber={pageInfo.nextPageNumber}>
+          <FontAwesomeIcon icon={faAngleRight} />
+        </PageButton>
+      )}
+    </Box>
+  );
+}
+
+function SearchComponent() {
+  const [keyword, setKeyword] = useState("");
+  const navigate = useNavigate();
+  const [category, setCategory] = useState("all");
+
+  function handleSearch() {
+    const params = new URLSearchParams();
+
+    params.set("k", keyword);
+    params.set("c", category);
+    navigate("?" + params);
+  }
+
+  const buttonStyle = {
+    background: "black",
+    borderRadius: "0",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
+  return (
+    <Flex mt={10}>
+      <Select
+        borderRadius={0}
+        defaultValue="all"
+        w={"140px"}
+        onChange={(e) => setCategory(e.target.value)}
+      >
+        <option value="all">전체</option>
+        <option value="product_name">상품명</option>
+        <option value="company_name">회사명</option>
+      </Select>
+      <Input
+        borderRadius={0}
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+      />
+      <Button onClick={handleSearch} {...buttonStyle}>
+        검색
+      </Button>
+    </Flex>
+  );
 }
 
 export function ProductMainList() {
@@ -44,7 +158,6 @@ export function ProductMainList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // @@
     axios
       .get(`/api/product/category/${category_id}?` + params)
       .then((response) => {
@@ -223,7 +336,12 @@ export function ProductMainList() {
         </SimpleGrid>
       </Flex>
 
-      <CategoryPagination />
+      <Center>
+        <VStack>
+          <SearchComponent />
+          <CategoryPagination pageInfo={pageInfo} />
+        </VStack>
+      </Center>
     </>
   );
 }

@@ -65,7 +65,17 @@ export const Recent = () => {
           </VStack>
         </Flex>
       ))}
-      <Button w={"100%"} bg={"black"} color="white" onClick={scrollToTop}>
+      <Button
+        mt={2}
+        w={"100%"}
+        bg={"black"}
+        color="white"
+        onClick={scrollToTop}
+        _hover={{
+          color: "black",
+          bg: "gray",
+        }}
+      >
         TOP
       </Button>
     </Box>

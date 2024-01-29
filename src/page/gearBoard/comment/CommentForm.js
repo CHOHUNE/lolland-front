@@ -1,4 +1,4 @@
-import { Box, Button, Textarea, useToast } from "@chakra-ui/react";
+import { Box, Button, Flex, Input, Textarea, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -22,9 +22,18 @@ export function CommentForm() {
 
   return (
     <Box>
-      <h1>댓글폼</h1>
-      <Textarea value={comment} onChange={(e) => setComment(e.target.value)} />
-      <Button onClick={handleSubmitt}>쓰기</Button>
+      <br />
+      <Flex gap={1}>
+        <Input
+          placeholder={"칭찬과 격려의 댓글을 작성자에게 큰 힘이 됩니다:)"}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
+        <Button colorScheme={"orange"} onClick={handleSubmitt}>
+          쓰기
+        </Button>
+      </Flex>
+      <br />
     </Box>
   );
 }

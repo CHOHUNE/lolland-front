@@ -24,14 +24,18 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useImmer } from "use-immer";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import * as PropTypes from "prop-types";
 import { GearCommentContainer } from "./comment/GearCommentContainer";
 import { faHeart as em } from "@fortawesome/free-regular-svg-icons";
 import { faHeart as ful } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { EffectCoverflow, Pagination } from "swiper/modules";
 
+// Import Swiper styles
+import "../../component/swiper.css";
 function LikeContainer({ like, onClick }) {
   if (like === null) {
     return <Spinner />;
@@ -120,8 +124,11 @@ export function GearView() {
         <br />
         <br />
         <Flex justifyContent={"space-between"}>
-          <Text>작성일 : {gearboard.gear_inserted}</Text>
-
+          <Box>
+            <Text>작성일 : {gearboard.gear_inserted}</Text>
+            <Text>추천수 : {gearboard.countLike}</Text>
+            <Text>댓글수 : {gearboard.commnetcount}</Text>
+          </Box>
           {/* 좋아요 표시*/}
           <LikeContainer like={like} onClick={handleLike} />
           <Button
@@ -135,86 +142,78 @@ export function GearView() {
           </Button>
         </Flex>
         <br />
-
+        <br />
         {/*  게시물 작성자  */}
-        <Card
-          w={"100%"}
-          direction={{ base: "column", sm: "row" }}
-          overflow="hidden"
-          variant="outline"
-        >
+        <Flex align="center" gap={5}>
           <Image
             objectFit="cover"
-            maxW={{ base: "100%", sm: "200px" }}
-            src="https://images.unsplash.com/photo-1667489022797-ab608913feeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw5fHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=800&q=60"
-            alt="Caffe Latte"
+            width={{ base: "25%", sm: "75px" }}
+            height={{ base: "25%", sm: "75px" }}
+            src={gearboard.file_url}
+            alt={gearboard.file_name}
+            style={{ borderRadius: "50%" }}
           />
+          <Box>
+            <Heading size="md">{gearboard.member_name}</Heading>
+            <Text>{gearboard.member_introduce}</Text>
+          </Box>
 
-          <Stack>
-            <Flex justifyContent={"space-between"}>
-              {/*글쓴 사람 정보*/}
-              <Box w={"500px"}>
-                <CardHeader>
-                  <Heading size="md"> 글쓴사람 정보 </Heading>
-                </CardHeader>
-                <CardBody>
-                  <Text py="1">글쓴사람 닉네임</Text>
-                </CardBody>
-                <CardFooter>
-                  <Button variant="solid" colorScheme="blue">
-                    Buy Latte
-                  </Button>
-                </CardFooter>
-              </Box>
-              {/* 작성물 , 댓글 */}
-              <Box w={"500px"}>
-                <Tabs>
-                  <TabList h={"60px"}>
-                    <Tab>
-                      <CardHeader>
-                        <Heading size="xs"> 작성물 </Heading>
-                      </CardHeader>
-                    </Tab>
-                    <Tab>
-                      <CardHeader>
-                        <Heading size="xs"> 댓글</Heading>
-                      </CardHeader>
-                    </Tab>
-                  </TabList>
-                  <TabPanels>
-                    <TabPanel>
-                      <CardBody>
-                        <Text py="1">
-                          제가 생각한 공냉쿨러 저소음... 가설...
-                        </Text>
-                        <Text py="1">마벨 히어로 컴 케이스도 있었네요</Text>
-                        <Text py="1">
-                          4070 super 글 보니 왜 이런 얘들 쭈구리 같죠?
-                        </Text>
-                      </CardBody>
-                    </TabPanel>
-                    <TabPanel>
-                      <CardBody>
-                        <Text py="1">
-                          대놓고 이런 사기를 칠 수도 있나요???@@;;;;;
-                        </Text>
-                        <Text py="1">
-                          7500f 는 진짜 대박 아이템 이긴 한가 봅니다다들 저{" "}
-                        </Text>
-                        <Text py="1">
-                          저거 팔면 40만원돈 생기는 거죠?와...복권 당첨..
-                        </Text>
-                      </CardBody>
-                    </TabPanel>
-                  </TabPanels>
-                </Tabs>
-              </Box>
-            </Flex>
-          </Stack>
-        </Card>
+          <Button ml="auto" variant="solid" colorScheme="twitter">
+            팔로우
+          </Button>
+        </Flex>
+        <br />
+
+        <Box>
+          <Swiper
+            effect={"coverflow"}
+            grabCursor={true}
+            centeredSlides={true}
+            slidesPerView={"auto"}
+            coverflowEffect={{
+              rotate: 50,
+              stretch: 0,
+              depth: 100,
+              modifier: 1,
+              slideShadows: true,
+            }}
+            pagination={true}
+            modules={[EffectCoverflow, Pagination]}
+            className="mySwiper"
+          >
+            {gearboard.files.map((file) => (
+              <SwiperSlide key={file.id}>
+                <img src={file.url} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </Box>
+
+        <Box display="flex" justifyContent="space-between">
+          {gearboard.files.map((file) => (
+            <Box key={file.id} my="5px">
+              <Image
+                style={{ borderRadius: "5%" }}
+                width="150px"
+                height="150px"
+                src={file.url}
+                alt={file.name}
+              />
+            </Box>
+          ))}
+        </Box>
+
+        <br />
         <br />
 
         {/* 댓글 기능 추가 */}
+        <Flex gap={2}>
+          <Heading size="md">댓글 </Heading>
+          <Heading color={"orange"} size="md">
+            {gearboard.commentcount}
+          </Heading>
+        </Flex>
+
         <GearCommentContainer />
       </Box>
     </Box>

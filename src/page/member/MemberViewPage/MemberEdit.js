@@ -18,9 +18,10 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useDaumPostcodePopup } from "react-daum-postcode";
+import { LoginContext } from "../../../component/LoginProvider";
 
 export function MemberEdit() {
   // 인풋 css
@@ -53,6 +54,8 @@ export function MemberEdit() {
       fontSize: "16px",
     },
   };
+
+  const { isAuthenticated } = useContext(LoginContext);
 
   const fileInputRef = useRef();
 
@@ -156,37 +159,41 @@ export function MemberEdit() {
   const [emailCodeCheckedState, setEmailCodeCheckedState] = useState(true);
 
   useEffect(() => {
-    axios.get("/api/member/memberInfo").then((response) => {
-      setId(response.data.id);
-      setMember_name(response.data.member_name);
-      setMember_login_id(response.data.member_login_id);
+    if (!isAuthenticated()) {
+      navigate("/");
+    } else {
+      axios.get("/api/member/memberInfo").then((response) => {
+        setId(response.data.id);
+        setMember_name(response.data.member_name);
+        setMember_login_id(response.data.member_login_id);
 
-      const phoneNumber = response.data.member_phone_number.split("-");
-      setMember_phone_number1(phoneNumber[0]);
-      setMember_phone_number2(phoneNumber[1]);
-      setMember_phone_number3(phoneNumber[2]);
+        const phoneNumber = response.data.member_phone_number.split("-");
+        setMember_phone_number1(phoneNumber[0]);
+        setMember_phone_number2(phoneNumber[1]);
+        setMember_phone_number3(phoneNumber[2]);
 
-      const email = response.data.member_email.split("@");
-      setMember_email1(email[0]);
-      setMember_email2(email[1]);
+        const email = response.data.member_email.split("@");
+        setMember_email1(email[0]);
+        setMember_email2(email[1]);
 
-      setMember_type(response.data.member_type);
+        setMember_type(response.data.member_type);
 
-      setMember_post_code(response.data.memberAddressDto.member_post_code);
-      setMember_address(response.data.memberAddressDto.member_address);
-      setMember_detail_address(
-        response.data.memberAddressDto.member_detail_address,
-      );
+        setMember_post_code(response.data.memberAddressDto.member_post_code);
+        setMember_address(response.data.memberAddressDto.member_address);
+        setMember_detail_address(
+          response.data.memberAddressDto.member_detail_address,
+        );
 
-      // 회원 자기 소개
-      setMember_introduce(response.data.member_introduce);
+        // 회원 자기 소개
+        setMember_introduce(response.data.member_introduce);
 
-      // 회원 프로필 사진
-      setFile_name(response.data.memberImageDto.file_name);
-      setFile_url(response.data.memberImageDto.file_url);
-      setImage_type(response.data.memberImageDto.image_type);
-    });
-  }, []);
+        // 회원 프로필 사진
+        setFile_name(response.data.memberImageDto.file_name);
+        setFile_url(response.data.memberImageDto.file_url);
+        setImage_type(response.data.memberImageDto.image_type);
+      });
+    }
+  }, [isAuthenticated]);
 
   // 이메일이나 핸드폰 번호가 input칸 하나라도 변경 되면 해당 데이터가 수정 되도록 작동 하는 useEffect ------------
   useEffect(() => {

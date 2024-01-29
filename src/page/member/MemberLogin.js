@@ -12,13 +12,13 @@ import {
   Input,
   useToast,
 } from "@chakra-ui/react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { LoginContext } from "../../component/LoginProvider";
 
 export function MemberLogin() {
-  const { fetchLogin } = useContext(LoginContext);
+  const { isAuthenticated, fetchLogin } = useContext(LoginContext);
 
   // 회원 로그인 정보 입력
   const [member_login_id, setMember_login_id] = useState("");
@@ -27,6 +27,20 @@ export function MemberLogin() {
   const navigate = useNavigate();
 
   const toast = useToast();
+
+  const location = useLocation();
+
+  // 이미 로그인 된 회원 이라면 메인페이지로 이동 시키기
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate("/");
+    }
+  }, [isAuthenticated, location]);
+
+  // 이미 로그인된 회원 은 아무것도 출력 하지 않게 한다.
+  if (isAuthenticated()) {
+    return null;
+  }
 
   const inputStyle = {
     shadow: "1px 1px 3px 1px #dadce0 inset",

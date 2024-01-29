@@ -119,14 +119,17 @@ export function ProductView() {
 
   // ---------------------------- 찜한 내역 가져오는 렌더링 ----------------------------
   useEffect(() => {
-    axios
-      .get("/api/productLike/" + product_id)
-      .then((response) => {
-        setIsFavorited(response.data.productLike);
-      })
-      .catch((error) => {
-        console.error("Error fetching product like status:", error);
-      });
+    // 로그인 했을때만 불러오도록
+    if (isAuthenticated()) {
+      axios
+        .get("/api/productLike/" + product_id)
+        .then((response) => {
+          setIsFavorited(response.data.productLike);
+        })
+        .catch((error) => {
+          console.error("Error fetching product like status:", error);
+        });
+    }
   }, [product_id]);
 
   // ---------------------------- 로딩로직 ----------------------------
@@ -389,6 +392,7 @@ export function ProductView() {
         mainImgUrl: mainImgUrl,
         options: [
           {
+            optionId: selectedOption.option_id,
             optionName: selectedOption.option_name,
             quantity: selectedOption.quantity,
             price: product.product.product_price,

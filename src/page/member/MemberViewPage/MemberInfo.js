@@ -9,9 +9,10 @@ import {
   Input,
   useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { LoginContext } from "../../../component/LoginProvider";
 
 export function MemberInfo() {
   // 버튼 css
@@ -33,6 +34,20 @@ export function MemberInfo() {
   const toast = useToast();
 
   const navigate = useNavigate();
+
+  const { isAuthenticated } = useContext(LoginContext);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      navigate("/login");
+    }
+  }, [location]);
+
+  if (!isAuthenticated()) {
+    return null;
+  }
 
   function handleMemberInfoClick() {
     axios
