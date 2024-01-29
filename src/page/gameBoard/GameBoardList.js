@@ -284,7 +284,7 @@ function GameBoardList() {
     "로스트 아크": "blue",
     "콘솔 게임": "purple",
     "모바일 게임": "orange",
-    기타: "gray",
+    자유: "gray",
   };
 
   if (gameBoardList === null || pageInfo === null) {
@@ -497,7 +497,7 @@ function GameBoardList() {
                   모바일 게임
                 </Button>
                 <Button
-                  onClick={() => navigate("?k=기타")}
+                  onClick={() => navigate("?k=자유")}
                   _hover={{ bgColor: "whitesmoke", color: "black" }}
                 >
                   자유
