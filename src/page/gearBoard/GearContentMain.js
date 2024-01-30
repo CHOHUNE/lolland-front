@@ -11,11 +11,11 @@ export function GearContentMain() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const toast = useToast();
 
-  // useEffect(() => {
-  //   axios
-  //     .get("/api/gearboard/gear_id/" + 91)
-  //     .then((response) => setGearboard(response.data));
-  // }, []);
+  useEffect(() => {
+    axios
+      .get("/api/gearboard/gear_id/" + 91)
+      .then((response) => setGearboard(response.data));
+  }, []);
 
   const handlePrevClick = () => {
     setCurrentIndex(
