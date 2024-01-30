@@ -28,19 +28,12 @@ export function GameBoardListTop6() {
   };
 
   return (
-    <SimpleGrid
-      columns={3}
-      spacing={4}
-      w={"80%"}
-      h={"800px"}
-      mb={"30px"}
-      ml={"2.5%"}
-    >
+    <SimpleGrid columns={3} spacing={4} w={"80%"} h={"800px"} ml={"2.5%"}>
       {top &&
         top.map((topTen) => (
           <Box
             w="90%"
-            h={"100%"}
+            h={"90%"}
             borderWidth="1px"
             borderRadius="lg"
             overflow="hidden"
@@ -82,11 +75,11 @@ export function GameBoardListTop6() {
               </Swiper>
             </Box>
 
-            <Box p="5">
+            <Box p="3">
               <Box display="flex" alignItems="baseline">
                 <Badge
                   borderRadius="full"
-                  style={{ fontSize: "1.2em" }}
+                  style={{ fontSize: "1em" }}
                   colorScheme={categoryColors[topTen.category]}
                 >
                   {topTen.category}
@@ -97,7 +90,7 @@ export function GameBoardListTop6() {
                   mx={"2px"} // Adjusted spacing around Badge
                   fontWeight={"bold"}
                   borderRadius={"full"}
-                  style={{ fontSize: "1.2em" }}
+                  style={{ fontSize: "1em" }}
                   bgColor={`rgba(0, 128, 0, ${topTen.count_like / 10})`}
                 >
                   {topTen.count_like}
@@ -129,7 +122,7 @@ export function GameBoardListTop6() {
                     <Badge
                       mx={"2%"}
                       borderRadius="full"
-                      style={{ fontSize: "1.1em" }}
+                      style={{ fontSize: "1em" }}
                     >
                       {topTen.countFile}
                       <FontAwesomeIcon icon={faImage} />
@@ -139,7 +132,7 @@ export function GameBoardListTop6() {
                     <Badge
                       mx={"2%"}
                       borderRadius="full"
-                      style={{ fontSize: "1.1em" }}
+                      style={{ fontSize: "1em" }}
                     >
                       {topTen.board_count}
                       <FontAwesomeIcon icon={faEye} />
@@ -149,19 +142,23 @@ export function GameBoardListTop6() {
               </Box>
 
               <Box
-                mt="1"
+                mt="3"
                 fontWeight="semibold"
                 as="h4"
                 lineHeight="tight"
                 noOfLines={1}
-                fontSize={"1.2rem"}
+                fontSize={"1.3em"}
                 display={"flex"}
                 onClick={() => navigate("/gameboard/id/" + topTen.id)}
                 _hover={{ cursor: "pointer" }}
               >
                 {topTen.title}
                 <Spacer />
-                {topTen.member_id}
+                <Box fontSize="0.8em" fontWeight="light">
+                  {" "}
+                  {/* 폰트 얇게 설정 */}
+                  {topTen.member_id}
+                </Box>
               </Box>
 
               <Box display="flex" mt="2" alignItems="center"></Box>

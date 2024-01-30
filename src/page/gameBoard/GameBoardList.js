@@ -97,8 +97,8 @@ function GameBoardList() {
       <Flex>
         <Center w={"100%"}>
           <VStack w={"100%"} ml={"10%"}>
-            <Heading as="h2" size="lg" my={"15px"}>
-              BEST 게시판
+            <Heading as="h2" size="lg" my={"5"}>
+              화제의 게시물
             </Heading>
             {/*TOP6 삽입 부분*/}
             <GameBoardListTop6 />
