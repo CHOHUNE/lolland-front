@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Card,
   CardBody,
   CardFooter,
@@ -22,25 +23,88 @@ import {
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faAngleLeft,
+  faAngleRight,
   faChevronLeft,
   faChevronRight,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+
+function PageButton({ variant, pageNumber, children }) {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+
+  function handleClick() {
+    params.set("p", pageNumber);
+    navigate("?" + params);
+  }
+
+  return (
+    <Button variant={variant} onClick={handleClick}>
+      {children}
+    </Button>
+  );
+}
+
+function PurchasePagination({ pageInfo }) {
+  const pageNumbers = [];
+  const navigate = useNavigate();
+
+  if (!pageInfo) {
+    return null;
+  }
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <Box mb={10} mt={10} display="flex" justifyContent="center">
+      {pageInfo.prevPageNumber && (
+        <PageButton variant="ghost" pageNumber={pageInfo.prevPageNumber}>
+          <FontAwesomeIcon icon={faAngleLeft} />
+        </PageButton>
+      )}
+
+      {pageNumbers.map((pageNumber) => (
+        <PageButton
+          key={pageNumber}
+          variant={
+            pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
+          }
+          pageNumber={pageNumber}
+        >
+          {pageNumber}
+        </PageButton>
+      ))}
+
+      {pageInfo.nextPageNumber && (
+        <PageButton variant={"ghost"} pageNumber={pageInfo.nextPageNumber}>
+          <FontAwesomeIcon icon={faAngleRight} />
+        </PageButton>
+      )}
+    </Box>
+  );
+}
 
 export function MemberPurchase() {
   const [orderList, setOrderList] = useState([]);
   const toast = useToast();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const location = useLocation();
+  const [pageInfo, setPageInfo] = useState(null);
 
   useEffect(() => {
     axios
-      .get("/api/payment/my")
+      .get("/api/payment/my?" + params)
       .then((response) => {
-        setOrderList(response.data);
+        setOrderList(response.data.orderList);
+        setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
         if (error.response.status === 500) {
@@ -57,7 +121,7 @@ export function MemberPurchase() {
           });
         }
       });
-  }, []);
+  }, [location]);
 
   const getStatusStyle = (orderStatus) => {
     switch (orderStatus) {
@@ -159,7 +223,9 @@ export function MemberPurchase() {
             ))}
         </VStack>
       </CardBody>
-      <CardFooter></CardFooter>
+      <CardFooter display="flex" justifyContent="center">
+        <PurchasePagination pageInfo={pageInfo} />
+      </CardFooter>
     </Card>
   );
 }

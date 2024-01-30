@@ -264,6 +264,10 @@ export function PurchaseInfo() {
                 w="40%"
                 colorScheme="red"
                 onClick={() => cancelOrderRequest()}
+                isDisabled={
+                  orderInfo.order_status === "CANCELED" ||
+                  orderInfo.order_status === "CANCEL_WAIT"
+                }
               >
                 주문 취소하기
               </Button>
