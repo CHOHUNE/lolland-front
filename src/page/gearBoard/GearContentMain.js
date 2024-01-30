@@ -17,14 +17,6 @@ export function GearContentMain() {
   //     .then((response) => setGearboard(response.data));
   // }, []);
 
-  // if (gearboard == null) {
-  //   return <Spinner />;
-  // }
-
-  if (gearboard == null) {
-    return <Spinner />;
-  }
-
   const handlePrevClick = () => {
     setCurrentIndex(
       (prevIndex) =>
