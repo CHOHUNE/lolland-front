@@ -51,6 +51,7 @@ import { ProductEventList } from "./page/product/ProductEventList";
 import PaymentPage from "./page/order/PaymentPage";
 import SuccessPage from "./page/order/SuccessPage";
 import FailPage from "./page/order/FailPage";
+import { CancelReqList } from "./page/admin/CancelReqList";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -128,6 +129,7 @@ const routes = createBrowserRouter(
         <Route path="qna" element={<QnaAnswer />}>
           <Route path="write/:question_id" element={<QnaWriteAnswer />} />
         </Route>
+        <Route path="cancelReqList" element={<CancelReqList />} />
       </Route>
     </Route>,
   ),
