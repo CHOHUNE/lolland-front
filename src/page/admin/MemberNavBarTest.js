@@ -64,7 +64,7 @@ export function MemberNavBarTest() {
           <IconButton
             {...buttonStyle}
             icon={<FontAwesomeIcon icon={faCreditCard} />}
-            onClick={() => console.log("결제 내역 페이지 이동")}
+            onClick={() => navigate("/memberPage")}
           />
         </Tooltip>
         <Tooltip hasArrow label="찜 목록" placement="right">
