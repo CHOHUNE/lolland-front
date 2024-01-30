@@ -133,6 +133,7 @@ export function Cart() {
       return {
         productId: product.product_id,
         productName: product.product_name,
+        optionId: product.option_id,
         optionName: product.option_name,
         quantity: product.quantity,
         price: product.product_price,
@@ -149,7 +150,7 @@ export function Cart() {
 
         if (existingEntry) {
           existingEntry.options.push({
-            option_id: purchase.option_id,
+            optionId: purchase.optionId,
             optionName: purchase.optionName,
             quantity: purchase.quantity,
             price: purchase.price,
@@ -161,6 +162,7 @@ export function Cart() {
             productName: purchase.productName,
             options: [
               {
+                optionId: purchase.optionId,
                 optionName: purchase.optionName,
                 quantity: purchase.quantity,
                 price: purchase.price,
