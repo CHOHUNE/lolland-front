@@ -30,7 +30,6 @@ function SuccessPage() {
             },
           },
         );
-        navigate("/");
       } catch (error) {
         if (error.response) {
           const { code, message } = error.response.data;

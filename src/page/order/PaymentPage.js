@@ -86,7 +86,7 @@ function PaymentPage() {
         customerMobilePhone: phone,
         successUrl: `${window.location.origin}/success`,
         failUrl: `${window.location.origin}/fail`,
-        // _skipAuth: "FORCE_SUCCESS",
+        _skipAuth: "FORCE_SUCCESS",
       });
     } catch (error) {
       console.error("Error requesting payment:", error);
