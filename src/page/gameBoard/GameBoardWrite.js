@@ -27,6 +27,7 @@ export function GameBoardWrite(props) {
   let navigate = useNavigate();
 
   function handleSubmit() {
+    // 사진 파일 필수
     // Check if uploadFiles is null
     // if (uploadFiles === null) {
     //   toast({
