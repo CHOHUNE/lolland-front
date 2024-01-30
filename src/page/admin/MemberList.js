@@ -245,7 +245,6 @@ export function MemberList() {
 
   // 삭제 버튼 클릭시 동작
   const handleMemberDeleteClick = (e) => {
-    console.log(e);
     setSelectMember(e);
     onOpen();
   };
