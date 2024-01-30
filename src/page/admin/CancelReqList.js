@@ -1,23 +1,86 @@
 import {
+  Box,
   Button,
   Card,
   CardBody,
   CardHeader,
   Center,
+  Flex,
+  HStack,
+  Image,
+  SimpleGrid,
+  StackDivider,
   Table,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
+  useToast,
+  VStack,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export function CancelReqList() {
+  // 버튼 css
+  const buttonStyle = {
+    background: "black",
+    color: "whitesmoke",
+    shadow: "1px 1px 3px 1px #dadce0",
+    _hover: {
+      backgroundColor: "whitesmoke",
+      color: "black",
+      transition:
+        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
+      shadow: "1px 1px 3px 1px #dadce0 inset",
+    },
+  };
+
+  const [cancelReqList, setCancelReqList] = useState([]);
+  const toast = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    axios
+      .get("/api/payment/cancel-req-member")
+      .then((response) => {
+        setCancelReqList(response.data);
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          toast({
+            title: "주문 내역을 불러오는 도중 에러",
+            description: "백엔드 코드를 확인하세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "주문 내역을 불러오는 도중 에러",
+            description: "다시 한 번 시도하시거나, 관리자에게 문의 바랍니다",
+            status: "error",
+          });
+        }
+      });
+  }, []);
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear().toString().substr(2); // 2024를 24로 변환
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // 월은 0부터 시작하므로 1을 더함
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    return `${year}년 ${month}월 ${day}일 / ${hours}시${minutes}분`;
+  };
+
   return (
     <Center>
-      <Card shadow={"1px 1px 3px 1px #dadce0"}>
+      <Card shadow={"1px 1px 3px 1px #dadce0"} w={"1500px"} mt={6} mb={6}>
         <CardHeader
           mt={4}
           textAlign={"center"}
@@ -27,63 +90,91 @@ export function CancelReqList() {
         >
           취소 요청 목록
         </CardHeader>
-        <CardBody>
-          <Table textAlign={"center"}>
-            <Thead>
-              <Tr>
-                <Th fontSize={"1.2rem"} w={"180px"} textAlign={"center"}>
-                  주문번호
-                </Th>
-                <Th fontSize={"1.2rem"} w={"180px"} textAlign={"center"}>
-                  상품명
-                </Th>
-                <Th fontSize={"1.2rem"} w={"200px"} textAlign={"center"}>
-                  가격
-                </Th>
-                <Th fontSize={"1.2rem"} w={"250px"} textAlign={"center"}>
-                  아이디
-                </Th>
-                <Th fontSize={"1.2rem"} w={"200px"} textAlign={"center"}>
-                  연락처
-                </Th>
-                <Th fontSize={"1.2rem"} w={"200px"} textAlign={"center"}>
-                  취소 승인
-                </Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {/*{memberList.map((member) => */}
-              {/*{*/}
-              {/*  const formatDate = (dateString) => {*/}
-              {/*    const date = new Date(dateString);*/}
-              {/*    const year = date.getFullYear();*/}
-              {/*    const month = (date.getMonth() + 1)*/}
-              {/*      .toString()*/}
-              {/*      .padStart(2, "0");*/}
-              {/*    const day = date.getDate().toString().padStart(2, "0");*/}
-              {/*    return `${year}년 ${month}월 ${day}일`;*/}
-              {/*  };*/}
-              return (
-              <Tr key={"아이디"}>
-                <Td textAlign={"center"}>{"member.member_login_id"}</Td>
-                <Td textAlign={"center"}>{"member.member_name"}</Td>
-                <Td textAlign={"center"}>{"member.member_phone_number"}</Td>
-                <Td textAlign={"center"}>{"member.member_email"}</Td>
-                <Td textAlign={"center"}>{"formatDate(member.reg_time)"}</Td>
-                <Td textAlign={"center"}>
-                  <Button
-                  // onClick={() => handleMemberDeleteClick(member)}
-                  // {...buttonStyle}
-                  >
-                    <FontAwesomeIcon icon={faTrashCan} />
-                  </Button>
-                </Td>
-              </Tr>
-              ){/*}*/}
-              {/*)}*/}
-            </Tbody>
-          </Table>
-        </CardBody>
+
+        <SimpleGrid columns={3} spacing={2}>
+          {cancelReqList.map((cancelList) => (
+            <CardBody key={cancelList.id} mb={14}>
+              <Box
+                margin="auto"
+                p={5}
+                borderWidth="1px"
+                borderRadius="lg"
+                shadow={"1px 1px 3px 1px #dadce0 inset"}
+              >
+                <Flex
+                  gap={4}
+                  h={"40px"}
+                  lineHeight={"40px"}
+                  fontSize={"0.9rem"}
+                  fontWeight={"bold"}
+                  bg={"black"}
+                  color={"whitesmoke"}
+                  justifyContent={"space-between"}
+                >
+                  <Text ml={2}>
+                    주문일 : {formatDate(cancelList.order_reg_time)}
+                  </Text>
+                  <Box>|</Box>
+                  <Text mr={2}>주문번호 : {cancelList.id}</Text>
+                </Flex>
+                <Box mt={2}>
+                  <Text fontSize={"0.9rem"} fontWeight={"bold"} bg={"#dadce0"}>
+                    결제 상품 정보
+                  </Text>
+                  <Flex gap={4} mt={2}>
+                    <Box alignSelf="flex-start">
+                      <Image
+                        src={cancelList.main_img_uri}
+                        w="100px"
+                        h="100px"
+                      />
+                    </Box>
+                    <Box textAlign={"left"}>
+                      <Text>{cancelList.order_name}</Text>
+                      <Text mt={2}>{cancelList.total_price} 원</Text>
+                    </Box>
+                  </Flex>
+                </Box>
+
+                <Box mt={2}>
+                  <Text fontSize={"0.9rem"} fontWeight={"bold"} bg={"#dadce0"}>
+                    회원 정보
+                  </Text>
+                  <Flex gap={4} mt={2}>
+                    <Box
+                      textAlign={"left"}
+                      ml={2}
+                      fontWeight={"bold"}
+                      w={"50px"}
+                    >
+                      <Text mt={1}>이름</Text>
+                      <Text mt={1}>아이디</Text>
+                      <Text mt={1}>이메일</Text>
+                      <Text mt={1}>전화번호</Text>
+                    </Box>
+                    <Box border={"1px solid #dadce0"}></Box>
+                    <Box textAlign={"left"} ml={2} w={"220px"}>
+                      <Text mt={1}>{cancelList.membersDto.member_name}</Text>
+                      <Text mt={1}>
+                        {cancelList.membersDto.member_login_id}
+                      </Text>
+                      <Text mt={1}>{cancelList.membersDto.member_email}</Text>
+                      <Text mt={1}>
+                        {cancelList.membersDto.member_phone_number}
+                      </Text>
+                    </Box>
+                    <Box border={"1px solid #dadce0"}></Box>
+                    <Box mt={8}>
+                      <Button w={"50px"} h={"40px"} {...buttonStyle}>
+                        환불
+                      </Button>
+                    </Box>
+                  </Flex>
+                </Box>
+              </Box>
+            </CardBody>
+          ))}
+        </SimpleGrid>
       </Card>
     </Center>
   );
