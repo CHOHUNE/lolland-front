@@ -8,7 +8,7 @@ import {
   Heading,
   useToast,
 } from "@chakra-ui/react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { LoginContext } from "../../component/LoginProvider";
 import axios from "axios";
 
@@ -18,7 +18,6 @@ function PaymentPage() {
   const location = useLocation();
   const { id, order_nano_id, order_name, customer_name, email, phone, amount } =
     location.state;
-  console.log(location.state);
 
   const [paymentWidget, setPaymentWidget] = useState(null);
   const paymentMethodsWidgetRef = useRef(null);

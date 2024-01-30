@@ -51,6 +51,8 @@ import { ProductEventList } from "./page/product/ProductEventList";
 import PaymentPage from "./page/order/PaymentPage";
 import SuccessPage from "./page/order/SuccessPage";
 import FailPage from "./page/order/FailPage";
+import { MemberPurchase } from "./page/order/MemberPurchase";
+import { PurchaseInfo } from "./PurchaseInfo";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -91,6 +93,8 @@ const routes = createBrowserRouter(
       <Route path="findId" element={<MemberFindId />} />
       <Route path="findPassword" element={<MemberFindPassword />} />
       <Route path="memberPage" element={<MemberView />}>
+        <Route index element={<MemberPurchase />} />
+        <Route path="order/:orderId" element={<PurchaseInfo />} />
         <Route path="memberInfo" element={<MemberInfo />} />
         <Route path="memberInfo/memberManagePage" element={<MemberManage />} />
         <Route path="memberEdit" element={<MemberEdit />} />

@@ -18,6 +18,7 @@
     "@tosspayments/payment-widget-sdk": "^0.10.2",
     "axios": "^1.6.1",
     "chart.js": "^4.4.1",
+    "date-fns": "^3.3.1",
     "dotenv": "^16.4.1",
     "framer-motion": "^10.16.4",
     "immer": "^10.0.3",

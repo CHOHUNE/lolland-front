@@ -10,7 +10,7 @@ function SuccessPage() {
 
   // 수량, 고객번호, 고유 나노아이디, 주문명, 고객명
 
-  ///success?paymentType={PAYMENT_TYPE}&orderId={ORDER_ID}&paymentKey={PAYMENT_KEY}&amount={AMOUNT}
+  ///payment?paymentType={PAYMENT_TYPE}&orderId={ORDER_ID}&paymentKey={PAYMENT_KEY}&amount={AMOUNT}
 
   useEffect(() => {
     const requestData = {
@@ -31,12 +31,13 @@ function SuccessPage() {
           },
         );
       } catch (error) {
+        console.log(error);
         if (error.response) {
           const { code, message } = error.response.data;
           navigate(`/fail?message=${message}&code=${code}`);
         } else {
           console.error("Unexpected error:", error.message);
-          navigate("/fail?message=Unexpected error&code=500");
+          navigate("/fail?message=INTERNAL_SERVER_ERROR&code=500");
         }
       }
     }
