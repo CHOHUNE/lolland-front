@@ -1,14 +1,15 @@
-import { Box, Flex, Heading, Spinner, Text, VStack } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import RatingChart from "./RatingChart";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faStarHalfAlt } from "@fortawesome/free-solid-svg-icons";
 import { faStar as farStar } from "@fortawesome/free-regular-svg-icons";
+import OptionChart from "./OptionChart";
 
 export const ProductStats = ({ product_id, average_rate }) => {
   const [ratingDistribution, setRatingDistribution] = useState({});
+  const [sellRateData, setSellRateData] = useState([]);
 
   useEffect(() => {
     axios
@@ -18,6 +19,15 @@ export const ProductStats = ({ product_id, average_rate }) => {
       })
       .catch((error) => {
         console.error("별점 분포도 가져오는 도중 에러 발생:", error);
+      });
+
+    axios
+      .get(`/api/product/sell-rate/${product_id}`)
+      .then((response) => {
+        setSellRateData(response.data);
+      })
+      .catch((error) => {
+        console.log(error.response);
       });
   }, [product_id]);
 
@@ -47,12 +57,7 @@ export const ProductStats = ({ product_id, average_rate }) => {
   };
 
   return (
-    <Flex
-      border="1px dashed black"
-      justifyContent="space-between"
-      my={10}
-      minW="1200px"
-    >
+    <Flex justifyContent="space-between" my={10} minW="1200px">
       <Box
         w="30%"
         h="250px"
@@ -91,9 +96,11 @@ export const ProductStats = ({ product_id, average_rate }) => {
         alignItems="center"
         justifyContent="center"
         textAlign="center"
-        border="1px dashed green"
       >
-        옵션 구매 선호도
+        <OptionChart
+          sellRateData={sellRateData}
+          boxDimensions={{ width: "100%", height: "100%" }}
+        />
       </Box>
     </Flex>
   );

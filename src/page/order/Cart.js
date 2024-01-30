@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   ButtonGroup,
   Checkbox,
@@ -266,14 +267,14 @@ export function Cart() {
   }
 
   return (
-    <>
-      <Heading my={5} mx={10}>
+    <Box mx="10%">
+      <Text my={5} mx={10} fontSize="3xl" className="specialHeadings">
         <FontAwesomeIcon icon={faBagShopping} />
-        <Text as="span" color="orange" ml={3}>
+        <Text as="span" color="orange" ml={3} className="specialHeadings">
           {memberLoginId}
         </Text>
         님의 장바구니
-      </Heading>
+      </Text>
       <TableContainer mx={10} mb={10}>
         <Flex justifyContent="space-between" mx={10} mb={5}>
           <Checkbox
@@ -372,6 +373,6 @@ export function Cart() {
           </Tbody>
         </Table>
       </TableContainer>
-    </>
+    </Box>
   );
 }
