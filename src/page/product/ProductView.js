@@ -433,9 +433,10 @@ export function ProductView() {
     <Box mx={"15%"} p={5}>
       {/* ------------------------------ 상품 수정, 삭제 ------------------------------ */}
       {isAdmin() && (
-        <Box>
+        <Box justifyContent={"end"} display={"flex"}>
           <Button
-            colorScheme="blue"
+            background={"black"}
+            color={"white"}
             onClick={() => navigate("/edit/" + product_id)}
           >
             수정

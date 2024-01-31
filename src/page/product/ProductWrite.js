@@ -89,6 +89,7 @@ export function ProductWrite() {
   // ---------------------------------- 저장 버튼 클릭 로직 ----------------------------------
   function handleSubmit() {
     options.map((option) => console.log(option));
+    setIsSubmitting(true);
 
     axios
       .postForm("/api/product/add", {
@@ -115,6 +116,9 @@ export function ProductWrite() {
           description: "오류발생",
           status: "error",
         });
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
   }
 
@@ -139,6 +143,28 @@ export function ProductWrite() {
     setOptions(options.filter((_, i) => i !== index));
   };
 
+  // ------------- 연속 클릭 방지 -------------
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 모든 입력 필드가 유효한지 확인하는 함수
+  const isFormValid = () => {
+    const hasMainImage = mainImg && mainImg.length > 0;
+    const hasContentImage = contentImg && contentImg.length > 0;
+    const hasValidOptions = options.every(
+      (option) => option.option_name.trim() && option.stock > 0,
+    );
+
+    return (
+      name.trim() &&
+      content.trim() &&
+      manufacturer.trim() &&
+      price.trim() &&
+      hasMainImage &&
+      hasContentImage &&
+      hasValidOptions
+    );
+  };
+
   return (
     <Box mt={5} mb={5}>
       <Text
@@ -150,7 +176,7 @@ export function ProductWrite() {
       >
         상품등록
       </Text>
-      <Center mt={5} boxShadow={"md"} p={5}>
+      <Box mt={5} boxShadow={"md"} p={5} minW={"800px"}>
         {/* ---------------------------------- 대분류 , 소분류 나누는 로직 ---------------------------------- */}
         <Box>
           <>
@@ -282,11 +308,16 @@ export function ProductWrite() {
             </Flex>
           </Box>
 
-          <Button mt={10} colorScheme="blue" onClick={handleSubmit}>
+          <Button
+            isDisabled={!isFormValid() || isSubmitting}
+            mt={10}
+            colorScheme="blue"
+            onClick={handleSubmit}
+          >
             저장
           </Button>
         </Box>
-      </Center>
+      </Box>
     </Box>
   );
 }

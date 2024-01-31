@@ -216,7 +216,7 @@ export function ProductEdit() {
         상품수정
       </Text>
       <Center>
-        <Box p={5} boxShadow={"md"} w={"60%"}>
+        <Box p={5} boxShadow={"md"} minW={"800px"}>
           {/* ------------------- 대분류 로직 ------------------- */}
           <FormControl mt={3}>
             <FormLabel fontWeight={"bold"}>대분류</FormLabel>
