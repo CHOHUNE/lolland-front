@@ -315,7 +315,7 @@ export const ReviewView = ({ product_id, productDetailImg }) => {
           {productDetailImg.map((imgUri, index) => (
             <Image
               key={index}
-              src={imgUri}
+              src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/product/productContent/productDefault.jpeg"
               alt={`제품 상세 이미지 ${index + 1}`}
               objectFit="cover"
             />
