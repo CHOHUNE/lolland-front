@@ -127,13 +127,13 @@ const routes = createBrowserRouter(
 
       {/* 관리자 페이지 */}
       <Route path="adminPage" element={<AdminView />}>
-        <Route index element={<AdminIndex />} />
+        <Route path="adminIndex" element={<AdminIndex />} />
         <Route path="product/write/" element={<ProductWrite />} />
         <Route path="memberList" element={<MemberList />} />
         <Route path="qna" element={<QnaAnswer />}>
           <Route path="write/:question_id" element={<QnaWriteAnswer />} />
         </Route>
-        <Route path="cancelReqList" element={<CancelReqList />} />
+        <Route index element={<CancelReqList />} />
       </Route>
     </Route>,
   ),
