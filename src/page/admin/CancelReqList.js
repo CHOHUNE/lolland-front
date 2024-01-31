@@ -47,9 +47,10 @@ export function CancelReqList() {
   };
 
   const [cancelReqList, setCancelReqList] = useState([]);
+  const [pageInfo, setPageInfo] = useState("");
+
   const toast = useToast();
   const navigate = useNavigate();
-
   const [params] = useSearchParams();
   const location = useLocation();
 
@@ -57,7 +58,8 @@ export function CancelReqList() {
     axios
       .get("/api/payment/cancel-req-member?" + params)
       .then((response) => {
-        setCancelReqList(response.data);
+        setCancelReqList(response.data.orderCancelReqDto);
+        setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
         if (error.response.status === 500) {
@@ -196,28 +198,34 @@ export function CancelReqList() {
 
         {/* 페이지 버튼  */}
         <Box mt={10} mb={10}>
-          {/*{pageInfo.prevPageNumber && (*/}
-          <Button
-            bg={"white"}
-            color={"black"}
-            _hover={{ backgroundColor: "black", color: "whitesmoke" }}
-            onClick={() => navigate("?page=1")}
-          >
-            <FontAwesomeIcon icon={faCaretLeft} />
-          </Button>
-          {/*)}*/}
+          {pageInfo.prevPageNumber && (
+            <Button
+              bg={"white"}
+              color={"black"}
+              _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+              onClick={() => navigate("?page=" + pageInfo.prevPageNumber)}
+            >
+              <Flex gap={1}>
+                <FontAwesomeIcon icon={faCaretLeft} />
+                이전
+              </Flex>
+            </Button>
+          )}
 
-          {/*{pageInfo.nextPageNumber && (*/}
-          <Button
-            bg={"white"}
-            color={"black"}
-            _hover={{ backgroundColor: "black", color: "whitesmoke" }}
-            ml={2}
-            onClick={() => navigate("?page=2")}
-          >
-            <FontAwesomeIcon icon={faCaretRight} />
-          </Button>
-          {/*)}*/}
+          {pageInfo.nextPageNumber && (
+            <Button
+              bg={"white"}
+              color={"black"}
+              _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+              ml={2}
+              onClick={() => navigate("?page=" + pageInfo.nextPageNumber)}
+            >
+              <Flex gap={1}>
+                다음
+                <FontAwesomeIcon icon={faCaretRight} />
+              </Flex>
+            </Button>
+          )}
         </Box>
       </Card>
     </Center>
