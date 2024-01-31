@@ -160,7 +160,6 @@ export function ProductWrite() {
       manufacturer.trim() &&
       price.trim() &&
       hasMainImage &&
-      hasContentImage &&
       hasValidOptions
     );
   };
