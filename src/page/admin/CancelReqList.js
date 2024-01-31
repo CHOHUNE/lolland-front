@@ -29,7 +29,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 export function CancelReqList() {
   // 버튼 css
@@ -50,9 +50,12 @@ export function CancelReqList() {
   const toast = useToast();
   const navigate = useNavigate();
 
+  const [params] = useSearchParams();
+  const location = useLocation();
+
   useEffect(() => {
     axios
-      .get("/api/payment/cancel-req-member")
+      .get("/api/payment/cancel-req-member?" + params)
       .then((response) => {
         setCancelReqList(response.data);
       })
@@ -71,7 +74,7 @@ export function CancelReqList() {
           });
         }
       });
-  }, []);
+  }, [location]);
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear().toString().substr(2); // 2024를 24로 변환
@@ -198,7 +201,7 @@ export function CancelReqList() {
             bg={"white"}
             color={"black"}
             _hover={{ backgroundColor: "black", color: "whitesmoke" }}
-            // onClick={() => navigate("?page=" + pageInfo.prevPageNumber)}
+            onClick={() => navigate("?page=1")}
           >
             <FontAwesomeIcon icon={faCaretLeft} />
           </Button>
@@ -210,7 +213,7 @@ export function CancelReqList() {
             color={"black"}
             _hover={{ backgroundColor: "black", color: "whitesmoke" }}
             ml={2}
-            // onClick={() => navigate("?page=" + pageInfo.nextPageNumber)}
+            onClick={() => navigate("?page=2")}
           >
             <FontAwesomeIcon icon={faCaretRight} />
           </Button>
