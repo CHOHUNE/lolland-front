@@ -92,7 +92,7 @@ export function AdminNavBar() {
             <IconButton
               {...buttonStyle}
               icon={<FontAwesomeIcon icon={faCommentsDollar} />}
-              onClick={() => navigate("/adminPage/cancelReqList")}
+              onClick={() => navigate("/adminPage")}
             />
           </Tooltip>
         </VStack>

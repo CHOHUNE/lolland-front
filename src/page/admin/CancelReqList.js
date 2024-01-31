@@ -29,7 +29,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 export function CancelReqList() {
   // 버튼 css
@@ -47,14 +47,20 @@ export function CancelReqList() {
   };
 
   const [cancelReqList, setCancelReqList] = useState([]);
+  const [pageInfo, setPageInfo] = useState("");
+  const [refundStatus, setRefundStatus] = useState(false);
+
   const toast = useToast();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const location = useLocation();
 
   useEffect(() => {
     axios
-      .get("/api/payment/cancel-req-member")
+      .get("/api/payment/cancel-req-member?" + params)
       .then((response) => {
-        setCancelReqList(response.data);
+        setCancelReqList(response.data.orderCancelReqDto);
+        setPageInfo(response.data.pageInfo);
       })
       .catch((error) => {
         if (error.response.status === 500) {
@@ -70,8 +76,11 @@ export function CancelReqList() {
             status: "error",
           });
         }
+      })
+      .finally(() => {
+        setRefundStatus(false);
       });
-  }, []);
+  }, [location, refundStatus]);
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear().toString().substr(2); // 2024를 24로 변환
@@ -84,7 +93,25 @@ export function CancelReqList() {
   };
 
   // 환불 버튼 클릭시 로직
-  const handleRefundClick = (id) => {};
+  const handleRefundClick = (cancelInfo) => {
+    axios
+      .post("/api/payment/toss/cancel", {
+        orderId: cancelInfo.order_nano_id,
+      })
+      .then(() =>
+        toast({
+          description: cancelInfo.order_name + "이 환불 처리 되었습니다.",
+          status: "success",
+        }),
+      )
+      .then(() => setRefundStatus(true))
+      .catch(() => {
+        toast({
+          description: "환불 처리 중 문제가 발생하였습니다.",
+          status: "error",
+        });
+      });
+  };
 
   return (
     <Center>
@@ -101,7 +128,7 @@ export function CancelReqList() {
 
         <SimpleGrid columns={3} spacing={2}>
           {cancelReqList.map((cancelList) => (
-            <CardBody key={cancelList.id} mb={14}>
+            <CardBody key={cancelList.id}>
               <Box
                 margin="auto"
                 p={5}
@@ -138,8 +165,13 @@ export function CancelReqList() {
                       />
                     </Box>
                     <Box textAlign={"left"}>
-                      <Text>{cancelList.order_name}</Text>
-                      <Text mt={2}>{cancelList.total_price} 원</Text>
+                      <Text fontSize={"1rem"}>{cancelList.order_name}</Text>
+                      <Flex mt={2} gap={1} fontSize={"1rem"}>
+                        <Text fontWeight={"bold"} color={"orangered"}>
+                          {cancelList.total_price.toLocaleString()}
+                        </Text>
+                        원
+                      </Flex>
                     </Box>
                   </Flex>
                 </Box>
@@ -178,7 +210,7 @@ export function CancelReqList() {
                         h={"40px"}
                         {...buttonStyle}
                         onClick={() => {
-                          handleRefundClick(cancelList.id);
+                          handleRefundClick(cancelList);
                         }}
                       >
                         환불
@@ -193,38 +225,34 @@ export function CancelReqList() {
 
         {/* 페이지 버튼  */}
         <Box mt={10} mb={10}>
-          {/*{pageInfo.prevPageNumber && (*/}
-          <Button
-            bg={"white"}
-            color={"black"}
-            _hover={{ backgroundColor: "black", color: "whitesmoke" }}
-            // onClick={() => navigate("?page=" + pageInfo.prevPageNumber)}
-          >
-            <FontAwesomeIcon icon={faCaretLeft} />
-          </Button>
-          {/*)}*/}
-          {/*{pageNumbers.map((pageNumber) => (*/}
-          {/*  <AdminMemberPageButton*/}
-          {/*    pageBg={listPage === pageNumber.toString() ? "black" : "white"}*/}
-          {/*    pageColor={listPage === pageNumber.toString() ? "white" : "black"}*/}
-          {/*    pageHove={{ backgroundColor: "black", color: "whitesmoke" }}*/}
-          {/*    key={pageNumber}*/}
-          {/*    pageNumber={pageNumber}*/}
-          {/*  >*/}
-          {/*    {pageNumber}*/}
-          {/*  </AdminMemberPageButton>*/}
-          {/*))}*/}
-          {/*{pageInfo.nextPageNumber && (*/}
-          <Button
-            bg={"white"}
-            color={"black"}
-            _hover={{ backgroundColor: "black", color: "whitesmoke" }}
-            ml={2}
-            // onClick={() => navigate("?page=" + pageInfo.nextPageNumber)}
-          >
-            <FontAwesomeIcon icon={faCaretRight} />
-          </Button>
-          {/*)}*/}
+          {pageInfo.prevPageNumber && (
+            <Button
+              bg={"white"}
+              color={"black"}
+              _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+              onClick={() => navigate("?page=" + pageInfo.prevPageNumber)}
+            >
+              <Flex gap={1}>
+                <FontAwesomeIcon icon={faCaretLeft} />
+                이전
+              </Flex>
+            </Button>
+          )}
+
+          {pageInfo.nextPageNumber && (
+            <Button
+              bg={"white"}
+              color={"black"}
+              _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+              ml={2}
+              onClick={() => navigate("?page=" + pageInfo.nextPageNumber)}
+            >
+              <Flex gap={1}>
+                다음
+                <FontAwesomeIcon icon={faCaretRight} />
+              </Flex>
+            </Button>
+          )}
         </Box>
       </Card>
     </Center>
