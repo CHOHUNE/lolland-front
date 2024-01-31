@@ -95,7 +95,7 @@ export function CancelReqList() {
   // 환불 버튼 클릭시 로직
   const handleRefundClick = (cancelInfo) => {
     axios
-      .post("/api/payment/toss/cancel", {
+      .post("/api/payment/admin/cancel", {
         orderId: cancelInfo.order_nano_id,
       })
       .then(() =>
