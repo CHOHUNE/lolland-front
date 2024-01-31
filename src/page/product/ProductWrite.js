@@ -156,7 +156,6 @@ export function ProductWrite() {
 
     return (
       name.trim() &&
-      content.trim() &&
       manufacturer.trim() &&
       price.trim() &&
       hasMainImage &&
