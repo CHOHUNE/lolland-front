@@ -311,14 +311,16 @@ export const ReviewView = ({ product_id, productDetailImg }) => {
       <TabIndicator mt="-1.5px" height="2px" bg="black" borderRadius="1px" />
       <TabPanels px={10}>
         {/* -------------------------- 상품 설명 -------------------------- */}
-        <TabPanel display="flex" justifyContent="center">
-          <Image
-            src={productDetailImg ? productDetailImg : ""}
-            alt={"제품 상세 이미지"}
-            objectFit="cover"
-          />
+        <TabPanel mx="20%" alignItems={"center"} justifyContent="center">
+          {productDetailImg.map((imgUri, index) => (
+            <Image
+              key={index}
+              src={imgUri}
+              alt={`제품 상세 이미지 ${index + 1}`}
+              objectFit="cover"
+            />
+          ))}
         </TabPanel>
-
         {/* -------------------------- 리뷰 & 댓글 -------------------------- */}
         <TabPanel>
           {/* -------------------------- 리뷰 입력란 -------------------------- */}

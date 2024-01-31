@@ -95,6 +95,12 @@ function SearchComponent() {
     navigate("?" + params);
   }
 
+  function handleKeyPress(event) {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  }
+
   return (
     <Box mx="35%">
       <InputGroup>
@@ -120,6 +126,7 @@ function SearchComponent() {
           _focus={{ border: "1px solid black", shadow: "none" }}
           _hover={{ border: "1px solid black" }}
           value={keyword}
+          onKeyPress={handleKeyPress}
           onChange={(e) => setKeyword(e.target.value)}
         />
         <InputRightElement bgColor="black" onClick={handleSearch}>

@@ -779,7 +779,7 @@ export function HomeBody() {
                           </Box>
 
                           <Box>
-                            {/*{product.product_price.toLocaleString("ko-KR")}원*/}
+                            {product.product_price.toLocaleString("ko-KR")}원
                             <Box as="span" color="gray.600" fontSize="sm"></Box>
                           </Box>
                         </Box>

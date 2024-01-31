@@ -68,13 +68,13 @@ function SuccessPage() {
             <Text as="span" fontWeight="bold">
               주문 번호
             </Text>{" "}
-            `${searchParams.get("orderId")}`
+            {searchParams.get("orderId")}
           </Text>
           <Text fontSize="sm">
             <Text as="span" fontWeight="bold">
               결제 금액
             </Text>{" "}
-            `${Number(searchParams.get("amount").toLocaleString())}원`
+            {Number(searchParams.get("amount").toLocaleString())}원
           </Text>
         </Box>
       </CardBody>

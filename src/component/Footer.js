@@ -6,6 +6,7 @@ import {
   Divider,
   Flex,
   HStack,
+  Image,
   Spacer,
   Text,
 } from "@chakra-ui/react";
@@ -86,9 +87,7 @@ export function Footer() {
             justifyContent="center"
             textAlign="center"
           >
-            <Text className="logo" fontSize="6xl">
-              Lolland
-            </Text>
+            <Image src="/logo.png" boxSize="100%" objectFit="fit" />
           </Box>
         </Flex>
       </Box>
