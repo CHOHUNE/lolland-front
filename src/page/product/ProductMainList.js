@@ -35,6 +35,7 @@ import {
   faChevronRight,
   faHouse,
 } from "@fortawesome/free-solid-svg-icons";
+import SwiperMainList from "./SwiperMainList";
 
 function PageButton({ variant, pageNumber, children }) {
   const [params] = useSearchParams();
@@ -265,15 +266,21 @@ export function ProductMainList() {
       >
         <Box
           mb={10}
-          border="1px dashed black"
           display="flex"
           justifyContent="center"
           alignItems="center"
           textAlign="center"
+          overflow={"hidden"}
           w="full"
           h="300px"
         >
-          이벤트 배너
+          {/*이벤트 배너*/}
+          {/*<Image*/}
+          {/*  objectFit={"cover"}*/}
+          {/*  w={"100%"}*/}
+          {/*  src="https://image5.compuzone.co.kr/img/images/main2014/C/CateRollingBanner_175785.jpg"*/}
+          {/*/>*/}
+          <SwiperMainList />
         </Box>
         <SimpleGrid h={"100%"} w={"100%"} columns={4} spacing={9}>
           {productList.map((product, index) => (

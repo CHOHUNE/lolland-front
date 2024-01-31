@@ -137,6 +137,7 @@ export function CancelReqList() {
                 shadow={"1px 1px 3px 1px #dadce0 inset"}
               >
                 <Flex
+                  borderRadius={"5px"}
                   gap={4}
                   h={"40px"}
                   lineHeight={"40px"}
@@ -145,6 +146,7 @@ export function CancelReqList() {
                   bg={"black"}
                   color={"whitesmoke"}
                   justifyContent={"space-between"}
+                  // shadow: "1px 1px 3px 1px #dadce0"
                 >
                   <Text ml={2}>
                     주문일 : {formatDate(cancelList.order_reg_time)}
@@ -153,7 +155,12 @@ export function CancelReqList() {
                   <Text mr={2}>주문번호 : {cancelList.id}</Text>
                 </Flex>
                 <Box mt={2}>
-                  <Text fontSize={"0.9rem"} fontWeight={"bold"} bg={"#dadce0"}>
+                  <Text
+                    borderRadius={"5px"}
+                    fontSize={"0.9rem"}
+                    fontWeight={"bold"}
+                    bg={"#dadce0"}
+                  >
                     결제 상품 정보
                   </Text>
                   <Flex gap={4} mt={2}>
@@ -177,7 +184,12 @@ export function CancelReqList() {
                 </Box>
 
                 <Box mt={2}>
-                  <Text fontSize={"0.9rem"} fontWeight={"bold"} bg={"#dadce0"}>
+                  <Text
+                    borderRadius={"5px"}
+                    fontSize={"0.9rem"}
+                    fontWeight={"bold"}
+                    bg={"#dadce0"}
+                  >
                     회원 정보
                   </Text>
                   <Flex gap={4} mt={2}>
