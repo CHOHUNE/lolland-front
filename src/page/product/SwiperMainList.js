@@ -7,7 +7,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Autoplay, Pagination, EffectFade } from "swiper/modules";
 
-function SwiperImg(props) {
+function SwiperMainList(props) {
   const swiperStyles = {
     objectFit: "cover",
     width: "100%",
@@ -16,7 +16,7 @@ function SwiperImg(props) {
   };
 
   return (
-    <Box mt={5} w="100%" h="100%" position="relative">
+    <Box w="100%" h="100%" position="relative">
       <Swiper
         slidesPerView={1}
         spaceBetween={30}
@@ -37,44 +37,22 @@ function SwiperImg(props) {
       >
         <SwiperSlide>
           <Img
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/main/main1.jpeg"
-            alt="Slide Image"
             style={swiperStyles}
+            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/event/%E1%84%8B%E1%85%B5%E1%84%87%E1%85%A6%E1%86%AB%E1%84%90%E1%85%B31.jpeg"
           />
         </SwiperSlide>
 
         <SwiperSlide>
           <Img
             style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/main/main2.jpeg"
+            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/event/%E1%84%8B%E1%85%B5%E1%84%87%E1%85%A6%E1%86%AB%E1%84%90%E1%85%B32.jpeg"
           />
         </SwiperSlide>
 
         <SwiperSlide>
           <Img
             style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/main/main3.jpeg"
-          />
-        </SwiperSlide>
-
-        <SwiperSlide>
-          <Img
-            style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/main/main4.jpeg"
-          />
-        </SwiperSlide>
-
-        <SwiperSlide>
-          <Img
-            style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/main/main5.jpeg"
-          />
-        </SwiperSlide>
-
-        <SwiperSlide>
-          <Img
-            style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/main/main6.jpeg"
+            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/event/%E1%84%8B%E1%85%B5%E1%84%87%E1%85%A6%E1%86%AB%E1%84%90%E1%85%B33.jpeg"
           />
         </SwiperSlide>
       </Swiper>
@@ -82,4 +60,4 @@ function SwiperImg(props) {
   );
 }
 
-export default SwiperImg;
+export default SwiperMainList;

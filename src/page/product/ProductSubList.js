@@ -114,6 +114,12 @@ function SearchComponent() {
     navigate("?" + params);
   }
 
+  function handleKeyPress(event) {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  }
+
   const buttonStyle = {
     background: "black",
     borderRadius: "0",
@@ -143,6 +149,7 @@ function SearchComponent() {
         borderRadius={0}
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
+        onKeyPress={handleKeyPress}
       />
       <Button onClick={handleSearch} {...buttonStyle}>
         검색
