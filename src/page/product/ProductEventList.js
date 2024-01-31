@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   Flex,
+  Heading,
   Image,
   SimpleGrid,
   Text,
@@ -193,6 +194,18 @@ export function ProductEventList() {
           ))}
         </SimpleGrid>
       </Flex>
+      <Box
+        display="flex"
+        flexDir="column"
+        justifyContent="center"
+        textAlign="center"
+        w="full"
+        h="50vh"
+        opacity={0.4}
+        zIndex={5}
+      >
+        <Heading size="md">진행중인 이벤트가 없습니다.</Heading>
+      </Box>
       <Pagination pageInfo={pageInfo} />
     </Box>
   );

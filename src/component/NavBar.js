@@ -119,7 +119,6 @@ export function NavBar() {
             <ButtonGroup variant="undefined" size="md" alignItems={"center"}>
               <Button onClick={() => navigate("/")}>HOME</Button>
               <Button onClick={() => navigate("/product/list/")}>신상품</Button>
-              <Button>인기글</Button>
               <Button onClick={() => navigate("/productEvent")}>이벤트</Button>
             </ButtonGroup>
           </Flex>
@@ -154,7 +153,7 @@ export function NavBar() {
             justifyContent="center"
             size="lg"
           >
-            <IconButton icon={<FontAwesomeIcon icon={faMagnifyingGlass} />} />
+            {/*<IconButton icon={<FontAwesomeIcon icon={faMagnifyingGlass} />} />*/}
             <IconButton
               icon={<FontAwesomeIcon icon={faBagShopping} />}
               onClick={() => {

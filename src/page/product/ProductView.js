@@ -104,7 +104,9 @@ export function ProductView() {
   useEffect(() => {
     axios.get("/api/product/product_id/" + product_id).then((response) => {
       setProduct(response.data);
-      setProductDetailImg(response.data.productDetailsImgs[0].sub_img_uri);
+      setProductDetailImg(
+        response.data.productDetailsImgs.map((img) => img.sub_img_uri),
+      );
       // --------------------- 최근 본 상품 ----------------------
       saveTransToRecentViewed(response.data);
     });
@@ -817,12 +819,6 @@ export function ProductView() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-      {/*<Box>*/}
-      {/*  <Flex wrap="wrap" justify="center" gap={4}>*/}
-      {/*    {renderProductDetailsImages()}*/}
-      {/*  </Flex>*/}
-      {/*</Box>*/}
 
       {/*--------------- 상품 스탯 --------------- */}
       <ProductStats
