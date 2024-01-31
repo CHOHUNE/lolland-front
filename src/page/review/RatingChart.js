@@ -1,6 +1,5 @@
 import React, { useRef, useEffect } from "react";
 import { Chart, Tooltip, TooltipItem } from "chart.js/auto";
-import { Bar } from "react-chartjs-2";
 
 const RatingChart = ({ ratingDistribution, boxDimensions }) => {
   const chartRef = useRef(null);

@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   ButtonGroup,
   Checkbox,
@@ -133,6 +134,7 @@ export function Cart() {
       return {
         productId: product.product_id,
         productName: product.product_name,
+        optionId: product.option_id,
         optionName: product.option_name,
         quantity: product.quantity,
         price: product.product_price,
@@ -149,7 +151,7 @@ export function Cart() {
 
         if (existingEntry) {
           existingEntry.options.push({
-            option_id: purchase.option_id,
+            optionId: purchase.optionId,
             optionName: purchase.optionName,
             quantity: purchase.quantity,
             price: purchase.price,
@@ -161,6 +163,7 @@ export function Cart() {
             productName: purchase.productName,
             options: [
               {
+                optionId: purchase.optionId,
                 optionName: purchase.optionName,
                 quantity: purchase.quantity,
                 price: purchase.price,
@@ -264,14 +267,14 @@ export function Cart() {
   }
 
   return (
-    <>
-      <Heading my={5} mx={10}>
+    <Box mx="10%">
+      <Text my={5} mx={10} fontSize="3xl" className="specialHeadings">
         <FontAwesomeIcon icon={faBagShopping} />
-        <Text as="span" color="orange" ml={3}>
+        <Text as="span" color="orange" ml={3} className="specialHeadings">
           {memberLoginId}
         </Text>
         님의 장바구니
-      </Heading>
+      </Text>
       <TableContainer mx={10} mb={10}>
         <Flex justifyContent="space-between" mx={10} mb={5}>
           <Checkbox
@@ -370,6 +373,6 @@ export function Cart() {
           </Tbody>
         </Table>
       </TableContainer>
-    </>
+    </Box>
   );
 }

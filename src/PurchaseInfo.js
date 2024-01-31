@@ -15,9 +15,12 @@ import {
   FormControl,
   FormLabel,
   Heading,
+  HStack,
+  IconButton,
   List,
   ListItem,
   SimpleGrid,
+  Tag,
   Text,
   useToast,
 } from "@chakra-ui/react";
@@ -25,6 +28,9 @@ import { useContext, useEffect, useState } from "react";
 import { LoginContext } from "./component/LoginProvider";
 import axios from "axios";
 import * as PropTypes from "prop-types";
+import { format } from "date-fns";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
 function Input(props) {
   return null;
@@ -41,6 +47,7 @@ export function PurchaseInfo() {
   const toast = useToast();
   const navigate = useNavigate();
   const [orderInfo, setOrderInfo] = useState();
+  const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
 
   useEffect(() => {
     axios
@@ -103,55 +110,165 @@ export function PurchaseInfo() {
       });
   }
 
+  const toggleAdditionalInfo = () => {
+    setShowAdditionalInfo(!showAdditionalInfo);
+  };
+
+  const labelStyles = {
+    textAlign: "left",
+    fontWeight: "bold",
+  };
+
+  const dataStyles = {
+    textAlign: "right",
+  };
+
+  const formatOrderDate = (orderRegTime) => {
+    const formattedDate = format(new Date(orderRegTime), "yyyy.MM.dd HH:mm");
+    return formattedDate;
+  };
+
+  const getStatusStyle = (orderStatus) => {
+    switch (orderStatus) {
+      case "ORDERED":
+        return { color: "#6FA7DD", colorScheme: "blue", content: "결제 완료" };
+      case "ORDERING":
+        return { color: "orange", colorScheme: "orange", content: "주문 중" };
+      case "CANCEL_WAIT":
+        return {
+          color: "red",
+          colorScheme: "red",
+          content: "결제 취소 대기 중",
+        };
+      case "CANCELED":
+        return { color: "gray", colorScheme: "gray", content: "결제 취소" };
+      default:
+        return {
+          color: "orange",
+          colorScheme: "orange",
+          content: "Unknown Status",
+        };
+    }
+  };
+
+  function formatPhoneNumber(phoneNumber) {
+    const cleaned = ("" + phoneNumber).replace(/\D/g, ""); // Remove non-numeric characters
+    const match = cleaned.match(/^(\d{3})(\d{4})(\d{4})$/); // Match groups of digits
+    if (match) {
+      return `${match[1]}-${match[2]}-${match[3]}`;
+    }
+    return phoneNumber;
+  }
+
   return (
-    <Card w="full">
+    <Card w="70%">
       {orderInfo && (
         <>
-          <CardHeader>
+          <CardHeader p={10}>
             <Heading textAlign="left" mb={5}>
               결제 내역 상세정보
             </Heading>
-            <Text textAlign="left" fontSize="lg">
-              {orderInfo.order_name}
-            </Text>
+            <HStack>
+              <Tag
+                colorScheme={getStatusStyle(orderInfo.order_status).colorScheme}
+                variant="outline"
+                borderRadius="full"
+                px={3}
+                mr={3}
+              >
+                {getStatusStyle(orderInfo.order_status).content}
+              </Tag>
+              <Text as="span" fontSize="lg">
+                {orderInfo.order_name}
+              </Text>
+            </HStack>
           </CardHeader>
           <CardBody>
             <SimpleGrid
               columns={2}
               spacing={10}
-              gridTemplateColumns="200px 1fr"
+              px={10}
+              gridTemplateColumns="100px 1fr"
             >
-              <Box fontWeight="bold">주문 번호</Box>
-              <Box>{orderInfo.order_name}</Box>
-              <Box fontWeight="bold">주문명</Box>
-              <Box>{orderInfo.order_nano_id}</Box>
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                fontWeight="bold"
-              >
+              <Box {...labelStyles}>주문명</Box>
+              <Box {...dataStyles}>{orderInfo.order_name}</Box>
+              <Box {...labelStyles}>주문 번호</Box>
+              <Box {...dataStyles}>{orderInfo.order_nano_id}</Box>
+              <Box {...labelStyles}>주문 시간</Box>
+              <Box {...dataStyles}>
+                {formatOrderDate(orderInfo.order_reg_time)}
+              </Box>
+              <Box display="flex" alignItems="center" {...labelStyles}>
                 주문 상품
               </Box>
               <Box>
                 <List>
                   {orderInfo.productList.map((product) => (
-                    <ListItem key={product.product_id}>
+                    <ListItem key={product.product_id} {...dataStyles}>
                       {product.product_name} {product.option_name} (
                       {product.quantity}개)
-                      {/*{product.total_price.toLocaleString()}원*/}
                     </ListItem>
                   ))}
                 </List>
               </Box>
-              <Box fontWeight="bold">주문 금액</Box>
-              <Box>{orderInfo.total_price.toLocaleString()}원</Box>
+              <Box {...labelStyles}>배송비</Box>
+              <Box {...dataStyles}>3,000원</Box>
+              <Box {...labelStyles}>주문 금액</Box>
+              <Box {...dataStyles}>
+                {orderInfo.total_price.toLocaleString()}원
+              </Box>
+              {showAdditionalInfo && (
+                <>
+                  <Box {...labelStyles}>받는 사람</Box>
+                  <Box {...dataStyles}>{orderInfo.receiver}</Box>
+                  <Box {...labelStyles}>휴대폰 번호</Box>
+                  <Box {...dataStyles}>
+                    {formatPhoneNumber(orderInfo.phone)}
+                  </Box>
+                  <Box {...labelStyles}>이메일</Box>
+                  <Box {...dataStyles}>{orderInfo.email}</Box>
+                  <Box {...labelStyles}>배송지</Box>
+                  <Box {...dataStyles}>
+                    {orderInfo.address} ({orderInfo.postalCode})
+                  </Box>
+                  <Box {...labelStyles}>배송 시 요청사항</Box>
+                  <Box {...dataStyles}>
+                    {orderInfo.requirement === ""
+                      ? "없음"
+                      : orderInfo.requirement}
+                  </Box>
+                </>
+              )}
+              <Box gridColumn="span 2" textAlign="center">
+                <IconButton
+                  variant="ghost"
+                  w="full"
+                  onClick={toggleAdditionalInfo}
+                  icon={
+                    showAdditionalInfo ? (
+                      <FontAwesomeIcon icon={faChevronUp} />
+                    ) : (
+                      <FontAwesomeIcon icon={faChevronDown} />
+                    )
+                  }
+                />
+              </Box>
             </SimpleGrid>
           </CardBody>
           <CardFooter display="flex" justifyContent="center">
             <ButtonGroup justifyContent="center" w="full">
-              <Button w="40%">영수증 인쇄</Button>
-              <Button w="40%" onClick={() => cancelOrderRequest()}>
+              <Button w="40%" onClick={() => navigate(-1)}>
+                돌아가기
+              </Button>
+              <Button
+                w="40%"
+                colorScheme="red"
+                onClick={() => cancelOrderRequest()}
+                isDisabled={
+                  orderInfo.order_status === "CANCELED" ||
+                  orderInfo.order_status === "CANCEL_WAIT"
+                }
+              >
                 주문 취소하기
               </Button>
             </ButtonGroup>

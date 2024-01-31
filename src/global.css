@@ -25,3 +25,7 @@ body {
     padding-bottom: 100%;
     object-fit: cover;
 }
+
+.specialHeadings {
+    font-family: 'GmarketSansMedium';
+}
