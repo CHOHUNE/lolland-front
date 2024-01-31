@@ -11,9 +11,7 @@ import {
   Divider,
   Flex,
   Heading,
-  HStack,
   Image,
-  Input,
   Select,
   SimpleGrid,
   Spacer,
@@ -24,7 +22,6 @@ import {
   TableContainer,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
@@ -33,148 +30,19 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import {
-  faAngleLeft,
-  faAngleRight,
-  faCaretDown,
-  faEye,
-  faImage,
-  faSearch,
-  faThumbsUp,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { LoginContext } from "../../component/LoginProvider";
-import { AddIcon, ChatIcon, StarIcon } from "@chakra-ui/icons";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination as SwiperPagination } from "swiper/modules";
-import YouTube from "react-youtube";
-
-function PageButton({ variant, pageNumber, children }) {
-  const [params] = useSearchParams();
-  const navigate = useNavigate();
-
-  function handleClick() {
-    params.set("p", pageNumber);
-    navigate("/gameboard/list?" + params);
-  }
-
-  return (
-    <Button variant={variant} onClick={handleClick}>
-      {children}
-    </Button>
-  );
-}
-
-function Pagination({ pageInfo }) {
-  const pageNumbers = [];
-
-  const navigate = useNavigate();
-
-  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
-    pageNumbers.push(i);
-  }
-
-  return (
-    <Center mt={5} mb={40}>
-      <Box>
-        {pageInfo.prevPageNumber && (
-          <PageButton variant="ghost" pageNumber={pageInfo.prevPageNumber}>
-            <FontAwesomeIcon icon={faAngleLeft} />
-          </PageButton>
-        )}
-
-        {pageNumbers.map((pageNumber) => (
-          <PageButton
-            key={pageNumber}
-            variant={
-              pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
-            }
-            pageNumber={pageNumber}
-          >
-            {pageNumber}
-          </PageButton>
-        ))}
-
-        {pageInfo.nextPageNumber && (
-          <PageButton variant="ghost" pageNumber={pageInfo.nextPageNumber}>
-            <FontAwesomeIcon icon={faAngleRight} />
-          </PageButton>
-        )}
-      </Box>
-    </Center>
-  );
-}
-
-function SearchComponent() {
-  const [keyword, setKeyword] = useState("");
-  const [category, setCategory] = useState("all");
-  const [sortBy, setSortBy] = useState("");
-  const navigate = useNavigate();
-
-  function handleSearch() {
-    // /?k=keyword&c=all
-    const params = new URLSearchParams();
-    params.set("k", keyword);
-    params.set("c", category);
-    params.set("s", sortBy);
-
-    navigate("/gameboard/list?" + params); // 경로 수정
-  }
-
-  const buttonStyle = {
-    background: "black",
-    color: "whitesmoke",
-    shadow: "1px 1px 3px 1px #dadce0",
-    _hover: {
-      backgroundColor: "whitesmoke",
-      color: "black",
-      transition:
-        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
-      shadow: "1px 1px 3px 1px #dadce0 inset",
-    },
-  };
-
-  return (
-    <Flex mt={"10px"}>
-      <Box>
-        <Select
-          defaultValue="default"
-          w={"120px"}
-          onChange={(e) => setSortBy(e.target.value)}
-        >
-          <option value="">최신순</option>
-          <option value="count_like">추천순</option>
-          <option value="board_count">조회수순</option>
-        </Select>
-      </Box>
-      <Box>
-        <Select
-          defaultValue="all"
-          w={"100px"}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="all">전체</option>
-          <option value="title">제목</option>
-          <option value="content">본문</option>
-        </Select>
-      </Box>
-
-      <Input
-        ml={2}
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-      />
-      <Button onClick={handleSearch} {...buttonStyle}>
-        검색
-      </Button>
-    </Flex>
-  );
-}
+import { ChatIcon } from "@chakra-ui/icons";
+import { GameBoardPagination } from "./GameBoardPagination";
+import { SearchComponent } from "./SearchComponent";
+import { GameBoardListArticle } from "./GameBoardListArticle";
+import { GameBoardListYouTube } from "./GameBoardListYouTube";
+import { GameBoardListTop6 } from "./GameBoardListTop6";
 
 function GameBoardList() {
   const [gameBoardList, setGameBoardList] = useState(null);
   const [notice, setNotice] = useState(null);
-  const [top, setTop] = useState(null);
   const [today, setToday] = useState(null);
 
   const [params] = useSearchParams();
@@ -186,21 +54,6 @@ function GameBoardList() {
   const { isAuthenticated } = useContext(LoginContext);
   const toast = useToast();
 
-  const [naver, setNaver] = useState(null);
-
-  const buttonStyle = {
-    background: "black",
-    color: "whitesmoke",
-    shadow: "1px 1px 3px 1px #dadce0",
-    _hover: {
-      backgroundColor: "whitesmoke",
-      color: "black",
-      transition:
-        "background 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out",
-      shadow: "1px 1px 3px 1px #dadce0 inset",
-    },
-  };
-
   useEffect(() => {
     // params.set("s", sortBy);
 
@@ -211,72 +64,29 @@ function GameBoardList() {
   }, [location, isAuthenticated, sortBy]);
 
   useEffect(() => {
-    axios.get("/api/gameboard/list/notice").then((response) => {
-      setNotice(response.data);
-    });
-  }, []);
-
-  useEffect(() => {
-    axios
-      .get("/api/gameboard/list/top")
-      .then((response) => setTop(response.data));
-  }, []);
-
-  useEffect(() => {
-    axios
-      .get("/api/gameboard/list/today")
-      .then((response) => setToday(response.data));
-  }, []);
-
-  useEffect(() => {
-    axios.get("/api/gameboard/naver").then((response) => {
-      setNaver(response.data);
-    });
-  }, []);
-
-  useEffect(() => {
     params.set("s", sortBy);
     navigate("/gameboard/list?" + params);
   }, [sortBy]);
 
-  const opts = {
-    width: "100%",
-    height: "100%",
-    playerVars: {
-      autoplay: 0,
-    },
-  };
-
-  const [searchedVideos, setSearchedVideos] = useState([]);
-
+  // today, notice
   useEffect(() => {
-    const params = {
-      key: process.env.REACT_APP_YOUTUBE_API_KEY,
-      q: "게임 리뷰",
-      part: "snippet",
-      type: "video",
-      maxResults: 4,
-      fields: "items(id, snippet(title))",
-      videoEmbeddable: true,
-    };
+    axios
+      .get("/api/gameboard/list/today")
+      .then((response) => setToday(response.data));
 
     axios
-      .get("https://www.googleapis.com/youtube/v3/search", {
-        params,
-      })
-      .then((response) => {
-        const videos = response.data.items.map((item) => {
-          return {
-            videoId: item.id.videoId,
-            title: item.snippet.title,
-          };
-        });
-
-        setSearchedVideos(videos);
-      });
+      .get("/api/gameboard/list/notice")
+      .then((response) => setNotice(response.data));
   }, []);
 
-  // 비동기 함수 정의
+  // 각 카테고리에 대한 색상 매핑
+  const categoryColors = {
+    "리그 오브 레전드": "green",
+    "로스트 아크": "blue",
+    "콘솔 게임": "purple",
+    "모바일 게임": "orange",
+    자유: "gray",
+  };
 
   if (gameBoardList === null || pageInfo === null) {
     return <Spinner />;
@@ -287,159 +97,11 @@ function GameBoardList() {
       <Flex>
         <Center w={"100%"}>
           <VStack w={"100%"} ml={"10%"}>
-            <Heading as="h2" size="lg" my={"15px"}>
-              BEST 게시판
+            <Heading as="h2" size="lg" my={"5"}>
+              화제의 게시물
             </Heading>
-            {/*추가 할 부분 */}
-
-            <SimpleGrid
-              columns={3}
-              spacing={4}
-              w={"80%"}
-              h={"800px"}
-              mb={"30px"}
-              ml={"2.5%"}
-            >
-              {top &&
-                top.map((topTen) => (
-                  <Box
-                    w="90%"
-                    h={"100%"}
-                    borderWidth="1px"
-                    borderRadius="lg"
-                    overflow="hidden"
-                    boxSizing="content-box"
-                    shadow={"1px 1px 3px 1px #dadce0"}
-                  >
-                    <Box
-                      position="relative"
-                      w={"100%"}
-                      h={"75%"}
-                      style={{ overflow: "hidden" }}
-                    >
-                      <Swiper
-                        slidesPerView={1}
-                        pagination={{
-                          clickable: true,
-                        }}
-                        modules={[Navigation, SwiperPagination]}
-                        className="mySwiper"
-                      >
-                        {topTen.files.map((file) => (
-                          <SwiperSlide key={file.id}>
-                            <Image
-                              src={file.file_url}
-                              alt={file.file_name}
-                              objectFit={"cover"}
-                              boxSize={"100%"}
-                              css={{
-                                transition: "transform 0.3s ease-in-out", // 변환 애니메이션 적용
-                                "&:hover": {
-                                  transform: "scale(1.1)", // 확대 효과
-                                },
-                              }}
-                              onClick={() =>
-                                navigate("/gameboard/id/" + topTen.id)
-                              }
-                              _hover={{ cursor: "pointer" }}
-                            />
-                          </SwiperSlide>
-                        ))}
-                      </Swiper>
-                    </Box>
-
-                    <Box p="5">
-                      <Box display="flex" alignItems="baseline">
-                        <Badge
-                          borderRadius="full"
-                          style={{ fontSize: "1.2em" }}
-                          colorScheme="teal"
-                        >
-                          {topTen.category}
-                        </Badge>
-                        <Badge
-                          colorScheme="green"
-                          variant="outline"
-                          mx={"2px"} // Adjusted spacing around Badge
-                          fontWeight={"bold"}
-                          borderRadius={"full"}
-                          style={{ fontSize: "1.2em" }}
-                          bgColor={`rgba(0, 128, 0, ${topTen.count_like / 10})`}
-                        >
-                          {topTen.count_like}
-                          <FontAwesomeIcon icon={faThumbsUp} />
-                        </Badge>
-                        <Text color={"grey"} ml={"2%"}>
-                          {new Date(topTen.reg_time).toLocaleDateString(
-                            "ko-KR",
-                            {
-                              year: "2-digit",
-                              month: "2-digit",
-                              day: "2-digit",
-                            },
-                          )}
-                        </Text>
-                        <Spacer />
-                        <Box display="flex">
-                          {topTen.count_comment !== 0 && (
-                            <Badge
-                              colorScheme={"green"}
-                              variant="outline"
-                              mx={"2%"}
-                              borderRadius={"full"}
-                              style={{ fontSize: "1.1em" }}
-                            >
-                              {topTen.count_comment}
-                              <ChatIcon />
-                            </Badge>
-                          )}
-
-                          {topTen.countFile !== 0 && (
-                            <Badge
-                              mx={"2%"}
-                              borderRadius="full"
-                              style={{ fontSize: "1.1em" }}
-                            >
-                              {topTen.countFile}
-                              <FontAwesomeIcon icon={faImage} />
-                            </Badge>
-                          )}
-                          {topTen.countFile !== 0 && (
-                            <Badge
-                              mx={"2%"}
-                              borderRadius="full"
-                              style={{ fontSize: "1.1em" }}
-                            >
-                              {topTen.board_count}
-                              <FontAwesomeIcon icon={faEye} />
-                            </Badge>
-                          )}
-                        </Box>
-                      </Box>
-
-                      <Box
-                        mt="1"
-                        fontWeight="semibold"
-                        as="h4"
-                        lineHeight="tight"
-                        noOfLines={1}
-                        fontSize={"1.2rem"}
-                        display={"flex"}
-                        onClick={() => navigate("/gameboard/id/" + topTen.id)}
-                        _hover={{ cursor: "pointer" }}
-                      >
-                        {topTen.title}
-                        <Spacer />
-                        {topTen.member_id}
-                      </Box>
-
-                      <Box display="flex" mt="2" alignItems="center"></Box>
-                    </Box>
-                  </Box>
-                ))}
-            </SimpleGrid>
-
-            {/* 그 외의 게시물 게시판 */}
+            {/*TOP6 삽입 부분*/}
+            <GameBoardListTop6 />
             <Center>
               <Heading as="h2" size="lg" my={"15px"}>
                 일반 게시물
@@ -464,22 +126,34 @@ function GameBoardList() {
                 </Button>
 
                 <Button
-                  onClick={() => navigate("?k=잡담")}
+                  onClick={() => navigate("?k=리그 오브 레전드")}
                   _hover={{ bgColor: "whitesmoke", color: "black" }}
                 >
-                  잡담
+                  리그 오브 레전드
                 </Button>
                 <Button
-                  onClick={() => navigate("?k=질문")}
+                  onClick={() => navigate("?k=로스트 아크")}
                   _hover={{ bgColor: "whitesmoke", color: "black" }}
                 >
-                  질문
+                  로스트 아크
                 </Button>
                 <Button
-                  onClick={() => navigate("?k=정보")}
+                  onClick={() => navigate("?k=콘솔 게임")}
                   _hover={{ bgColor: "whitesmoke", color: "black" }}
                 >
-                  정보
+                  콘솔 게임
+                </Button>
+                <Button
+                  onClick={() => navigate("?k=모바일 게임")}
+                  _hover={{ bgColor: "whitesmoke", color: "black" }}
+                >
+                  모바일 게임
+                </Button>
+                <Button
+                  onClick={() => navigate("?k=자유")}
+                  _hover={{ bgColor: "whitesmoke", color: "black" }}
+                >
+                  자유
                 </Button>
                 <Spacer />
                 <Stack spacing={3}>
@@ -601,7 +275,11 @@ function GameBoardList() {
                             </Badge>
                           </Td>
                           <Td w="5%" pl={"0"}>
-                            {noticies.category}
+                            <Badge
+                              colorScheme={categoryColors[noticies.category]}
+                            >
+                              {noticies.category}
+                            </Badge>
                           </Td>
                           <Td
                             w="40%"
@@ -665,7 +343,9 @@ function GameBoardList() {
                           </Td>
 
                           <Td w="5%" pl="0">
-                            {board.category}
+                            <Badge colorScheme={categoryColors[board.category]}>
+                              {board.category}
+                            </Badge>
                           </Td>
                           <Td
                             w="40%"
@@ -718,7 +398,7 @@ function GameBoardList() {
             <Center>
               <VStack>
                 <SearchComponent />
-                <Pagination pageInfo={pageInfo} />
+                <GameBoardPagination pageInfo={pageInfo} />
               </VStack>
             </Center>
           </VStack>
@@ -727,24 +407,36 @@ function GameBoardList() {
         <Box w={"25%"} margin={"15px auto"} mr={"5%"}>
           <Card shadow={"1px 1px 3px 1px #dadce0"}>
             <CardHeader>
-              <Heading size="md">오늘의 BEST</Heading>
+              <Heading fontSize={"1.5rem"} textAlign={"center"}>
+                오늘의 BEST 게시물
+              </Heading>
             </CardHeader>
 
             <CardBody>
               <Stack divider={<StackDivider />} spacing="4">
                 {today &&
-                  today.map((todayPost) => (
+                  today.map((todayPost, index) => (
                     <Box key={todayPost.id}>
-                      <Heading
-                        size="xs"
-                        textTransform="uppercase"
-                        _hover={{ cursor: "pointer" }}
-                        onClick={() =>
-                          navigate("/gameboard/id/" + todayPost.id)
-                        }
-                      >
-                        {todayPost.title}
-                      </Heading>
+                      <Flex align={"center"}>
+                        <Badge
+                          variant={"subtle"}
+                          colorScheme={"green"}
+                          mr={"2"}
+                        >
+                          {" "}
+                          {index + 1} 위{" "}
+                        </Badge>
+                        <Heading
+                          size="xs"
+                          textTransform="uppercase"
+                          _hover={{ cursor: "pointer" }}
+                          onClick={() =>
+                            navigate("/gameboard/id/" + todayPost.id)
+                          }
+                        >
+                          {todayPost.title}
+                        </Heading>
+                      </Flex>
                     </Box>
                   ))}
               </Stack>
@@ -752,61 +444,12 @@ function GameBoardList() {
           </Card>
           <br />
           <br />
-          <Card>
-            <CardHeader size={"md"}>
-              <Heading>화제의 게임 동영상</Heading>
-            </CardHeader>
-            <CardBody>
-              <div
-                style={{
-                  margin: 20,
-                  display: "flex",
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  width: "80%",
-                }}
-              >
-                {searchedVideos.map((item) => (
-                  <Box key={item.videoId}>
-                    <YouTube videoId={item.videoId} opts={opts} />
-                    <div style={{ width: 280 }}>
-                      {item.title.replace(/&QUOT;/gi, '"')}
-                    </div>
-                  </Box>
-                ))}
-              </div>
-            </CardBody>
-          </Card>
+          {/*<GameBoardListYouTube />*/}
+          {/*TODO : 할당량 초과시 주석 처리*/}
           <br />
           <Box>
             <Divider orientation="horizontal" color={"orange"} />
-            <Card shadow={"1px 1px 3px 1px #dadce0"}>
-              <CardHeader>
-                <Heading size="md">게임 관련 최신 기사</Heading>
-              </CardHeader>
-
-              <CardBody>
-                <Stack divider={<StackDivider />} spacing="4">
-                  {naver &&
-                    naver.items !== null &&
-                    naver.items.map((news) => (
-                      <Box key={news.link}>
-                        <Heading
-                          size="xs"
-                          textTransform="uppercase"
-                          _hover={{ cursor: "pointer" }}
-                          onClick={() => window.open(news.link, "_blank")}
-                        >
-                          {news.title
-                            .replace(/&quot;/g, "") // &quot; 제거
-                            .replace(/<b>/g, "") // <b> 제거
-                            .replace(/<\/b>/g, "") + "..."}
-                        </Heading>
-                      </Box>
-                    ))}
-                </Stack>
-              </CardBody>
-            </Card>
+            <GameBoardListArticle />
           </Box>
         </Box>
       </Flex>

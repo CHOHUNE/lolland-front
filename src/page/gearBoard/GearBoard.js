@@ -54,7 +54,8 @@ export function GearBoard() {
   }
 
   return (
-    <Box>
+    <Box w={"80%"} textAlign={"center"} m={"0 auto"}>
+      <br />
       <h1>게임 장비 게시판</h1>
       <VStack spacing={2} align="start">
         <FormControl>
@@ -81,6 +82,7 @@ export function GearBoard() {
       <FormControl>
         <FormLabel>컨텐츠</FormLabel>
         <Textarea
+          style={{ height: "200px" }}
           value={gear_content}
           onChange={(e) => setGear_content(e.target.value)}
         />
@@ -93,11 +95,12 @@ export function GearBoard() {
           accept="image/*"
           onChange={(e) => setUploadFiles(e.target.files)}
         />
+        <br />
         <FormHelperText>
           한 개 파일은 1MB 이내, 총 용량으 10MB 이내로 첨부 하세요.
         </FormHelperText>
       </FormControl>
-
+      <br />
       <Button
         isDisabled={isSubmitting}
         onClick={handleSave}

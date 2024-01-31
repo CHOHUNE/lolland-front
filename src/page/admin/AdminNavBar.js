@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChartLine,
   faComment,
+  faCommentsDollar,
   faPeopleGroup,
   faPlus,
   faTableList,
@@ -85,6 +86,13 @@ export function AdminNavBar() {
               {...buttonStyle}
               icon={<FontAwesomeIcon icon={faPeopleGroup} />}
               onClick={() => navigate("/adminPage/memberList")}
+            />
+          </Tooltip>
+          <Tooltip hasArrow label="취소 요청" placement="right">
+            <IconButton
+              {...buttonStyle}
+              icon={<FontAwesomeIcon icon={faCommentsDollar} />}
+              onClick={() => navigate("/adminPage/cancelReqList")}
             />
           </Tooltip>
         </VStack>

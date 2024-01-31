@@ -1,40 +1,51 @@
-import React, { useEffect, useRef, useState } from "react";
-import { nanoid } from "nanoid";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { loadPaymentWidget } from "@tosspayments/payment-widget-sdk";
-import { Box, Button, ButtonGroup, Checkbox, Heading } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Checkbox,
+  Heading,
+  useToast,
+} from "@chakra-ui/react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { LoginContext } from "../../component/LoginProvider";
+import axios from "axios";
 
 const apiKey = process.env.REACT_APP_TOSS_CLIENT_KEY;
-const orderId = nanoid();
 
 function PaymentPage() {
+  const location = useLocation();
+  const { id, order_nano_id, order_name, customer_name, email, phone, amount } =
+    location.state;
+
   const [paymentWidget, setPaymentWidget] = useState(null);
-  const [orderInfo, setOrderInfo] = useState(null);
   const paymentMethodsWidgetRef = useRef(null);
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState(amount);
   const navigate = useNavigate();
+  const toast = useToast();
+  const { isAuthenticated } = useContext(LoginContext);
 
   useEffect(() => {
-    const storedOrderDetail = localStorage.getItem("orderDetail");
-    if (storedOrderDetail) {
-      const parsedOrderDetail = JSON.parse(storedOrderDetail);
-      setOrderInfo(parsedOrderDetail);
-      setPrice(parsedOrderDetail.price);
+    if (isAuthenticated()) {
+      const fetchPaymentWidget = async () => {
+        try {
+          const loadedWidget = await loadPaymentWidget(apiKey, order_nano_id);
+          setPaymentWidget(loadedWidget);
+        } catch (error) {
+          console.error("Error fetching payment widget:", error);
+          navigate("/pay");
+        }
+      };
+      fetchPaymentWidget();
     } else {
-      console.log("아무런 주문 정보가 저장되어있지 않습니다");
+      toast({
+        title: "권한이 없습니다",
+        description: "다시 로그인 해주세요",
+        status: "error",
+      });
+      navigate("/");
     }
-  }, []);
-
-  useEffect(() => {
-    const fetchPaymentWidget = async () => {
-      try {
-        const loadedWidget = await loadPaymentWidget(apiKey, orderId);
-        setPaymentWidget(loadedWidget);
-      } catch (error) {
-        console.error("Error fetching payment widget:", error);
-      }
-    };
-    fetchPaymentWidget();
   }, []);
 
   useEffect(() => {
@@ -67,11 +78,11 @@ function PaymentPage() {
     // 결제 과정에서 악의적으로 결제 금액 변동 유무를 확인
     try {
       await paymentWidget?.requestPayment({
-        orderId: orderId,
-        orderName: orderInfo.orderName,
-        customerName: orderInfo.orderMember,
-        customerEmail: orderInfo.customerEmail,
-        customerMobilePhone: orderInfo.customerMobilePhone,
+        orderId: order_nano_id,
+        orderName: order_name,
+        customerName: customer_name,
+        customerEmail: email,
+        customerMobilePhone: phone,
         successUrl: `${window.location.origin}/success`,
         failUrl: `${window.location.origin}/fail`,
         _skipAuth: "FORCE_SUCCESS",
@@ -80,6 +91,27 @@ function PaymentPage() {
       console.error("Error requesting payment:", error);
     }
   };
+
+  function handleOrderCancel() {
+    axios
+      .post("/api/payment/toss/cancel", {
+        orderId: order_nano_id,
+      })
+      .then((response) => {
+        toast({
+          title: "주문이 성공적으로 취소되었습니다",
+          status: "success",
+        });
+        navigate("/");
+      })
+      .catch((error) => {
+        toast({
+          title: "취소 도중 에러가 발생했습니다",
+          description: "다시 한 번 시도해주시거나, 관리자에게 문의해주세요",
+          status: "error",
+        });
+      });
+  }
 
   return (
     <div
@@ -116,6 +148,7 @@ function PaymentPage() {
           onClick={() => {
             localStorage.removeItem("orderDetail");
             localStorage.removeItem("purchaseInfo");
+            handleOrderCancel();
             navigate("/");
           }}
         >

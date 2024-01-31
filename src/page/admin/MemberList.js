@@ -245,7 +245,6 @@ export function MemberList() {
 
   // 삭제 버튼 클릭시 동작
   const handleMemberDeleteClick = (e) => {
-    console.log(e);
     setSelectMember(e);
     onOpen();
   };
@@ -275,7 +274,7 @@ export function MemberList() {
 
   return (
     <Center>
-      <Card shadow={"1px 1px 3px 1px #dadce0"}>
+      <Card shadow={"1px 1px 3px 1px #dadce0"} mt={6} mb={6}>
         <CardHeader
           mt={4}
           textAlign={"center"}

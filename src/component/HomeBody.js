@@ -134,7 +134,7 @@ export function HomeBody() {
 
   // -------------------------------- 커뮤니티 뉴스API 가져오기 --------------------------------
   useEffect(() => {
-    axios.get("/api/gameboard/naver").then((response) => {
+    axios.get("/api/gameboard/pc").then((response) => {
       setNaver(response.data);
     });
   }, []);

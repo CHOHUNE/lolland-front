@@ -10,18 +10,19 @@ function SuccessPage() {
 
   // 수량, 고객번호, 고유 나노아이디, 주문명, 고객명
 
-  ///success?paymentType={PAYMENT_TYPE}&orderId={ORDER_ID}&paymentKey={PAYMENT_KEY}&amount={AMOUNT}
+  ///payment?paymentType={PAYMENT_TYPE}&orderId={ORDER_ID}&paymentKey={PAYMENT_KEY}&amount={AMOUNT}
 
   useEffect(() => {
     const requestData = {
       orderId: searchParams.get("orderId"),
-      amount: searchParams.get("quantity"),
+      amount: searchParams.get("amount"),
       paymentKey: searchParams.get("paymentKey"),
     };
+    console.log(requestData);
     async function confirm() {
       try {
         const response = await axios.post(
-          "/payment/toss/success",
+          "/api/payment/toss/success",
           requestData,
           {
             headers: {
@@ -29,12 +30,14 @@ function SuccessPage() {
             },
           },
         );
-        // 결제 성공 비즈니스 로직 TODO: 백엔드로 전송
-        navigate("/");
       } catch (error) {
+        console.log(error);
         if (error.response) {
           const { code, message } = error.response.data;
           navigate(`/fail?message=${message}&code=${code}`);
+        } else {
+          console.error("Unexpected error:", error.message);
+          navigate("/fail?message=INTERNAL_SERVER_ERROR&code=500");
         }
       }
     }

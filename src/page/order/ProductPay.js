@@ -38,8 +38,10 @@ import { parse } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCreditCard, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { LoginContext } from "../../component/LoginProvider";
+import { nanoid } from "nanoid";
 
 export function ProductPay() {
+  const orderId = nanoid();
   const [addressOption, setAddressOption] = useState("회원 정보와 동일");
   const [purchaseInfo, setPurchaseInfo] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -49,8 +51,9 @@ export function ProductPay() {
   const [orderName, setOrderName] = useState("");
   const [requirement, setRequirement] = useState("");
   const [dataFetched, setDataFetched] = useState(false);
-  const { isAuthenticated } = useContext(LoginContext);
+  const { isAuthenticated, hasAccess } = useContext(LoginContext);
   const toast = useToast();
+  const [memberLoginId, setMemberLoginId] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false); // 주소목록 모달창
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -63,6 +66,7 @@ export function ProductPay() {
   const closeModal = () => setIsModalOpen(false);
 
   const [userInfo, setUserInfo] = useState({
+    orderMemberLoginId: "",
     orderMember: "",
     receiver: "",
     contact: "",
@@ -133,6 +137,7 @@ export function ProductPay() {
         setContactLast(contactParts[2]);
       }
       setUserInfo({
+        orderMemberLoginId: data.member_login_id,
         orderMember: data.member_name,
         receiver: data.member_name,
         contact: data.member_phone_number,
@@ -302,21 +307,48 @@ export function ProductPay() {
   }
 
   // ------------------------------ 주문 정보 로컬 스토리지에 저장 ------------------------------
-  function handlePayment() {
-    const orderData = {
-      orderName: orderName,
-      price: totalPrice,
-      quantity: totalQuantity,
-      customerName: userInfo.orderMember,
-      customerEmail: userInfo.email,
-      customerMobilePhone: `${contactFirst}${contactMiddle}${contactLast}`,
-      receiver: userInfo.receiver,
-      address: `${userInfo.basicAddress} ${userInfo.detailAddress}`,
-      postalCode: userInfo.postalCode,
-      requirement: requirement,
-    };
-    localStorage.setItem("orderDetail", JSON.stringify(orderData));
-    navigate("/payment");
+  async function handlePayment() {
+    console.log(purchaseInfo);
+    if (hasAccess(userInfo.orderMemberLoginId)) {
+      //본인 일치 확인
+      // 주문 정보 생성
+      const orderData = {
+        orderId: orderId,
+        orderName: orderName,
+        totalPrice: totalPrice + 3000.0,
+        member_login_id: userInfo.orderMemberLoginId,
+        customerName: userInfo.orderMember,
+        customerEmail: userInfo.email,
+        customerMobilePhone: `${contactFirst}${contactMiddle}${contactLast}`,
+        receiver: userInfo.receiver,
+        address: `${userInfo.basicAddress} ${userInfo.detailAddress}`,
+        postalCode: userInfo.postalCode,
+        requirement: requirement,
+        productAndOptionDto: purchaseInfo.flatMap((group) =>
+          group.options.map((option) => ({
+            product_id: group.productId,
+            option_id: option.optionId,
+            quantity: option.quantity,
+          })),
+        ),
+      };
+      // 서버에 저장
+      const response = await axios.post("/api/payment/toss", orderData);
+      console.log(response);
+
+      // 응답 데이터를 사용하여 Payment페이지로 넘기기
+      navigate("/payment", {
+        state: {
+          ...response.data,
+        },
+      });
+    } else {
+      toast({
+        title: "권한이 없습니다",
+        description: "재로그인 해주세요",
+        status: "warning",
+      });
+    }
   }
 
   return (
