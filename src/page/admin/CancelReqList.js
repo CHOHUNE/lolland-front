@@ -101,7 +101,7 @@ export function CancelReqList() {
 
         <SimpleGrid columns={3} spacing={2}>
           {cancelReqList.map((cancelList) => (
-            <CardBody key={cancelList.id} mb={14}>
+            <CardBody key={cancelList.id}>
               <Box
                 margin="auto"
                 p={5}
@@ -203,17 +203,7 @@ export function CancelReqList() {
             <FontAwesomeIcon icon={faCaretLeft} />
           </Button>
           {/*)}*/}
-          {/*{pageNumbers.map((pageNumber) => (*/}
-          {/*  <AdminMemberPageButton*/}
-          {/*    pageBg={listPage === pageNumber.toString() ? "black" : "white"}*/}
-          {/*    pageColor={listPage === pageNumber.toString() ? "white" : "black"}*/}
-          {/*    pageHove={{ backgroundColor: "black", color: "whitesmoke" }}*/}
-          {/*    key={pageNumber}*/}
-          {/*    pageNumber={pageNumber}*/}
-          {/*  >*/}
-          {/*    {pageNumber}*/}
-          {/*  </AdminMemberPageButton>*/}
-          {/*))}*/}
+
           {/*{pageInfo.nextPageNumber && (*/}
           <Button
             bg={"white"}
