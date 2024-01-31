@@ -48,6 +48,7 @@ export function CancelReqList() {
 
   const [cancelReqList, setCancelReqList] = useState([]);
   const [pageInfo, setPageInfo] = useState("");
+  const [refundStatus, setRefundStatus] = useState(false);
 
   const toast = useToast();
   const navigate = useNavigate();
@@ -75,8 +76,11 @@ export function CancelReqList() {
             status: "error",
           });
         }
+      })
+      .finally(() => {
+        setRefundStatus(false);
       });
-  }, [location]);
+  }, [location, refundStatus]);
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear().toString().substr(2); // 2024를 24로 변환
@@ -89,7 +93,25 @@ export function CancelReqList() {
   };
 
   // 환불 버튼 클릭시 로직
-  const handleRefundClick = (id) => {};
+  const handleRefundClick = (cancelInfo) => {
+    axios
+      .post("/api/payment/toss/cancel", {
+        orderId: cancelInfo.order_nano_id,
+      })
+      .then(() =>
+        toast({
+          description: cancelInfo.order_name + "이 환불 처리 되었습니다.",
+          status: "success",
+        }),
+      )
+      .then(() => setRefundStatus(true))
+      .catch(() => {
+        toast({
+          description: "환불 처리 중 문제가 발생하였습니다.",
+          status: "error",
+        });
+      });
+  };
 
   return (
     <Center>
@@ -143,8 +165,13 @@ export function CancelReqList() {
                       />
                     </Box>
                     <Box textAlign={"left"}>
-                      <Text>{cancelList.order_name}</Text>
-                      <Text mt={2}>{cancelList.total_price} 원</Text>
+                      <Text fontSize={"1rem"}>{cancelList.order_name}</Text>
+                      <Flex mt={2} gap={1} fontSize={"1rem"}>
+                        <Text fontWeight={"bold"} color={"orangered"}>
+                          {cancelList.total_price.toLocaleString()}
+                        </Text>
+                        원
+                      </Flex>
                     </Box>
                   </Flex>
                 </Box>
@@ -183,7 +210,7 @@ export function CancelReqList() {
                         h={"40px"}
                         {...buttonStyle}
                         onClick={() => {
-                          handleRefundClick(cancelList.id);
+                          handleRefundClick(cancelList);
                         }}
                       >
                         환불
