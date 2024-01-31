@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardBody,
+  CardFooter,
   CardHeader,
   Center,
   Flex,
@@ -21,7 +22,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCaretLeft,
+  faCaretRight,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -77,6 +82,9 @@ export function CancelReqList() {
 
     return `${year}년 ${month}월 ${day}일 / ${hours}시${minutes}분`;
   };
+
+  // 환불 버튼 클릭시 로직
+  const handleRefundClick = (id) => {};
 
   return (
     <Center>
@@ -165,7 +173,14 @@ export function CancelReqList() {
                     </Box>
                     <Box border={"1px solid #dadce0"}></Box>
                     <Box mt={8}>
-                      <Button w={"50px"} h={"40px"} {...buttonStyle}>
+                      <Button
+                        w={"50px"}
+                        h={"40px"}
+                        {...buttonStyle}
+                        onClick={() => {
+                          handleRefundClick(cancelList.id);
+                        }}
+                      >
                         환불
                       </Button>
                     </Box>
@@ -175,6 +190,42 @@ export function CancelReqList() {
             </CardBody>
           ))}
         </SimpleGrid>
+
+        {/* 페이지 버튼  */}
+        <Box mt={10} mb={10}>
+          {/*{pageInfo.prevPageNumber && (*/}
+          <Button
+            bg={"white"}
+            color={"black"}
+            _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+            // onClick={() => navigate("?page=" + pageInfo.prevPageNumber)}
+          >
+            <FontAwesomeIcon icon={faCaretLeft} />
+          </Button>
+          {/*)}*/}
+          {/*{pageNumbers.map((pageNumber) => (*/}
+          {/*  <AdminMemberPageButton*/}
+          {/*    pageBg={listPage === pageNumber.toString() ? "black" : "white"}*/}
+          {/*    pageColor={listPage === pageNumber.toString() ? "white" : "black"}*/}
+          {/*    pageHove={{ backgroundColor: "black", color: "whitesmoke" }}*/}
+          {/*    key={pageNumber}*/}
+          {/*    pageNumber={pageNumber}*/}
+          {/*  >*/}
+          {/*    {pageNumber}*/}
+          {/*  </AdminMemberPageButton>*/}
+          {/*))}*/}
+          {/*{pageInfo.nextPageNumber && (*/}
+          <Button
+            bg={"white"}
+            color={"black"}
+            _hover={{ backgroundColor: "black", color: "whitesmoke" }}
+            ml={2}
+            // onClick={() => navigate("?page=" + pageInfo.nextPageNumber)}
+          >
+            <FontAwesomeIcon icon={faCaretRight} />
+          </Button>
+          {/*)}*/}
+        </Box>
       </Card>
     </Center>
   );
