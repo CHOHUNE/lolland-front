@@ -289,7 +289,7 @@ export function CompanyList() {
                               key={subCategory.subcategory_id}
                               onClick={() =>
                                 handleFilter(subCategory.subcategory_id)
-                              } //TODO: 상품 여러개 생긴 후 정상적으로 작동하는지 확인
+                              }
                             >
                               {subCategory.subcategory_name}
                             </ListItem>
@@ -306,7 +306,7 @@ export function CompanyList() {
           w={{ base: "65%", md: "70%", lg: "75%", xl: "80%" }}
           display={"flex"}
           justifyContent={"center"}
-          alignItems={"center"}
+          alignItems={"flex-start"}
         >
           <Flex
             display={"flex"}
@@ -327,7 +327,7 @@ export function CompanyList() {
             >
               <Recent />
             </Box>
-            <SimpleGrid h={"100%"} w={"100%"} columns={4} spacing={5}>
+            <SimpleGrid h={"100%"} w={"100%"} columns={4} spacing={10}>
               {productList.map((product, index) => (
                 <Box
                   key={index}
@@ -351,7 +351,7 @@ export function CompanyList() {
                   <Box
                     position="relative"
                     p={5}
-                    height="200px"
+                    height="250px"
                     width="100%"
                     bg="white"
                     display={"flex"}
