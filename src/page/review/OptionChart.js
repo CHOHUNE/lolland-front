@@ -66,7 +66,8 @@ function OptionChart({ sellRateData, boxDimensions }) {
     return () => {
       chartRef.current.destroy();
     };
-  }, [sellRateData, boxDimensions]);
+  }, [sellRateData]);
+
   return <canvas id="option-chart" />;
 }
 
