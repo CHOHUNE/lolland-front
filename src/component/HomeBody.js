@@ -718,7 +718,7 @@ export function HomeBody() {
                   spacing={9}
                 >
                   {categoryProducts[category.category_id]
-                    ?.slice(0, 6)
+                    ?.slice(0, 8)
                     .map((product) => (
                       <Box
                         key={product.product_id}

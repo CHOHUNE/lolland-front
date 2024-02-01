@@ -434,28 +434,30 @@ export function ProductView() {
 
   return (
     <Box mx={"15%"} p={5}>
-      {/* ------------------------------ 상품 수정, 삭제 ------------------------------ */}
-      {isAdmin() && (
-        <Box justifyContent={"end"} display={"flex"}>
-          <Button
-            background={"black"}
-            color={"white"}
-            onClick={() => navigate("/edit/" + product_id)}
-          >
-            수정
-          </Button>
-          <Button colorScheme="red" onClick={onOpen}>
-            삭제
-          </Button>
-        </Box>
-      )}
       {/* ---------------------- 카테고리 순서 ---------------------- */}
       <Box minW={"800px"}>
-        <Box justify="center" align="start" maxW="100%" m="auto" mt={10} mb={7}>
-          <Text ml={4} fontSize={"0.9rem"}>
-            {product.category_name} > {product.subcategory_name}
-          </Text>
-        </Box>
+        <Flex mt={10} display={"flex"} justifyContent={"space-between"}>
+          <Box>
+            <Text ml={4} fontSize={"0.9rem"}>
+              {product.category_name} > {product.subcategory_name}
+            </Text>
+          </Box>
+          {/* ------------------------------ 상품 수정, 삭제 ------------------------------ */}
+          {isAdmin() && (
+            <Box justifyContent={"end"} display={"flex"}>
+              <Button
+                background={"black"}
+                color={"white"}
+                onClick={() => navigate("/edit/" + product_id)}
+              >
+                수정
+              </Button>
+              <Button colorScheme="red" onClick={onOpen}>
+                삭제
+              </Button>
+            </Box>
+          )}
+        </Flex>
         <Box justify="center" align="start" maxW="100%" m="auto">
           {/* ---------------------- 상품명 ---------------------- */}
           <Text ml={4} fontWeight={"bold"} fontSize={"1.7rem"}>
