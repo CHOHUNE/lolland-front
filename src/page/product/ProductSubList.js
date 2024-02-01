@@ -369,7 +369,7 @@ export function ProductSubList() {
         </SimpleGrid>
       </Flex>
 
-      <Center>
+      <Center mt={10}>
         <VStack>
           <SearchComponent />
           <SubCategoryPagination pageInfo={pageInfo} />
