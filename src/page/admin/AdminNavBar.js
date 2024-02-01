@@ -68,12 +68,12 @@ export function AdminNavBar() {
               }}
             />
           </Tooltip>
-          <Tooltip hasArrow label="판매 현황 보기" placement="right">
-            <IconButton
-              {...buttonStyle}
-              icon={<FontAwesomeIcon icon={faChartLine} />}
-            />
-          </Tooltip>
+          {/*<Tooltip hasArrow label="판매 현황 보기" placement="right">*/}
+          {/*  <IconButton*/}
+          {/*    {...buttonStyle}*/}
+          {/*    icon={<FontAwesomeIcon icon={faChartLine} />}*/}
+          {/*  />*/}
+          {/*</Tooltip>*/}
           <Tooltip hasArrow label="문의 답변 등록하기" placement="right">
             <IconButton
               {...buttonStyle}
