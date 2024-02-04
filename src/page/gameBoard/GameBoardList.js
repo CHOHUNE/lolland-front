@@ -444,7 +444,7 @@ function GameBoardList() {
           </Card>
           <br />
           <br />
-          {/*<GameBoardListYouTube />*/}
+          <GameBoardListYouTube />
           {/*TODO : 할당량 초과시 주석 처리*/}
           <br />
           <Box>

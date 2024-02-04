@@ -32,7 +32,7 @@ export function GameBoardListTop6() {
       {top &&
         top.map((topTen) => (
           <Box
-            w="90%"
+            w="95%"
             h={"90%"}
             borderWidth="1px"
             borderRadius="lg"
