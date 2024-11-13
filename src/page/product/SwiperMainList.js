@@ -38,21 +38,21 @@ function SwiperMainList(props) {
         <SwiperSlide>
           <Img
             style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/event/%E1%84%8B%E1%85%B5%E1%84%87%E1%85%A6%E1%86%AB%E1%84%90%E1%85%B31.jpeg"
+            src="https://myprojectsbuckets.s3.ap-northeast-2.amazonaws.com/lolland/event/%E1%84%8B%E1%85%B5%E1%84%87%E1%85%A6%E1%86%AB%E1%84%90%E1%85%B31.jpeg"
           />
         </SwiperSlide>
 
         <SwiperSlide>
           <Img
             style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/event/%E1%84%8B%E1%85%B5%E1%84%87%E1%85%A6%E1%86%AB%E1%84%90%E1%85%B32.jpeg"
+            src="https://myprojectsbuckets.s3.ap-northeast-2.amazonaws.com/lolland/event/%E1%84%8B%E1%85%B5%E1%84%87%E1%85%A6%E1%86%AB%E1%84%90%E1%85%B32.jpeg"
           />
         </SwiperSlide>
 
         <SwiperSlide>
           <Img
             style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/event/%E1%84%8B%E1%85%B5%E1%84%87%E1%85%A6%E1%86%AB%E1%84%90%E1%85%B33.jpeg"
+            src="https://myprojectsbuckets.s3.ap-northeast-2.amazonaws.com/lolland/event/%E1%84%8B%E1%85%B5%E1%84%87%E1%85%A6%E1%86%AB%E1%84%90%E1%85%B33.jpeg"
           />
         </SwiperSlide>
       </Swiper>

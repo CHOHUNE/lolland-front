@@ -37,7 +37,7 @@ function SwiperImg(props) {
       >
         <SwiperSlide>
           <Img
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/main/main1.jpeg"
+            src="https://myprojectsbuckets.s3.ap-northeast-2.amazonaws.com/lolland/main/main1.jpeg"
             alt="Slide Image"
             style={swiperStyles}
           />
@@ -46,35 +46,35 @@ function SwiperImg(props) {
         <SwiperSlide>
           <Img
             style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/main/main2.jpeg"
+            src="https://myprojectsbuckets.s3.ap-northeast-2.amazonaws.com/lolland/main/main2.jpeg"
           />
         </SwiperSlide>
 
         <SwiperSlide>
           <Img
             style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/main/main3.jpeg"
+            src="https://myprojectsbuckets.s3.ap-northeast-2.amazonaws.com/lolland/main/main3.jpeg"
           />
         </SwiperSlide>
 
         <SwiperSlide>
           <Img
             style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/main/main4.jpeg"
+            src="https://myprojectsbuckets.s3.ap-northeast-2.amazonaws.com/lolland/main/main4.jpeg"
           />
         </SwiperSlide>
 
         <SwiperSlide>
           <Img
             style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/main/main5.jpeg"
+            src="https://myprojectsbuckets.s3.ap-northeast-2.amazonaws.com/lolland/main/main5.jpeg"
           />
         </SwiperSlide>
 
         <SwiperSlide>
           <Img
             style={swiperStyles}
-            src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/main/main6.jpeg"
+            src="https://myprojectsbuckets.s3.ap-northeast-2.amazonaws.com/lolland/main/main6.jpeg"
           />
         </SwiperSlide>
       </Swiper>

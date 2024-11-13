@@ -312,7 +312,7 @@ export const ReviewView = ({ product_id, productDetailImg }) => {
       <TabPanels px={10}>
         {/* -------------------------- 상품 설명 -------------------------- */}
         <TabPanel mx="20%" alignItems={"center"} justifyContent="center">
-          <Image src="https://lollandproject0108.s3.ap-northeast-2.amazonaws.com/lolland/product/productContent/productDefault.jpeg" />
+          <Image src="https://myprojectsbuckets.s3.ap-northeast-2.amazonaws.com/lolland/product/productContent/productDefault.jpeg" />
           {productDetailImg.map((imgUri, index) => (
             <Image
               key={index}
